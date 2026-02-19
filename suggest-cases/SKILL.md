@@ -10,7 +10,7 @@ inputs:
     required: false
 ---
 
-# TASK: What I do
+## TASK: What I do
 
 Analyze existing test suites, test cases and proactively suggest new test cases that fill coverage gaps and can be use in Test Management Tool in Markdown format:
 * Analyze existing test suites, test cases or project requirements.
