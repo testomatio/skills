@@ -19,10 +19,6 @@ Analyze existing test suites, test cases and proactively suggest new test cases 
 * Improve and normalize existing tests.
 * Convert automation tests into manual test format.
 * Organize tests into suites.
-* Apply consistent test projectstructure:
-- generate safe local test_ids (with prefix `@Tsk`).
-- generate safe local suite_ids (with prefix `@Ssk`).
-- reuse existing labels and tags logically.
 (Focus on edge cases, negative scenarios, boundary conditions, error handling, security, and cross-cutting concerns)
 
 ## When to Use
