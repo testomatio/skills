@@ -1,6 +1,6 @@
 ---
 name: suggest-cases
-description: Analyze existing test suites  and suggest new test cases to improve coverage. Identify gaps in edge cases, negative scenarios, boundary values, error handling, accessibility, and performance. Generates ready-to-use test cases in Test Management system markdown format. Triggers include "suggest tests", "suggest cases", "what else should I test", "expand coverage", "missing tests", "gap analysis", "more test cases".
+description: Analyze existing test suites and suggest new test cases to improve coverage. Identify gaps in edge cases, negative scenarios, boundary values, error handling, accessibility, and performance. Generates ready-to-use test cases in Test Management system markdown format. Triggers include "suggest tests", "suggest cases", "what else should I test", "expand coverage", "missing tests", "gap analysis", "more test cases".
 inputs:
   reqDir:
     description: "Directory containing requirements (default: requirements)"
@@ -16,7 +16,6 @@ Analyze existing test suites, test cases and proactively suggest new test cases 
 * Analyze existing test suites, test cases or project requirements.
 * Detect coverage gaps.
 * Suggest new manual test cases.
-* Improve and normalize existing tests.
 * Convert automation tests into manual test format.
 * Organize tests into suites.
 (Focus on edge cases, negative scenarios, boundary conditions, error handling, security, and cross-cutting concerns)
@@ -26,7 +25,7 @@ Analyze existing test suites, test cases and proactively suggest new test cases 
 - User asks "what else should I test?".
 - User wants to expand test coverage.
 - User wants AI to identify blind spots in their test suite.
-- User mentions "suggest", "more tests", "gaps", "missing coverage", "improve test description",
+- User mentions "suggest", "more tests", "gaps", "missing coverage", "expand test coverage",
 
 ---
 
