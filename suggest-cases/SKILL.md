@@ -49,11 +49,16 @@ Fail immediately and **STOP** execution on any error:
 ## Directory Resolution
 
 Determine:
-* `reqDir` => default: `requirements`  TODO: should we have the requirement folder??? or only based on the existing one?
-* `testDir` => default: `manual-tests`
-- If you can't find the tests in `testDir`, `reqDir` with needed information or they don't exist, ask the user: `Where are the manual tests for analysis?`.
--- If the user can't give an answer => stop execution with an appropriate error.
+* `{{reqDir}}` => default: `requirements`  TODO: should we have the requirement folder??? or only based on the existing one?
+* `{{testDir}}` => default: `manual-tests`
 
+1. If `{{testDir}}` or `{{reqDir}}` exists => use it.
+2. If not:
+- Search the repository for `.md` files in directories like `test`, `tests`, `manual`, `qa`, or `spec`.
+- If found => use the most relevant directory.
+3. If still not found:
+- Ask the user:`Where are the manual tests to improve?`
+- If the user can't give an answer => stop execution with an appropriate error.
 ---
 
 ## Approach
@@ -122,7 +127,7 @@ If source code is available, analyze it for untested paths:
 
 ### 4. Generate Suggested Test Cases
 
-Load and use the template file: `templates/suggested-test-cases.md`
+Load and use the template file: `./templates/TESTOMAT_MARKDOWN_FORMAT.md`
 
 Generate test cases in Markdown format grouped by gap type.
 
