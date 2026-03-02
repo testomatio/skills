@@ -3,33 +3,36 @@ name: testomatio-sync
 description: Synchronize Markdown test scenarios between local project and Test Management Tool (Testomat.io)
 inputs:
   action:
-    description: "Operation type: pull (export from server) or push (import to server)"
-    required: true
+    description: "Operation Sync command: push | pull (optional - inferred from user intent if not provided)"
+    required: false
   testDir:
     description: "Directory for manual tests (default: manual-tests)"
     required: false
 ---
 
-## TASK: What I do
+## TESTOMATIO-SYNC SKILL: What I do
 
-A unified synchronization Test Management Tool (Testomat.io) skill that can:
+Synchronization Markdown test scenarios between local project and Testomat.io:
+- **pull**: Download test scenarios from Testomat.io to local Markdown files
+- **push**: Upload local Markdown files to Testomat.io
 
-* Pull test scenarios from management tool into a local folder in Markdown format.
-* Push Markdown test scenarios from the local project to management tool.
+If action is not provided, infer from user intent:
+- words like `pull`, `export`, `download`, `get tests` => pull action
+- words like `push`, `upload`, `sync to server`, `import` => push action
+
+If any unclear state => ask user to clarify the initial action!
 
 ---
 
 ## Error Handling
 
 Fail immediately and **STOP** execution on any error:
-
-* Missing TESTOMATIO token.
-* User refuses to provide token.
-* `.env` file cannot be created.
-* Directory creation command fails.
-* Invalid action parameter.
-* No markdown files found during push.
-* CLI sync(push/pull) command fails (network/auth/401/403/etc.).
+- No TESTOMATIO token provided or user refuses to provide token (as `.env` variable or as simple variable).
+- Cannot create `.env` file
+- Directory creation fails.
+- Invalid action parameter.
+- No markdown files found during push.
+- CLI sync(push/pull) command fails (network/auth/401/403/etc.).
 
 **Do not retry automatically**.
 **Do NOT continue after failure**.
@@ -39,184 +42,109 @@ Fail immediately and **STOP** execution on any error:
 
 ## Precondition: Environment Handling Logic
 
-### Step 0 — Validate or Create `.env`
+### Check Testomatio Token
 
-Check if `.env` exists in project root. Possible user flows:
+1. Check if `TESTOMATIO` token was provided as input.
+2. If not provided, check for `.env` file in project root for `TESTOMATIO` token.
+3. If still not found => ask user for token.
 
-#### Case 1: `.env` exists
+### Configure Testomatio env
 
-`.env` exists flow - read existing `.env` file:
-* If `TESTOMATIO` variable is missing or empty => FAIL: `WARNING: TESTOMATIO token is missing in .env file. Please add: TESTOMATIO=tstmt_your_api_key`
-- `TESTOMATIO_URL` is OPTIONAL. If missing => set and use `TESTOMATIO_URL=https://app.testomat.io/` as default one.
+| Key | Description | Default Value |
+|-----|-------------|---------------|
+| TESTOMATIO | System API token (format: tstmt_xxxxx) | Required, No default value |
+| TESTOMATIO_URL | Testomatio server url | https://app.testomat.io/   |
 
-#### Case 2.1: `.env` does NOT exist
-
-Ask the user: `TESTOMATIO token is required. Please enter your Testomat API token (format: tstmt_xxxxx):`
-
-* If user provides token: 
-- Validate it starts with `tstmt_`. If not => FAIL execution and STOP.
-- If valid token => Create `.env` in project root with:
+`TESTOMATIO` token must be available for the next steps:
+* If user does NOT provide token in `.env` file or by typing it => STOP skill immediately and return error like `ERROR: TESTOMATIO token is required. Operation aborted.`
+* If token not found, ask: `TESTOMATIO` token is required. Please enter your Testomat API token (format: tstmt_xxxxx):`
+* If token provided or defined during conversation => create/update `.env` file in project root:
 
 ```
-# if user enter `TESTOMATIO=...` only
-TESTOMATIO=tstmt_user_api_key
-
-OR
-
-# if user enter `TESTOMATIO=...` and `TESTOMATIO_URL=...
-TESTOMATIO_URL=https://your-account-testomat.io
 TESTOMATIO=tstmt_your_api_key
+...
 ```
 
-* Continue execution.
-
-> **If user does NOT provide token in `.env` file or by typing it => STOP skill immediately and return the appropriate error like `ERROR: TESTOMATIO token is required. Operation aborted.`**.
+**Continue execution if all required variables are defined**.
 
 ---
 
-## What I execute
+## What I execute - Testomatio Sync Actions
 
-### Step 1 — Determine Working Directory
+The sync process supports two operations:
+- **Pull** - Retrieve the latest test scenarios from Testomat.io and update the local project.
+- **Push** - Send local Markdown test updates to Testomat.io.
 
-Determine `testDir` directory:
-- If dir already exists => continue.
-- If dir does NOT exist => create it (use default: `testDir="manual-tests"`)
+### Pull Changes
 
-Command for folder creation:
-
-```bash
-mkdir -p {{testDir}}
-```
-
----
-
-### Step 2 — ACTION = pull
-
-#### Purpose
-
-Export tests from Testomat server into Markdown.
-
-#### Pull Execution
-
-1) Change working directory:
+1) Ensure `testDir` exists; otherwise create `manual-tests` folder in the project and use it as the working directory (`cd ...`).
+2) Download tests in Markdown format from the Testomat.io:
 
 ```bash
-cd {{testDir}}
-```
-
-2) Run **pull** command based on the system OS version:
-- If `TESTOMATIO_URL` exists in .env:
-
-```bash
-# Linux or Mac
-TESTOMATIO_URL=$TESTOMATIO_URL TESTOMATIO=$TESTOMATIO npx -y check-tests@latest pull
-
-# Windows
-set TESTOMATIO_URL=$TESTOMATIO_URL&&set TESTOMATIO=$TESTOMATIO&& npx check-tests@latest pull
-```
-- else:
-
-```bash
-# Linux or Mac
-TESTOMATIO=$TESTOMATIO npx -y check-tests@latest pull
-
-# Windows
-set TESTOMATIO=$TESTOMATIO&& npx check-tests@latest pull
+npx -y check-tests@latest pull
 ```
 
 ---
 
-### Step 2 — ACTION = push
+### Warning Before Push
 
-#### Purpose
+Before push, warn user about potential risks:
+- Save and commit local changes.
+- Pull latest changes from Testomat.io first to avoid overwriting.
+
+### Push Changes
 
 Import local Markdown tests into Test Management Tool (Testomat.io).
 
-#### Pre-Push Validation
+```bash
+npx -y check-tests@latest push
+```
 
-1. Ensure manual test directory exists.
-2. Ensure at least one test `.md` file exists.
-3. Ensure file contains valid block:
+**Pre-Push Validation**:
+1. Ensure at least one test `.md` file exists.
+2. Ensure file contains valid test blocks:
 
 ```md
 <!-- test
-id: ...
 priority: ...
+creator: ...
+tags: ...
+labels: ...
 -->
-```
-- If no valid tests found => Ask user: `No valid test blocks found. Create a sample test template? (yes/no)`. If NO => STOP execution.
+# Successful login ...
 
-#### Push Execution
+...
 
-1) Change working directory:
-
-```bash
-cd {{testDir}}
 ```
 
-2) Run **push** command after updates based on the system OS version:
-- If `TESTOMATIO_URL` exists in .env:
-
-```bash
-# Linux or Mac
-TESTOMATIO_URL=$TESTOMATIO_URL TESTOMATIO=$TESTOMATIO npx -y check-tests@latest push
-
-# Windows
-set TESTOMATIO_URL=$TESTOMATIO_URL&&set TESTOMATIO=$TESTOMATIO&& npx check-tests@latest push
-```
-- else:
-
-```bash
-# Linux or Mac
-TESTOMATIO=$TESTOMATIO npx -y check-tests@latest push
-
-# Windows
-set TESTOMATIO=$TESTOMATIO&& npx check-tests@latest push
-```
+(If no valid tests found => Return `No valid test blocks found!` message and **STOP** execution).
 
 ---
 
-#### Example Real Usage
+## Example Real Usage
 
-* User **PULL** action:
-
-```text
-Use testomatio-sync to pull tests`
+**Pull tests:**
+```
+Use testomatio-sync to pull tests
 ```
 
-* User **PULL** action to custom user testDir:
-
-```text
-Use testomatio-sync to pull tests in folder `testDir="manual-tests"`
+**Pull with custom folder:**
+```
+Use testomatio-sync to pull tests in folder "manual-tests"
 ```
 
-OR
-
-```text
-Use testomatio-sync to pull test files in folder `testDir="manual-tests" by TESTOMATIO=tstmt_xxx and TESTOMATIO_URL=https://app.testomat.io`
+**Push tests:**
+```
+Use testomatio-sync to push tests
 ```
 
-- Executed command:
-
-```bash
-# Linux or Mac
-TESTOMATIO_URL=https://app.testomat.io TESTOMATIO=tstmt_your_api_key npx -y check-tests@latest pull
+**With custom token:**
+```
+Use testomatio-sync to push tests with TESTOMATIO=tstmt_xxx
 ```
 
-- Result:
+**Result:**
 
 ```
-✔ Test scenarios successfully pulled into '{{testDir}}'
-```
-
-* User **PUSH** action:
-
-```text
-Use testomatio-sync to push ".md" tests`
-```
-
-- Result:
-
-```
-✔ Test scenarios successfully pushed to Test Management Tool!'
+✔ Test scenarios successfully synced with the Test Management Tool!'
 ```
