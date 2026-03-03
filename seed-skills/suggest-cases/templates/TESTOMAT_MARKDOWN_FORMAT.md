@@ -104,7 +104,7 @@ Use these section headers within test cases:
 ### Tags & Labels & Test IDs
 
 * Tags use `@tag-name` format (lowercase, kebab-case), like: `@smoke`, `@regression`, `@e2e`, etc.
-* Labels must be relates to the system standard labels in Testomat.io or by testing functionality: `Automated`, `Manual`, `Needs Review`, `User Flow`, etc.
+* Labels must be relates to the system standard labels in Testomat.io or by testing functionality: `Manual` (for all manual suggested cases), `Needs Review`, `User Flow`, etc.
 * Format: `@Txxxxxxxx` (e.g., `@T123ff599`).
 
 ### Steps Format

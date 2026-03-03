@@ -1,193 +1,124 @@
 ---
 name: suggest-cases
-description: Analyze existing test suites and suggest new test cases to improve coverage. Identify gaps in edge cases, negative scenarios, boundary values, error handling, accessibility, and performance. Generates ready-to-use test cases in Test Management system markdown format.
-inputs:
-  testDir:
-    description: "Directory containing manual tests (default: manual-tests)"
-    required: false
+description: Analyze existing test suites and project structure to identify coverage gaps. Generate new test cases in Test Management Tool markdown format to fill identified gaps.
 ---
 
 ## SUGGEST-CASES SKILL: What I do
 
-Analyze existing project and proactively suggest new manuall test cases that fill coverage gaps and can be use in Test Management Tool in Markdown format:
-* Suggest new manual test based on the existing test suites, test cases or any available requirements.
-* Detect coverage gaps.
-* Suggest new manual test cases based on the automation scripts.
-* Organize tests into suites.
-(Focus on edge cases, negative scenarios, boundary conditions, error handling, security, and cross-cutting concerns)
+Analyze project to find gaps in test coverage and generate new manual test cases in Test Management Tool Markdown format.
 
-Suggest cases skill triggers include "suggest tests", "suggest cases", "what else should I test", "expand coverage", "missing tests", "gap analysis", "more test cases".
-If any unclear state => ask user to clarify the initial action!
+**What I analyze:**
+- Existing manual test files in the project.
+- Automated test files (spec, test, cy files, etc) for context.
+- Project structure and source code for uncovered paths.
 
-## When to Use
+**What I generate:**
+- New test cases addressing identified gaps
+- Tag suggested tests with `@suggested` for easy filtering
 
-- User asks "what else should I test?".
-- User wants to expand test coverage.
-- User wants AI to identify blind spots in their test suite.
-- User mentions "suggest", "more tests", "gaps", "missing coverage", "expand test coverage",
+If any unclear state => ask user to clarify what they want!
 
 ---
 
 ## Error Handling
 
-Fail immediately and **STOP** execution on any error:
+### Recoverable Situations
 
-* NO existing suite/test in markdown format 
-* Can't understand the requirements by project structure
-* Test directory does not exist  
-* No readable files found  
-* Invalid action parameter  
-* Markdown structure cannot be generated
+Attempt recovery before failing when:
+- No test files found in common locations => ask user to specify test directory path.
+- No readable test content found => ask user to clarify location.
+
+### Hard Fail (STOP immediately)
+
+Stop execution and return a clear human-readable error if:
+- Cannot analyze project structure after clarification.
+- No test files or source code found to analyze after clarification.
 
 **Do not retry automatically**.
-**Do NOT continue after failure**.
+**Do NOT continue after system-level failure**.
 **Return a clear human-readable error message describing the actual failure**.
 
 ---
 
-## Directory Resolution
+## Precondition: Finding Test Files
 
-Determine:
-* `{{reqDir}}` => default: `requirements`  TODO: should we have the requirement folder??? or only based on the existing one?
-* `{{testDir}}` => default: `manual-tests`
+Analyze the project folder to find existing tests:
+1. Look for markdown test files to define existing test files: `tests`, `test`, `manual-tests`, `manual`, `qa`, `spec`, etc.
+2. Look for automated test files: `*.spec.ts`, `*.test.ts`, `*.cy.js`, `*.spec.js`, `*.test.js`, etc.
+3. Look for source code to understand untested paths.
 
-1. If `{{testDir}}` or `{{reqDir}}` exists => use it.
-2. If not:
-- Search the repository for `.md` files in directories like `test`, `tests`, `manual`, `qa`, or `spec`.
-- If found => use the most relevant directory.
-3. If still not found:
-- Ask the user:`Where are the manual tests to improve?`
-- If the user can't give an answer => stop execution with an appropriate error.
+Build a mental map of what is tested and what is missing.
+
 ---
 
-## Approach
+## Suggest-Cases Actions: What I execute
 
-### 1. Read Existing Tests
-
-Read all test cases in the project:
-
-```bash
-# Find markdown test files
-find . -name "*.md" -path "*/tests/*" -o -name "*.md" -path "*/manual-cases/*"
-
-# Also check automated test files for context
-find . -name "*.spec.ts" -o -name "*.test.ts" -o -name "*.cy.js"
-```
-
-Read requirements in the project (if exists):
-
-```bash
-# Find markdown requirements files TODO: if need???
-find . -name "*.md" -path "*/requirements/*"
-
-```
-
-Build a mental map of:
-- What features are tested.
-- What missing or untested.
-- What types of tests exist (happy path, negative, boundary, etc.).
-- What areas have dense coverage vs. sparse coverage.
-
-### 2. Identify Coverage Gaps
+### 1. Identify Coverage Gaps
 
 For each tested feature, check for missing:
 
 **Missing test types:**
-- ❌ No negative tests (only happy path)
-- ❌ No boundary value tests
-- ❌ No error handling tests (API down, timeout, network error)
-- ❌ No concurrent/race condition tests
-- ❌ No security tests (injection, unauthorized access, CSRF)
-- ❌ No accessibility tests
-- ❌ No performance-related tests (large data, slow network)
+- No negative tests (only happy path).
+- No boundary value tests.
+- No error handling tests (API down, timeout, network error).
+- No security tests (injection, unauthorized access).
+- No empty states (no data, first-time user).
+- No maximum capacity tests (max items, max file size).
+- No data format variations (unicode, special characters).
+- No state recovery (session expiry, back button).
 
-**Missing scenarios:**
-- ❌ Empty states (no data, first-time user)
-- ❌ Maximum capacity (max items in cart, max file size, max users)
-- ❌ Data format variations (unicode, special characters, very long strings)
-- ❌ State recovery (browser refresh, session expiry, back button)
-- ❌ Multi-user scenarios (two users editing same resource)
-- ❌ Timezone and locale variations
+### 2. Generate Suggested Test Cases
 
-**Missing feature areas:**
-- Compare tested features vs. application sitemap/routes
-- Check if all CRUD operations are tested for each resource
-- Verify all user roles are tested
-- Check all integration points (third-party APIs, webhooks)
+Use template from `./templates/TESTOMAT_MARKDOWN_FORMAT.md`
 
-### 3. Also Read Source Code
+Generate test cases in Markdown format grouped by gap type:
+- Identify feature name.
+- Create or reuse suite.
+- Generate structured test case.
+- Follow the template structure exactly.
 
-If source code is available, analyze it for untested paths:
+**Tag suggested tests with `@suggested` for easy filtering.**
 
-- Read route definitions to find untested endpoints
-- Read validation logic to identify untested validation rules
-- Read error handlers to find untested error paths
-- Read feature flags to find untested feature combinations
+### 3. New ID Handling
 
-### 4. Generate Suggested Test Cases
+Generate local IDs (do NOT guess server IDs):
+- For tests: `@Tsk` + 6 unique characters (e.g., `@Tsk7c7a92`).
+- For suites: `@Ssk` + 6 unique characters (e.g., `@Ssk9af210`).
 
-Load and use the template file: `./templates/TESTOMAT_MARKDOWN_FORMAT.md`
+Ensure uniqueness within project.
 
-Generate test cases in Markdown format grouped by gap type.
+### 4. Prioritize Suggestions
 
-Requirements:
-* Identify feature name.
-* Create or reuse suite.
-* Generate structured test case.
-* Follow the template structure exactly.
-* Preserve the suite metadata comment block.
-* Assign logical tags and labels.
-* Do not modify formatting.
-* Output valid Markdown.
+Rank by:
+1. **Critical gaps** - missing negative tests for security-sensitive features.
+2. **High-value gaps** - missing boundary tests for core business logic.
+3. **Medium-value gaps** - missing edge cases, error handling.
+4. **Nice-to-have** - accessibility, performance.
 
-> Tag suggested tests with `@suggested` for easy filtering and review in Testomat.io.
+---
 
-Example:
-<!-- test
-priority: high
-tags: @suggested, @negative
--->
-
-### 5. New ID Handling Policy
-
-If you suggest, create a new test case, you should suggest suite/test id based on this rules:
-* Do NOT guess server IDs  
-* Generate local IDs:
-- For tests: `@Tsk` + 6 unique characters  
-Example: `@Tsk7c7a92` 
-- For suites: `@Ssk` + 6 unique characters  
-Example: `@Ssk9af210`
-
-> Ensure uniqueness within project.
-
-### 6. Prioritize Suggestions
-
-Rank suggestions by:
-
-1. **Critical gaps** - missing negative tests for security-sensitive features
-2. **High-value gaps** - missing boundary tests for core business logic
-3. **Medium-value gaps** - missing edge cases, concurrency, error handling
-4. **Nice-to-have** - accessibility, performance, cross-browser, locale
-
-### 7. Output Format
+## Output Format
 
 Provide:
-1. **Gap summary** - what types of tests are missing and where
-2. **Suggested test cases** - complete tests in Test Management Tool Markdown format
-3. **Priority** - which suggestions to implement first
-4. **Estimated effort** - how many tests to add per area
+1. **Gap summary** - what types of tests are missing.
+2. **Suggested test cases** - complete tests in Test Management Tool Markdown format.
+3. **Priority** - which suggestions to implement first.
+
+---
 
 ## Example Real Usage
 
-* Check user/system requirements and generate a new manual test cases ".md" files to cover feature gaps:
-
-```text
-Use suggest-cases to analyze project and suggest a new tests`
+**Analyze project and suggest missing tests:**
+```
+Use suggest-cases to find gaps in test coverage
 ```
 
-* Fill suite/requirement gaps:
-
-```text
-Use suggest-cases to fill gaps in suite="Login page"`
+**Suggest tests for specific area:**
 ```
----
+Use suggest-cases to suggest tests for login functionality
+```
+
+**Expand coverage:**
+```
+Use suggest-cases to expand test coverage for cases from the "/manual-test" folder only
+```
