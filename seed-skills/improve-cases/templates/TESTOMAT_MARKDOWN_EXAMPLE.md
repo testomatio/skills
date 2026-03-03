@@ -4,19 +4,16 @@ emoji:
 -->
 # Home Page Validation
 
-### PURPOSE
+## PURPOSE
 -------
 Verify that a guest user can view all critical UI elements on the Home page and ensure proper functionality of interactive components.
 
-### COVERAGE
+## COVERAGE
 --------
 - Page title verification
-- H1 header validation
-- Citation block verification
-- Footer copyright text
-- Footer links visibility and functionality
+- Footer copyright text & links visibility verification
 
-### PREREQUISITES & SETUP
+## PREREQUISITES & SETUP
 --------------------
 1. Browser Requirements:
    - Latest version of Chrome, Firefox, or Safari
@@ -36,7 +33,7 @@ Verify that a guest user can view all critical UI elements on the Home page and 
    - Ensure browser window is maximized
 
 <!-- test
-id: @T937c7ttt
+id: @Ts37c7ttt
 priority: normal
 tags: @smoke
 labels: Manual
@@ -50,33 +47,27 @@ Verify that the browser tab displays the correct title when accessing the Home p
 1. Navigate to application base URL: "http://site.com"
 
 ## Steps:
-1. Wait for page to fully load
-2. Observe the browser tab title
-
-## Expected Results:
-- Browser tab title contains "UI Test Automation Playground"
-- Title is displayed correctly in the browser tab
-- No encoding issues or special character problems
+* Wait for page to fully load.
+   *Expected*: Page is loaded.
+   *Expected*: Title is displayed correctly with needed text.
+* Observe the browser tab title.
+   *Expected*: Browser tab title contains "UI Test Automation Playground".
 
 <!-- test
 id: @T693f9c26
 priority: normal
 -->
-# Verify H1 Header
+# Verify Footer copyright text & links visibility 
 
 ## Description:
-Verify that the main H1 heading is displayed correctly on the Home page.
+Verify that the footer has correct copyright text & active links
 
 ## Preconditions:
 1. Navigate to application base URL: "http://site.com"
 
-## Test Steps:
-1. Wait for page to fully load
-2. Locate the main heading (H1 element)
-3. Verify the heading text content
-
-## Expected Results:
-- H1 header is visible on the page
-- Header text displays: "UI Test Automation Playground"
-- Header is properly formatted as H1 (largest heading)
-- Header is positioned appropriately on the page
+## Steps:
+* Wait for page to fully load.
+   *Expected*: Page is loaded.
+* Observe the browser tab title.
+   *Expected*: Footer has correct copyright text.
+   *Expected*: Footer has active links.

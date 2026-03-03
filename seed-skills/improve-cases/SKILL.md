@@ -1,181 +1,149 @@
 ---
 name: improve-cases
-description: Analyze existing markdown manual test cases and improve their clarity, structure, and readability for QA team. Update test titles, descriptions, steps, and tags/labels to match Testomat.io format. Use good example tests as reference. Triggers include "improve tests", "enhance cases", "clean up tests", "format tests", "fix test descriptions", "standardize tests".
-inputs:
-  testDir:
-    description: "Directory containing manual test cases (default: manual-tests)"
-    required: false
-  exampleFile:
-    description: "Path to a well-written test file to use as reference (optional)"
-    required: false
+description: Analyze and improve existing markdown manual test cases for clarity, structure, and Test Management Tool format compliance.
 ---
 
-# TASK: What I do
+## IMPROVE-CASES SKILL: What I do
 
-Analyze and improve existing markdown manual test cases to make them clearer and easily understandable by QA team:
+Analyze and improve existing markdown manual test cases to make them clearer and more understandable for QA team:
+- Improve test titles for clarity.
+- Enhance test descriptions.
+- Fix broken formatting and markdown syntax issues.
+- Standardize test structure to Test Management Tool format.
+- Ensure consistent terminology and language.
+- Update tags and labels.
 
-* Read and analyze existing manual test cases in markdown format
-* Improve test titles for clarity
-* Enhance test descriptions
-* Fix broken formatting and markdown syntax issues
-* Standardize test structure to Test Management Tool format (like Testomat.io)
-* Enhance step clarity with proper Expected Results
-* Ensure consistent terminology and language
-* Update tags and labels
-* Preserve original test intent, and IDs
-* Do NOT modify test/suite IDs - keep them as-is
+**CRITICAL - DO NOT CHANGE:**
+- Original test/suite IDs
+- Original test intent
+- Original language (fix only clarity/grammar)
 
-## When to Use
-
-- User asks "improve my test cases"
-- User wants to standardize test format
-- User mentions "fix test descriptions", "format tests", "clean up tests"
-- User wants to make tests more understandable for QA team
-- User mentions "enhance cases", "update tests", "improve readability"
+If any unclear state => ask user to clarify what they want!
 
 ---
 
 ## Error Handling
 
-Fail immediately and **STOP** execution on any error:
+### Recoverable Situations
 
-* Test directory does not exist
-* No readable markdown files found
-* Cannot parse test structure
+Attempt recovery before failing when:
+- No test files found in common locations => ask user to specify test directory path.
+- No readable test content found => ask user to clarify location.
+
+### Hard Fail (STOP immediately)
+
+Stop execution and return a clear human-readable error if:
+- Cannot find or read test files after clarification.
+- Cannot parse or understand test structure.
 
 **Do not retry automatically**.
-**Do NOT continue after failure**.
+**Do NOT continue after system-level failure**.
 **Return a clear human-readable error message describing the actual failure**.
 
 ---
 
-## Directory Resolution
+## Improve-Cases Actions: What I execute
 
-Determine:
-* `{{testDir}}` => default: `manual-tests`
+Analyze the project folder to find existing manual markdown test files.
+Read test cases and analyze current format, quality, and possible issues for improving.
 
-1. If `{{testDir}}` exists => use it.
-2. If not:
-- Search the repository for `.md` files in directories like `test`, `tests`, `manual`, `qa`, or `spec`.
-- If found => use the most relevant directory.
-3. If still not found:
-- Ask the user:`Where are the manual tests to improve?`
-- If the user can't give an answer => stop execution with an appropriate error.
+### 1. Analyze Test Quality
 
----
+For each test, analyze parent/child tests and suite context, then identify issues:
 
-## Reference Format
-
-Use these files as reference for proper Test Management Tool format:
-
-1. File: `./templates/TESTOMAT_MARKDOWN_EXAMPLE.md` - Well-structured format example.
-3. `{{exampleFile}}` (if provided by user) - Good test to reference.
-
----
-
-## Approach
-
-### 1. Find and Read Existing Tests
-
-```bash
-# Find markdown test files
-find . -name "*.md" -path "*/manual-tests/*" -o -name "*.md" -path "*/tests/*"
-
-# List test directory
-ls -la manual-tests/
-```
-
-Read all test files and analyze:
-- Current test format and sections
-- Quality of test descriptions
-- Step clarity and completeness
-- Tags and labels usage
-- Missing sections or formatting issues
-
-### 2. Analyze Test Quality
-
-For each test, identify:
+**Title Clarity:**
+- Unclear or vague test title.
+- Missing action-object format.
+- Not specific enough to understand what is being tested.
 
 **Description Issues:**
-- Vague or unclear test purpose
-- Missing or incomplete description
-- Ambiguous language
+- Vague or unclear test purpose.
+- Missing or incomplete description.
+- Ambiguous language.
 
-**Step Issues:**
-- Missing Expected Results
-- Inconsistent step format
-- Unclear actions
+**Step Issues & Expected Results:**
+- Missing Expected Results.
+- Inconsistent step format.
+- Unclear actions.
+- Steps not ordered logically.
+- Expected results not relevant to the steps.
+- Missing pass/fail criteria.
 
 **Formatting Issues:**
 - Broken markdown syntax
-- Improper code formatting
 - Missing sections
+- Inconsistent header hierarchy
 
-**Tag/Label Issues:**
-- Missing priority in header
-- Inconsistent or missing tags
-- Labels not following Testomat.io format
+**Unambiguity:**
+- Generic or subjective terms ("should work", "might fail")
+- Vague language that could be interpreted multiple ways
+- Steps that cannot be verified objectively
+- Missing specific values, data, or conditions
 
-### 3. Improve Tests (In-Place)
+### 2. Improve Tests
 
-For each test, apply improvements:
+First analyze the test suite context (parent suite, related tests), then apply improvements:
 
 **Title Improvements:**
-- Make clear and specific
-- Use action-result format: "Verify [action] results in [expected]"
+- Make clear and specific.
+- Use action-result format: "Verify [action] results in [expected]".
+- Ensure title reflects actual test purpose.
 
 **Description Improvements:**
-- Make purpose clear and concise
-- Use specific, measurable language
-- Fix grammar and spelling only
+- Make purpose clear and concise.
+- Include context from parent suite when relevant.
+- Fix grammar and spelling only.
 
 **Step Improvements:**
-- Ensure each step has Expected Result
-- Make actions specific and reproducible
-- Use consistent bullet format `* `
+- Ensure each step has explicit Expected Result.
+- Make actions specific and reproducible.
+- Add measurable pass/fail criteria.
+- Use numbered steps with clear order.
+- Ensure results are directly relevant to the step action.
+- Make results measurable and verifiable.
+- Avoid vague terms - use specific values/conditions.
 
-**Tag/Label Improvements:**
-- Add priority: critical/high/normal/low
-- Add tags: @smoke, @regression, @happy-path, @negative, etc.
-- Add label: Manual, Automated, Needs Review
+**Unambiguity Improvements:**
+- Replace generic terms with specific, testable language.
+- Avoid subjective terms ("should work", "might fail").
+- Include specific data values, boundaries, or conditions.
+- Ensure steps can be verified objectively.
 
-**Formatting Improvements:**
-- Fix code blocks with proper ``` fences
-- Use inline code ` for technical elements
-- Ensure consistent header hierarchy
-
-### 4. Preserve Original Content
-
-**CRITICAL - DO NOT CHANGE:**
-- Original test/suite IDs
-- Original test intent
-- Original language
-- Original wording (fix only clarity/grammar)
-- Original environment
-- Attached files or references
-
-### 5. Save Changes
+### 3. Save Changes
 
 Overwrite original files with improved versions. Keep same file names and directory structure.
 
 ---
 
+## Reference Format
+
+Use file: `./templates/TESTOMAT_MARKDOWN_EXAMPLE.md` as reference for proper Test Management Tool format.
+
+---
+
 ## Example Real Usage
 
-* Improve all manual test cases:
-
-```text
+**Improve test descriptions:**
+```
 Use improve-cases to enhance my test descriptions
 ```
 
-* Improve with specific example reference:
-
-```text
-Use improve-cases with exampleFile: login-flow.md
+**Standardize test format:**
+```
+Use improve-cases to standardize all test cases to Testomat.io format
 ```
 
-* Standardize test format:
+**Improve specific area:**
+```
+Use improve-cases to improve test clarity in login tests
+```
 
-```text
-Use improve-cases to standardize all test cases to Testomat.io format
+**Improve specific folder:**
+```
+Use improve-cases to improve test cases from the the "./manual-test" folder only
+```
+
+**Improve specific file:**
+```
+Use improve-cases to improve test cases from the the "./manual-test/home-page.test.md" file
 ```
