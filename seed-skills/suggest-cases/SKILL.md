@@ -1,24 +1,23 @@
 ---
 name: suggest-cases
-description: Analyze existing test suites and suggest new test cases to improve coverage. Identify gaps in edge cases, negative scenarios, boundary values, error handling, accessibility, and performance. Generates ready-to-use test cases in Test Management system markdown format. Triggers include "suggest tests", "suggest cases", "what else should I test", "expand coverage", "missing tests", "gap analysis", "more test cases".
+description: Analyze existing test suites and suggest new test cases to improve coverage. Identify gaps in edge cases, negative scenarios, boundary values, error handling, accessibility, and performance. Generates ready-to-use test cases in Test Management system markdown format.
 inputs:
-  reqDir:
-    description: "Directory containing requirements (default: requirements)"
-    required: false
   testDir:
     description: "Directory containing manual tests (default: manual-tests)"
     required: false
 ---
 
-## TASK: What I do
+## SUGGEST-CASES SKILL: What I do
 
-Analyze existing test suites, test cases and proactively suggest new test cases that fill coverage gaps and can be use in Test Management Tool in Markdown format:
-* Analyze existing test suites, test cases or project requirements.
+Analyze existing project and proactively suggest new manuall test cases that fill coverage gaps and can be use in Test Management Tool in Markdown format:
+* Suggest new manual test based on the existing test suites, test cases or any available requirements.
 * Detect coverage gaps.
-* Suggest new manual test cases.
-* Convert automation tests into manual test format.
+* Suggest new manual test cases based on the automation scripts.
 * Organize tests into suites.
 (Focus on edge cases, negative scenarios, boundary conditions, error handling, security, and cross-cutting concerns)
+
+Suggest cases skill triggers include "suggest tests", "suggest cases", "what else should I test", "expand coverage", "missing tests", "gap analysis", "more test cases".
+If any unclear state => ask user to clarify the initial action!
 
 ## When to Use
 
