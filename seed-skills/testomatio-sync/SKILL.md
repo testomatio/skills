@@ -26,16 +26,24 @@ If any unclear state => ask user to clarify the initial action!
 
 ## Error Handling
 
-Fail immediately and **STOP** execution on any error:
-- No TESTOMATIO token provided or user refuses to provide token (as `.env` variable or as simple variable).
+### Recoverable Situations
+
+Attempt recovery before failing when:
+- TESTOMATIO token is missing => ask user to provide it.
+- No markdown files found => confirm directory or ask user to specify another path.
+
+### Hard Fail (STOP immediately)
+
+Stop execution and return a clear human-readable error if:
+- User refuses to provide TESTOMATIO token.
 - Cannot create `.env` file
 - Directory creation fails.
-- Invalid action parameter.
-- No markdown files found during push.
+- User repeatedly provides invalid action parameter after clarification.
+- No markdown files found after confirming directory with user.
 - CLI sync(push/pull) command fails (network/auth/401/403/etc.).
 
 **Do not retry automatically**.
-**Do NOT continue after failure**.
+**Do NOT continue after system-level failure**.
 **Return a clear human-readable error message describing the actual failure**.
 
 ---
@@ -69,15 +77,17 @@ TESTOMATIO=tstmt_your_api_key
 
 ---
 
-## What I execute - Testomatio Sync Actions
+## Testomatio Sync Actions: What I execute
 
 The sync process supports two operations:
 - **Pull** - Retrieve the latest test scenarios from Testomat.io and update the local project.
 - **Push** - Send local Markdown test updates to Testomat.io.
 
+(Use `npx ... pull/push -d {{folder-name}}` in case if we have the folder name**).
+
 ### Pull Changes
 
-1) Ensure `testDir` exists; otherwise create `manual-tests` folder in the project and use it as the working directory (`cd ...`).
+1) Ensure `testDir` exists; otherwise create `manual-tests` folder in the project.
 2) Download tests in Markdown format from the Testomat.io:
 
 ```bash
@@ -101,7 +111,7 @@ npx -y check-tests@latest push
 ```
 
 **Pre-Push Validation**:
-1. Ensure at least one test `.md` file exists.
+1. Ensure at least one test `.test.md` file exists.
 2. Ensure file contains valid test blocks:
 
 ```md
@@ -116,8 +126,6 @@ labels: ...
 ...
 
 ```
-
-(If no valid tests found => Return `No valid test blocks found!` message and **STOP** execution).
 
 ---
 
