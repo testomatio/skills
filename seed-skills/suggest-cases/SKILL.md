@@ -11,6 +11,8 @@ Analyze project to find gaps in test coverage and generate new manual test cases
 - Existing manual test files in the project.
 - Automated test files (spec, test, cy files, etc) for context.
 - Project structure and source code for uncovered paths.
+- Test suite purpose and business goals.
+- Main testing flows and user journeys.
 
 **What I generate:**
 - New test cases addressing identified gaps
@@ -43,9 +45,12 @@ Stop execution and return a clear human-readable error if:
 ## Precondition: Finding Test Files
 
 Analyze the project folder to find existing tests:
-1. Look for markdown test files to define existing test files: `tests`, `test`, `manual-tests`, `manual`, `qa`, `spec`, etc.
-2. Look for automated test files: `*.spec.ts`, `*.test.ts`, `*.cy.js`, `*.spec.js`, `*.test.js`, etc.
-3. Look for source code to understand untested paths.
+1. Search for test-related directories such as: `tests`, `manual-tests`, `manual`, `qa`, `spec`, or similarly named folders.
+2. Within those directories, look specifically for Markdown-based test files, including:
+- Files ending with `.test.md`
+- Any other `.md` files that define test cases, test scenarios, QA procedures, or specifications
+3. Look for automated test files: `*.spec.ts`, `*.test.ts`, `*.cy.js`, `*.spec.js`, `*.test.js`, etc.
+4. Look for source code to understand untested paths.
 
 Build a mental map of what is tested and what is missing.
 
@@ -55,7 +60,12 @@ Build a mental map of what is tested and what is missing.
 
 ### 1. Identify Coverage Gaps
 
-For each tested feature, check for missing:
+Before suggesting tests, fully understand:
+- Test suite purpose and business goals.
+- Main user flows and key testing scenarios.
+- If the SUT is a web application and you need more context, use browser to explore the application and verify your understanding.
+
+Then for each tested feature, check for missing:
 
 **Missing test types:**
 - No negative tests (only happy path).
@@ -90,10 +100,11 @@ Ensure uniqueness within project.
 ### 4. Prioritize Suggestions
 
 Rank by:
-1. **Critical gaps** - missing negative tests for security-sensitive features.
-2. **High-value gaps** - missing boundary tests for core business logic.
-3. **Medium-value gaps** - missing edge cases, error handling.
-4. **Nice-to-have** - accessibility, performance.
+1. **Critical gaps** - core business flows, payment, auth, main CRUD operations.
+1. **Important gaps** - key user flows, authentication, authorization, primary features.
+2. **High-level gaps** - secondary-level business features, edge cases for critical flows, security-related scenarios.
+3. **Normal gaps** - extended user actions (help pages, export, settings, secondary features).
+4. **Low-level** - cosmetic checks, boundary testing, minor UI interactions.
 
 ---
 
@@ -118,7 +129,12 @@ Use suggest-cases to find gaps in test coverage
 Use suggest-cases to suggest tests for login functionality
 ```
 
-**Expand coverage:**
+**Expand coverage by specific folder:**
 ```
-Use suggest-cases to expand test coverage for cases from the "/manual-test" folder only
+Use suggest-cases to expand test coverage for cases from the "./manual-test" folder only
+```
+
+**Expand coverage by specific file:**
+```
+Use suggest-cases to expand test coverage for cases from the "./manual-test/home-page.test.md" folder only
 ```

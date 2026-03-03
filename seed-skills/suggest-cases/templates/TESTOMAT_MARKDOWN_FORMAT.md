@@ -95,11 +95,11 @@ Use these section headers within test cases:
 
 | Value | Use For |
 |-------|---------|
-| `critical` | Must not fail - core business flows, payment, auth |
-| `high` | High level functionality - key features, main workflows |
-| `important` | Important functionality - based on the test context |
-| `normal` | Standard functionality - regular features (default) |
-| `low` | Nice-to-have - cosmetic, edge cases, exploratory |
+| `critical` | Must not fail - core business flows, payment, auth, main CRUD operations |
+| `important` | Key user flows, authentication, authorization, primary features |
+| `high` | Secondary business features, edge cases for critical flows, security-related scenarios |
+| `normal` | Extended actions (help pages, export, settings, secondary features) |
+| `low` | Nice-to-have - Cosmetic checks, boundary testing, minor UI interactions |
 
 ### Tags & Labels & Test IDs
 
