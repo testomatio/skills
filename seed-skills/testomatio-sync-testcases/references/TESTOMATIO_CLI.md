@@ -1,4 +1,4 @@
-# Testomat.io CLI Configuration Documentation
+# Testomat.io CLI Documentation
 
 This document provides comprehensive information about all CLI options and environment variables available in the check-tests sync command.
 
@@ -70,6 +70,9 @@ TESTOMATIO_URL=https://app.testomat.io
 ### Pull Basic Usage
 
 ```bash
+# Export the latest test scenarios from Testomat.io to root project dir
+npx -y check-tests@latest pull
+
 # Export the latest test scenarios from Testomat.io to local project, folder manual-tests
 npx -y check-tests@latest pull -d manual-tests 
 
@@ -84,6 +87,9 @@ TESTOMATIO=tstmt_xxxxx npx -y check-tests@latest pull
 
 ```bash
 # Import current local test in Markdown format to Testomat.io
+npx -y check-tests@latest push
+
+# Import current local test in Markdown format to Testomat.io by specific folder
 npx -y check-tests@latest push -d manual-tests
 
 # Import current local test in Markdown format to Testomat.io, with prepend dir option
@@ -93,7 +99,7 @@ TESTOMATIO_PREPEND_DIR="backend-tests" npx -y check-tests@latest push --no-empty
 TESTOMATIO_LABELS="smoke,regression" npx -y check-tests@latest push
 
 # Apply labels with values using label:value format
-TESTOMATIO_LABELS="severity:high,feature:auth,team:frontend"
+TESTOMATIO_LABELS="severity:high,feature:auth,team:frontend" npx -y check-tests@latest push
 
 # if we can't use variables from the `.env` file, set it to command line
 TESTOMATIO=tstmt_xxxxx npx -y check-tests@latest push

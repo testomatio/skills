@@ -15,13 +15,18 @@ inputs:
 This skill enables synchronization of Markdown test scenarios between your local project and Testomat.io Test Management System.
 Use when users want to pull tests from Testomat.io to local Markdown files, push local Markdown tests to Testomat.io (Importing or exporting test scenarios).
 
+Test Cases Sync Jornay: 
+- Export test cases from Testomat.io.
+- Bulk editing manual tests in IDE or refactoring test cases.
+- Further push back to the Testomat.io.
+
 ### When to Use This Skill
 
 Trigger this skill when user mentions:
-- Pulling, exporting, downloading, or getting tests from Testomat.io => pull action.
-- Pushing, uploading, sending, or syncing tests to Testomat.io => push action.
+- **Pull/Export/Download**: "pull tests", "export from Testomat.io", "download tests", "get tests from TMS" => pull action.
+- **Push/Upload/Import**: "push tests", "upload tests to Testomat.io", "import to Testomat.io" => push action.
 
-If any unclear state => ask user to clarify the initial action!
+> If any unclear state => ask user to clarify the initial action!
 
 ---
 
@@ -43,7 +48,7 @@ Stop execution and return a clear human-readable error if:
 - No markdown files found after confirming directory with user.
 - CLI sync(push/pull) command fails (network/auth/401/403/etc.).
 
-**If something fails after multiple attempts, return a clear, human-readable error message that describes the actual error/failure.**.
+**If something fails after multiple attempts, return a clear, human-readable error message that describes the actual error/failure.**
 
 ---
 
@@ -61,12 +66,22 @@ Save credentials to `.env` file:
 
 ```env
 TESTOMATIO=tstmt_xxxxx
+TESTOMATIO_URL=https://app.testomat.io
 ...
 ```
 
-### Configure Testomat.io cli configuration
+### Configure Testomat.io Sync Operations
 
-Use file: `./references/TESTOMATIO_CLI.md` to get all extra information for proper Test Management Tool action you need.
+Key environment variables:
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `TESTOMATIO` | API key (format: tstmt_xxxxx) | Yes |
+| `TESTOMATIO_URL` | Server URL | No |
+| `TESTOMATIO_LABELS` | Comma-separated labels | No |
+| `TESTOMATIO_WORKDIR`| Working directory for relative file paths | No |
+| `TESTOMATIO_PREPEND_DIR` | Directory to prepend to paths | No |
+
+For complete CLI options, environment variables, and advanced examples, see `./references/TESTOMATIO_CLI.md`
 
 ---
 
@@ -76,6 +91,11 @@ Use file: `./references/TESTOMATIO_CLI.md` to get all extra information for prop
 
 1) Ensure `testDir` exists; otherwise create `manual-tests` folder in the project.
 2) Retrieves test scenarios from Testomat.io and saves them as Markdown files locally.
+
+**Use Cases:**
+- Export tests from TMS to markdown for bulk editing in IDE
+- Backup test cases locally
+- Refactoring test cases offline
 
 **Basic Command:**
 ```bash
@@ -88,7 +108,8 @@ npx -y check-tests@latest pull -d <directory>
 npx -y check-tests@latest pull -d manual-tests
 ```
 
-More commands and examples available in `./references/TESTOMATIO_CLI.md` file - "Pull Basic Usage" section. 
+**More examples**: See `./references/TESTOMATIO_CLI.md` - "Pull Basic Usage" section.
+
 ---
 
 ### Warning Before Push
@@ -98,6 +119,14 @@ Before push, warn user about potential risks:
 - Pull latest changes from Testomat.io first to avoid overwriting.
 
 ### Push Changes
+
+1) Ensure the user has saved all updates and has files to send to the server.
+2) Upload local Markdown tests into Testomat.io.
+
+**Use Cases:**
+- Mass create test cases in Testomat.io from markdown files
+- Import bulk-edited tests back to TMS
+- Sync refactored test cases to Testomat.io
 
 **Pre-Push Validation**:
 1. Ensure at least one test `.test.md` file exists.
@@ -110,14 +139,11 @@ creator: ...
 tags: ...
 labels: ...
 -->
-# Successful login ...
+# ... (test case title)
 
-...
+... (test case description)
 
 ```
-
-1) Ensure the user has saved all updates and has files to send to the server
-2) Upload local Markdown tests into Test Management Tool (Testomat.io) by corresponding "Push Basic Usage" command.
 
 **Basic Command:**
 ```bash
@@ -130,7 +156,7 @@ npx -y check-tests@latest push -d <directory>
 npx -y check-tests@latest push -d manual-tests
 ```
 
-More commands and examples available in `./references/TESTOMATIO_CLI.md` file - "Push Basic Usage" section.
+**More examples**: See `./references/TESTOMATIO_CLI.md` - "Push Basic Usage" section.
 
 ---
 
@@ -138,26 +164,31 @@ More commands and examples available in `./references/TESTOMATIO_CLI.md` file - 
 
 **Pull tests:**
 ```
-Use testomatio-sync to pull tests
+Use testomatio-sync-testcases skill to pull tests from Testomat.io
 ```
 
 **Pull with custom folder:**
 ```
-Use testomatio-sync to pull tests in folder "manual-tests"
+Use testomatio-sync-testcases to pull tests in folder "manual-tests"
 ```
 
 **Push tests:**
 ```
-Use testomatio-sync to push tests
+Use testomatio-sync-testcases to push tests to Testomat.io
 ```
 
 **With custom token:**
 ```
-Use testomatio-sync to push tests with TESTOMATIO=tstmt_xxx
+Use testomatio-sync-testcases to push tests with TESTOMATIO=tstmt_xxx
 ```
+
+**Bulk test case edit workflow:**
+- "Use testomatio-sync-testcases skill to pull tests from Testomat.io, I need to bulk edit them in IDE"
+- (Save some user updates)
+- "Use testomatio-sync-testcases skill to push the updated tests back to Testomat.io"
 
 **Result:**
 
 ```
-✔ Test scenarios successfully synced with the Test Management Tool!'
+✔ Test scenarios successfully synced with the Test Management Tool!
 ```
