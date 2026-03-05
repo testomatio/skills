@@ -1,6 +1,6 @@
 ---
-name: testomatio-sync
-description: Synchronize Markdown test scenarios between local project and Test Management Tool (Testomat.io)
+name: testomatio-sync-testcases
+description: Synchronize Markdown test scenarios between local project and Test Management Tool (Testomat.io). Supports custom directories, labels, and advanced import/export options.
 inputs:
   action:
     description: "Operation Sync command: push | pull (optional - inferred from user intent if not provided)"
@@ -10,15 +10,16 @@ inputs:
     required: false
 ---
 
-## TESTOMATIO-SYNC SKILL: What I do
+## TESTOMATIO-SYNC-TESTCASES SKILL: What I do
 
-Synchronization Markdown test scenarios between local project and Testomat.io:
-- **pull**: Download test scenarios from Testomat.io to local Markdown files
-- **push**: Upload local Markdown files to Testomat.io
+This skill enables synchronization of Markdown test scenarios between your local project and Testomat.io Test Management System.
+Use when users want to pull tests from Testomat.io to local Markdown files, push local Markdown tests to Testomat.io (Importing or exporting test scenarios).
 
-If action is not provided, infer from user intent:
-- words like `pull`, `export`, `download`, `get tests` => pull action
-- words like `push`, `upload`, `sync to server`, `import` => push action
+### When to Use This Skill
+
+Trigger this skill when user mentions:
+- Pulling, exporting, downloading, or getting tests from Testomat.io => pull action.
+- Pushing, uploading, sending, or syncing tests to Testomat.io => push action.
 
 If any unclear state => ask user to clarify the initial action!
 
@@ -42,9 +43,7 @@ Stop execution and return a clear human-readable error if:
 - No markdown files found after confirming directory with user.
 - CLI sync(push/pull) command fails (network/auth/401/403/etc.).
 
-**Do not retry automatically**.
-**Do NOT continue after system-level failure**.
-**Return a clear human-readable error message describing the actual failure**.
+**If something fails after multiple attempts, return a clear, human-readable error message that describes the actual error/failure.**.
 
 ---
 
@@ -56,44 +55,40 @@ Stop execution and return a clear human-readable error if:
 2. If not provided, check for `.env` file in project root for `TESTOMATIO` token.
 3. If still not found => ask user for token.
 
-### Configure Testomatio env
+### .env File Best Practice
 
-| Key | Description | Default Value |
-|-----|-------------|---------------|
-| TESTOMATIO | System API token (format: tstmt_xxxxx) | Required, No default value |
-| TESTOMATIO_URL | Testomatio server url | https://app.testomat.io/   |
+Save credentials to `.env` file:
 
-`TESTOMATIO` token must be available for the next steps:
-* If user does NOT provide token in `.env` file or by typing it => STOP skill immediately and return error like `ERROR: TESTOMATIO token is required. Operation aborted.`
-* If token not found, ask: `TESTOMATIO` token is required. Please enter your Testomat API token (format: tstmt_xxxxx):`
-* If token provided or defined during conversation => create/update `.env` file in project root:
-
-```
-TESTOMATIO=tstmt_your_api_key
+```env
+TESTOMATIO=tstmt_xxxxx
 ...
 ```
 
-**Continue execution if all required variables are defined**.
+### Configure Testomat.io cli configuration
+
+Use file: `./references/TESTOMATIO_CLI.md` to get all extra information for proper Test Management Tool action you need.
 
 ---
 
-## Testomatio Sync Actions: What I execute
-
-The sync process supports two operations:
-- **Pull** - Retrieve the latest test scenarios from Testomat.io and update the local project.
-- **Push** - Send local Markdown test updates to Testomat.io.
-
-(Use `npx ... pull/push -d {{folder-name}}` in case if we have the folder name**).
+## Testomatio Sync Testcase Supported Operations: What I execute
 
 ### Pull Changes
 
 1) Ensure `testDir` exists; otherwise create `manual-tests` folder in the project.
-2) Download tests in Markdown format from the Testomat.io:
+2) Retrieves test scenarios from Testomat.io and saves them as Markdown files locally.
 
+**Basic Command:**
 ```bash
-npx -y check-tests@latest pull
+npx -y check-tests@latest pull -d <directory>
 ```
 
+**Examples:**
+```bash
+# Pull tests to default manual-tests folder
+npx -y check-tests@latest pull -d manual-tests
+```
+
+More commands and examples available in `./references/TESTOMATIO_CLI.md` file - "Pull Basic Usage" section. 
 ---
 
 ### Warning Before Push
@@ -103,12 +98,6 @@ Before push, warn user about potential risks:
 - Pull latest changes from Testomat.io first to avoid overwriting.
 
 ### Push Changes
-
-Import local Markdown tests into Test Management Tool (Testomat.io).
-
-```bash
-npx -y check-tests@latest push
-```
 
 **Pre-Push Validation**:
 1. Ensure at least one test `.test.md` file exists.
@@ -127,9 +116,25 @@ labels: ...
 
 ```
 
+1) Ensure the user has saved all updates and has files to send to the server
+2) Upload local Markdown tests into Test Management Tool (Testomat.io) by corresponding "Push Basic Usage" command.
+
+**Basic Command:**
+```bash
+npx -y check-tests@latest push -d <directory>
+```
+
+**Examples:**
+```bash
+# Push tests from manual-tests folder
+npx -y check-tests@latest push -d manual-tests
+```
+
+More commands and examples available in `./references/TESTOMATIO_CLI.md` file - "Push Basic Usage" section.
+
 ---
 
-## Example Real Usage
+## Example: Skill Real Usage
 
 **Pull tests:**
 ```
