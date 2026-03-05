@@ -1,5 +1,5 @@
 ---
-name: testomatio-sync-testcases
+name: testomatio-sync-cases
 description: Synchronize Markdown test scenarios between local project and Test Management Tool (Testomat.io). Supports custom directories, labels, and advanced import/export options.
 inputs:
   action:
@@ -10,7 +10,7 @@ inputs:
     required: false
 ---
 
-## TESTOMATIO-SYNC-TESTCASES SKILL: What I do
+## TESTOMATIO-SYNC-CASES SKILL: What I do
 
 This skill enables synchronization of Markdown test scenarios between your local project and Testomat.io Test Management System.
 Use when users want to pull tests from Testomat.io to local Markdown files, push local Markdown tests to Testomat.io (Importing or exporting test scenarios).
@@ -164,28 +164,28 @@ npx -y check-tests@latest push -d manual-tests
 
 **Pull tests:**
 ```
-Use testomatio-sync-testcases skill to pull tests from Testomat.io
+Use testomatio-sync-cases skill to pull tests from Testomat.io
 ```
 
 **Pull with custom folder:**
 ```
-Use testomatio-sync-testcases to pull tests in folder "manual-tests"
+Use testomatio-sync-cases to pull tests in folder "manual-tests"
 ```
 
 **Push tests:**
 ```
-Use testomatio-sync-testcases to push tests to Testomat.io
+Use testomatio-sync-cases to push tests to Testomat.io
 ```
 
 **With custom token:**
 ```
-Use testomatio-sync-testcases to push tests with TESTOMATIO=tstmt_xxx
+Use testomatio-sync-cases to push tests with TESTOMATIO=tstmt_xxx
 ```
 
 **Bulk test case edit workflow:**
-- "Use testomatio-sync-testcases skill to pull tests from Testomat.io, I need to bulk edit them in IDE"
+- "Use testomatio-sync-cases skill to pull tests from Testomat.io, I need to bulk edit them in IDE"
 - (Save some user updates)
-- "Use testomatio-sync-testcases skill to push the updated tests back to Testomat.io"
+- "Use testomatio-sync-cases skill to push the updated tests back to Testomat.io"
 
 **Result:**
 
