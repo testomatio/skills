@@ -52,6 +52,14 @@ Stop execution and return a clear human-readable error if:
 
 ---
 
+## References
+
+| Description | File |
+|-------------|------|
+| Testomat.io CLI Commands Documentation | ./references/TESTOMATIO_CLI.md |
+
+---
+
 ## Precondition: Environment Handling Logic
 
 ### Check Testomatio Token
@@ -81,7 +89,7 @@ Key environment variables:
 | `TESTOMATIO_WORKDIR`| Working directory for relative file paths | No |
 | `TESTOMATIO_PREPEND_DIR` | Directory to prepend to paths | No |
 
-For complete CLI options, environment variables, and advanced examples, see `./references/TESTOMATIO_CLI.md`
+For complete CLI options, environment variables, and advanced examples, see **references** file.
 
 ---
 
@@ -108,7 +116,7 @@ npx -y check-tests@latest pull -d <directory>
 npx -y check-tests@latest pull -d manual-tests
 ```
 
-**More examples**: See `./references/TESTOMATIO_CLI.md` - "Pull Basic Usage" section.
+**More examples**: See "Pull Basic Usage" section from references.
 
 ---
 
@@ -156,7 +164,7 @@ npx -y check-tests@latest push -d <directory>
 npx -y check-tests@latest push -d manual-tests
 ```
 
-**More examples**: See `./references/TESTOMATIO_CLI.md` - "Push Basic Usage" section.
+**More examples**: See "Push Basic Usage" section from references.
 
 ---
 
