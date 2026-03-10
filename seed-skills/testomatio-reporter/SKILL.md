@@ -17,7 +17,7 @@ Trigger this skill when user wants to:
 - Set up test reporting in their project
 - Add Testomat.io reporter to existing tests
 - Configure HTML reports for local test results
-- Connect tests to Testomat.io TMS
+- Push test results to Testomat.io TMS
 
 ---
 
@@ -95,9 +95,20 @@ TESTOMATIO_URL=https://app.testomat.io
 
 Run tests with reporter to verify configuration:
 - First run: use HTML report mode for quick verification (by "HTML Reports" references instruction).
-- Then: run execute test with "TESTOMATIO" token to push results to TMS.
 
-### Step 6: Final Summary
+### Step 6: Push results to TMS
+
+Run test execution command with "TESTOMATIO" token to push results to TMS based on the framework run command.
+
+Playwright Example:
+
+```bash
+npx check-tests@latest Playwright "**/*{.,_}{test,spec,cy}.js"
+# or If no `.env` used
+TESTOMATIO=tstmt_sP4dVIsq1zYH3gM6uTvTAYTs3-HXd9s8AQ1692050199 npx check-tests@latest Playwright "**/*{.,_}{test,spec,cy}.js" --no-empty
+```
+
+### Final Summary
 
 After verifying the setup, output a short log-style summary of what was configured. Include:
 - Framework used.
@@ -123,7 +134,9 @@ Verification:
 ✔ Reporter ready to push results to Testomatio
 
 Next steps:
-1. Push test execution results to TMS:
+1. Suggets a new automation tests
+2. Push a new test to TMS:
+
 ```bash
 TESTOMATIO=tstmt_xxxxx npx playwright test --grep "@smoke"
 ```
