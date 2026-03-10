@@ -128,7 +128,7 @@ Next steps:
 TESTOMATIO=tstmt_xxxxx npx playwright test --grep "@smoke"
 ```
 
-> Documentation: https://testomatio.com/docs
+> Documentation: https://docs.testomat.io/getting-started/
 
 ---
 
