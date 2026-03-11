@@ -96,17 +96,19 @@ TESTOMATIO_URL=https://app.testomat.io
 Run tests with reporter to verify configuration:
 - First run: use HTML report mode for quick verification (by "HTML Reports" references instruction).
 
-### Step 6: Push results to TMS
+### Step 6: Push tests to TMS
 
-Run test execution command with "TESTOMATIO" token to push results to TMS based on the framework run command.
+Push tests to TMS based with the "TESTOMATIO" token.
 
 Playwright Example:
 
 ```bash
 npx check-tests@latest Playwright "**/*{.,_}{test,spec,cy}.js"
 # or If no `.env` used
-TESTOMATIO=tstmt_sP4dVIsq1zYH3gM6uTvTAYTs3-HXd9s8AQ1692050199 npx check-tests@latest Playwright "**/*{.,_}{test,spec,cy}.js" --no-empty
+TESTOMATIO=tstmt_xxxxx npx check-tests@latest Playwright "**/*{.,_}{test,spec,cy}.js" --no-empty
 ```
+
+> After that, you can go to the Testomat.io UI and check that the tests have been added to the project scope.
 
 ### Final Summary
 
@@ -115,7 +117,7 @@ After verifying the setup, output a short log-style summary of what was configur
 - Reporter installation status.
 - Configuration file updated.
 - Optional features enabled.
-- Verification result.
+- Verification of setup and test import.
 - Next actions for the user.
 
 #### Output Example
@@ -172,6 +174,14 @@ TESTOMATIO=tstmt_xxxxx npx playwright test --grep "@smoke"
 
 ## Examples
 
+### Global Setup Command
+
+Install @testomatio/reporter to my project and import tests to TMS.
+
+```
+Use testomatio-reporter skill to install reporter and import tests to TMS
+```
+
 ### Basic Setup (Playwright)
 
 ```
@@ -186,7 +196,7 @@ Agent: Run tests with: npx playwright test
 ### HTML Report Only (No TMS)
 
 ```
-User: I want local HTML reports
+User: I want local HTML reports by @testomatio/reporter
 Agent: Setting up HTML reports...
 Agent: Run: TESTOMATIO_HTML_REPORT_SAVE=1 npx playwright test
 Agent: Report saved to testomatio-report/testomatio-report.html
