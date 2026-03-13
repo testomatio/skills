@@ -164,7 +164,7 @@ TESTOMATIO=tstmt_xxxxx npx playwright test --grep "@smoke"
 * **Missing `TESTOMATIO` token**
   - Ask the user to provide it.
   - Tell them they can obtain it from their Testomat project: **Settings → Project → "Project Reporting API key"**
-  - Example link: https://testomat.io/projects/<project-id>/settings/project
+  - Example link for user's steps: `https://testomat.io/projects/<project-id>/settings/project`
 
 * **Package not installed**
   - Offer to install it.
