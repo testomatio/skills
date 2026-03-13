@@ -35,8 +35,16 @@ Trigger this skill when user mentions:
 ### Recoverable Situations
 
 Attempt recovery before failing when:
-- TESTOMATIO token is missing => ask user to provide it.
-- No markdown files found => confirm directory or ask user to specify another path.
+* **Missing `TESTOMATIO` token**
+  - Ask the user to provide it.
+  - Tell them they can obtain it from their Testomat.io project: **Settings -> Project -> "Project Reporting API key"** value
+  - Example link: `https://testomat.io/projects/<project-id>/settings/project`
+  - If the user cannot find the token:
+    - Ask them to open an existing Testomat.io project and copy the key from **Settings → Project -> "Project Reporting API key"** value.
+    - Or create a new project in Testomat.io and copy the **Project Reporting API key** from the same page.
+
+* No markdown files found
+  - Confirm directory or ask user to specify another path.
 
 ### Hard Fail (STOP immediately)
 
