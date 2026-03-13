@@ -56,7 +56,7 @@ Ask User:
 
 For new demo project, scaffold with:
 - Framework: Playwright (default), CodeceptJS, or Jest
-- Add sample test file
+- Add sample test file and framework config
 - Pre-configure reporter in config
 - Create `.env` with placeholder for "TESTOMATIO" token.
 
@@ -108,7 +108,7 @@ npx check-tests@latest Playwright "**/*{.,_}{test,spec,cy}.js"
 TESTOMATIO=tstmt_xxxxx npx check-tests@latest Playwright "**/*{.,_}{test,spec,cy}.js" --no-empty
 ```
 
-> After that, you can go to the Testomat.io UI and check that the tests have been added to the project scope.
+> After that, user can go to the Testomat.io UI and check that the tests have been added to the project scope.
 
 ### Final Summary
 
@@ -161,22 +161,30 @@ TESTOMATIO=tstmt_xxxxx npx playwright test --grep "@smoke"
 
 ### Recoverable
 
-- Missing "TESTOMATIO" token => Ask user to provide
-- Package not installed => Offer to install
-- Config syntax error => Fix based on framework
+* **Missing `TESTOMATIO` token**
+  - Ask the user to provide it.
+  - Tell them they can obtain it from their Testomat project: **Settings → Project → "Project Reporting API key"**
+  - Example link: https://testomat.io/projects/<project-id>/settings/project
+
+* **Package not installed**
+  - Offer to install it.
+
+* **Config syntax error**
+  - Fix based on the detected framework.
 
 ### Hard Fail
 
-- Invalid API key format => Stop, ask for valid token
-- Unsupported framework => Stop, explain supported frameworks
+* **Invalid API key format or value**
+  - Stop and ask for a valid token.
+
+* **Unsupported framework**
+  - Stop and explain supported frameworks.
 
 ---
 
 ## Examples
 
-### Global Setup Command
-
-Install @testomatio/reporter to my project and import tests to TMS.
+**Global Setup Command:** Install @testomatio/reporter to my project and import tests to TMS.
 
 ```
 Use testomatio-reporter skill to install reporter and import tests to TMS
