@@ -1,5 +1,5 @@
 ---
-name: testomatio-reporter
+name: testomatio-reporter-setup
 description: Configure Testomat.io reporter in an existing automation project. Add test reporting to Playwright, CodeceptJS, Mocha, Jest, or WebdriverIO projects.
 license: MIT
 metadata:
@@ -7,7 +7,7 @@ metadata:
   version: 1.0.0
 ---
 
-# TESTOMATIO-REPORTER SKILL: What I do
+# TESTOMATIO-REPORTER-SETUP SKILL: What I do
 
 This skill configures Testomat.io reporter in your automation project and sends test results to your testing workspace.
 
@@ -190,7 +190,7 @@ TESTOMATIO=tstmt_xxxxx npx playwright test --grep "@smoke"
 **Global Setup Command:** Install @testomatio/reporter to my project and import tests to TMS.
 
 ```
-Use testomatio-reporter skill to install reporter and import tests to TMS
+Use testomatio-reporter-setup skill to install reporter and import tests to TMS
 ```
 
 ### Basic Setup (Playwright)
