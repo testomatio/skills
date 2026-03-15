@@ -21,13 +21,12 @@ Triggers this skill when user wants to:
 ### 1. Detect Automation and Manual Case Files
 
 1) Identify all manual and automated test cases in the repository.
+    * Manual test cases include:
+        - Markdown files inside `/tests/`;
+        - `.feature` files (Gherkin).
+    * Automated tests include, like: `*.spec.ts`, `*.test.js`, `*.cy.js`, etc...
 
-* Manual test cases include:
-    - Markdown files inside `/tests/`;
-    - `.feature` files (Gherkin).
-* Automated tests include, like: `*.spec.ts`, `*.test.js`, `*.cy.js`, etc...
-
-_(If needed, based on the original test framework, you may use shell commands such as: `find . -path "*/tests/*.md"`...)_
+    _(If needed, based on the original test framework, you may use shell commands such as: `find . -path "*/tests/*.md"`...)_
 
 2) Parse each test to extract: title, steps, expected results, tags, and suite location.
 
