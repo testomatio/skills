@@ -245,7 +245,9 @@ Rules:
 
 Show summary results to user terminal. Include any relevant information you think is important. E.g. amount of test cases generated, amount of test suites, etc. Better to use markdown table. It should be concise and easy to read.
 
-Ask user if he want to change something to achieve the result which satisfies him.
+Show the generated files list and destination folder.
+
+Ask user to review generated files and ask if he want to change something to achieve the satisfactory result.
 
 ## Output formats
 
