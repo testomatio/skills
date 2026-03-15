@@ -110,8 +110,8 @@ I've gathered information from the following sources:
 
 ❓ Do you want to:
 
-1. Go to next step
-2. Type changes
+1. ➡️ Go to next step
+2. ✏️ Type changes
 ```
 
 [Wait for user approval before proceeding to Step 2.]
@@ -130,7 +130,7 @@ Example:
 1. smoke
 2. regression
 3. acceptance
-4. other
+4. ✏️ other
 ```
 
 #### Role
@@ -159,7 +159,7 @@ Example:
 ❓ Choose role:
 
 1. default (or propose recommended based on context)
-2. Type role name
+2. ✏️ Type role name
 ```
 
 **If you show not all roles to the user, add "_Show all available roles_" option.**
@@ -170,8 +170,8 @@ Example:
 ❓ Choose role:
 
 1. default (or propose recommended based on context)
-2. Show all available roles
-3. Type role name
+2. ☰ Show all available roles
+3. ✏️ Type role name
 ```
 
 Choose **default** in case user does not specify role.
@@ -214,10 +214,10 @@ Example:
 ```
 ❓ Do you want to:
 
-1. Keep as is
-2. Less details
-3. More details
-4. Type anything you want to change
+1. 👍 Keep as is
+2. ➖ Less details
+3. ➕ More details
+4. ✏️ Type anything you want to change
 ```
 
 ### Step 4: Generate Detailed Test Cases
