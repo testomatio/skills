@@ -1,6 +1,6 @@
 ---
 name: testomatio-reporter-setup
-description: Configure Testomat.io reporter in an existing automation project. Add test reporting to Playwright, CodeceptJS, Mocha, Jest, or WebdriverIO projects.
+description: Set up Testomat.io test reporting to project. Configure automation framework (like Playwright, CodeceptJS, Mocha, Jest, WebdriverIO, etc.) reporters to connect the local test suite with Testomat.io TMS.
 license: MIT
 metadata:
   author: Testomat.io
@@ -14,10 +14,10 @@ This skill configures Testomat.io reporter in your automation project and sends 
 ## When to Use
 
 Trigger this skill when user wants to:
-- Set up test reporting in their project
-- Add Testomat.io reporter to existing tests
-- Configure HTML reports for local test results
-- Push test results to Testomat.io TMS
+- Set up test reporting in their project.
+- Add Testomat.io reporter to existing framework/project.
+- Configure HTML reports for local test results.
+- Push test results to Testomat.io TMS.
 
 ---
 
@@ -25,12 +25,10 @@ Trigger this skill when user wants to:
 
 ### Step 1: Detect Project Framework
 
-First, check for existing test framework config in project:
-- Playwright: `playwright.config.*`;
-- CodeceptJS: `codecept.conf.*`;
-- Jest: `jest.config.*`;
-- WebdriverIO: `wdio.conf.*`;
-- or some custom `package.json` with test scripts
+Identify which testing framework is used in the project:
+  - Supported frameworks: `Playwright`, `CodeceptJS`, `Jest`, `Mocha`, `WebdriverIO`.
+
+> If the framework is unclear, inspect the repository structure, dependencies, configuration files, and `package.json` scripts to determine which framework is used or ask the user which framework the project uses.
 
 **If config found:**
 - Proceed to Step 2 (Install reporter).
@@ -46,18 +44,20 @@ First, check for existing test framework config in project:
 
 Ask User:
 1. **Framework?** (auto-detected from config, or ask if not found)
-2. **Testomatio API key?** (format: `tstmt_xxxxx`) - or use existing `.env`
-3. **Configure artifacts?** (S3 storage for screenshots/videos) - optional
-4. **Use HTML reports?** (for local-only results without pushing to TMS)
+2. **Replace or Add your Testomat.io API key to .env file?** (format: `tstmt_xxxxx`)
+3. **Use HTML reports?** (for local-only results without pushing to TMS)
+4. **Push identified tests to the Testomat.io TMS?**
+<!-- 4. **Push identified tests to the Testomat.io TMS?** - by testomatio-sync-cases skill??? -->
+<!-- 5. **Configure artifacts?** (S3 storage for screenshots/videos) - optional -->
 
 > Move to Step 2 (Install reporter) after filling all gaps.
 
 #### Create Demo Project (if requested)
 
 For new demo project, scaffold with:
-- Framework: Playwright (default), CodeceptJS, or Jest
-- Add sample test file and framework config
-- Pre-configure reporter in config
+- Framework: Playwright (default), CodeceptJS.
+- Add sample test file and framework config.
+- Pre-configure reporter in config.
 - Create `.env` with placeholder for "TESTOMATIO" token.
 
 **Step 1 Summary (Log):** After completing framework detection and/or interactive setup, output a short log-style summary. Include:
@@ -96,9 +96,10 @@ TESTOMATIO_URL=https://app.testomat.io
 Run tests with reporter to verify configuration:
 - First run: use HTML report mode for quick verification (by "HTML Reports" references instruction).
 
-### Step 6: Push tests to TMS
+### Step 6: Import Tests to TMS
 
-Push tests to TMS based with the "TESTOMATIO" token.
+After the reporter is successfully configured and the "TESTOMATIO" API token is added to the project, push the detected tests to Testomat.io.
+**Do not run this step** if the reporter is not configured or the token is missing.
 
 Playwright Example:
 
@@ -108,7 +109,8 @@ npx check-tests@latest Playwright "**/*{.,_}{test,spec,cy}.js"
 TESTOMATIO=tstmt_xxxxx npx check-tests@latest Playwright "**/*{.,_}{test,spec,cy}.js" --no-empty
 ```
 
-> After that, user can go to the Testomat.io UI and check that the tests have been added to the project scope.
+✅ If all steps finished successfully, the tests will appear in the Testomat.io project:
+  - Suggest the user go to the Testomat.io UI interface and check if the tests have been added to the project scope.
 
 ### Final Summary
 
@@ -127,7 +129,7 @@ Testomatio Reporter configuration complete:
 - Reporter: @testomatio/reporter installed
 - Config updated: playwright.config.ts
 - HTML reports: enabled
-- Artifacts storage: not configured
+<!-- - Artifacts storage: not configured -->
 - Testomatio API key: detected (.env)
 
 Verification:
@@ -136,8 +138,7 @@ Verification:
 ✔ Reporter ready to push results to Testomatio
 
 Next steps:
-1. Suggets a new automation tests
-2. Push a new test to TMS:
+1. Execute tests and push results to TMS:
 
 ```bash
 TESTOMATIO=tstmt_xxxxx npx playwright test --grep "@smoke"
@@ -175,13 +176,13 @@ TESTOMATIO=tstmt_xxxxx npx playwright test --grep "@smoke"
 * **Config syntax error**
   - Fix based on the detected framework.
 
-### Hard Fail
+* **Unsupported or unclear framework errors**
+  - Ask the user to confirm the framework or provide additional project details.
+
+### Blocking issues
 
 * **Invalid API key format or value**
-  - Stop and ask for a valid token.
-
-* **Unsupported framework**
-  - Stop and explain supported frameworks.
+  - Stop the setup and ask the user to provide a valid Testomat.io API token.
 
 ---
 
