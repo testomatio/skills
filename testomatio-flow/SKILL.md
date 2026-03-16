@@ -14,7 +14,7 @@ Trigger this skill when you need to:
 - Generate test cases from requirements and push them to Testomat.io
 - Improve existing test cases and upload updates
 - Add Testomat.io reporter to your project
-– Write new autotests
+- Write new autotests
 - Fix autotests and sync coverage
 - Manage the complete test lifecycle in one go
 
@@ -27,6 +27,7 @@ This skill uses a **flexible, logic-based approach** that adapts to your specifi
 The skill analyzes your request and intelligently routes tasks to appropriate sub-skills, then suggests logical next steps:
 
 #### **Test Generation Flow**
+
 ```
 User: "Generate test cases for user registration"
 ↓
@@ -34,14 +35,15 @@ Uses test-case-generator skill
 ↓
 Skill suggests: "Test cases generated! Would you like to:
 1. ⬆️ Upload to Testomat.io now
-2. 🔧 Add Testomat.io reporter first
+2. 🔧 Add Testomat.io reporter to your automation project
 3. ✨ Improve test quality
 4. 📊 Analyze coverage gaps"
 ```
 
 #### **Test Improvement Flow**
+
 ```
-User: "Improve existing API tests"
+User: "Improve existing tests"
 ↓
 Uses test-case-improver skill
 ↓
@@ -53,8 +55,9 @@ Skill suggests: "Tests improved! Next steps:
 ```
 
 #### **Autotest Fixing Flow**
+
 ```
-User: "Fix failing Cypress tests"
+User: "Fix failing UI tests"
 ↓
 Uses autotests-fixer skill
 ↓
@@ -65,18 +68,43 @@ Skill suggests: "Tests fixed! Ready to:
 4. 🔧 Optimize test performance"
 ```
 
+#### **Test Coverage Analysis Flow**
+
+```
+User: "Analyze test coverage gaps"
+↓
+Uses coverage-analyzer skill
+↓
+Skill suggests: "Coverage analysis complete! Next steps:
+1. ✨ Generate more test cases
+2. 🔧 Fix missing test cases
+3. ⬆️ Upload updated tests to Testomat.io
+4. 📊 Monitor coverage trends"
+```
+
+#### **Write new autotests Flow**
+
+```
+User: "Write new autotests"
+↓
+Uses autotests-generator skill
+↓
+Skill suggests: "Autotests generated! Next steps:
+1. 🔧 Add Testomat.io reporter to your automation project"
+```
+
 ## 🛠️ Available Sub-Skills
 
 The skill orchestrates these specialized capabilities:
 
-| Skill | Purpose |
-| ----- | ------- |
-| **test-case-generator** | Generate new test cases from requirements |
-| **test-case-improver** | Improve existing test cases quality |
-| **traceability-matrix** | Create traceability between requirements and tests |
-| **testomatio-tests-sync** | Upload test cases to Testomat.io TMS |
-| **autotests-fixer** | Fix failing automated tests |
-| **coverage-analyzer** | Analyze and improve test coverage |
+| Skill                     | Purpose                                            |
+| ------------------------- | -------------------------------------------------- |
+| **test-case-generator**   | Generate new test cases from requirements          |
+| **test-case-improver**    | Improve existing test cases quality                |
+| **traceability-matrix**   | Create traceability between requirements and tests |
+| **testomatio-tests-sync** | Upload test cases to Testomat.io TMS               |
+| **autotests-fixer**       | Fix failing automated tests                        |
+| **coverage-analyzer**     | Analyze and improve test coverage                  |
 
 ## 🎯 Smart Task Routing
 
@@ -85,6 +113,7 @@ Instead of fixed steps, this skill intelligently routes your request to the appr
 ### Context-Aware Analysis
 
 **When triggered, the skill:**
+
 1. **Analyzes your request** to understand the core need
 2. **Gathers relevant context** (project structure, existing tests, requirements)
 3. **Selects appropriate sub-skills** for the task
@@ -94,6 +123,7 @@ Instead of fixed steps, this skill intelligently routes your request to the appr
 ### Example Request Flows
 
 #### Request: "Generate test cases for user registration"
+
 ```
 🎯 User Request: "Generate test cases for user registration"
 
@@ -114,47 +144,6 @@ Instead of fixed steps, this skill intelligently routes your request to the appr
 4. 📊 Create traceability matrix"
 ```
 
-#### Request: "My tests are failing, help me fix them"
-```
-🎯 User Request: "My tests are failing, help me fix them"
-
-📊 Context Analysis:
-- Framework: Cypress
-- Failures: 3 tests in auth/
-- Issues: Element not found, timeouts
-- Testomat.io: Connected
-
-🔧 Action: Uses autotests-fixer skill
-✨ Output: Fixes provided and validated
-
-💡 Smart Suggestion:
-"Tests fixed! Next steps:
-1. 🔄 Re-run tests to verify fixes
-2. ⬆️ Upload fixes to Testomat.io
-3. ✨ Add better error handling
-4. 📊 Improve test coverage"
-```
-
-#### Request: "Upload tests to Testomat.io"
-```
-🎯 User Request: "Upload tests to Testomat.io"
-
-📊 Context Analysis:
-- Test files: Found 23 test files
-- Testomat.io: Configured
-- Last sync: 2 days ago
-
-⬆️ Action: Uses testomatio-tests-sync skill
-📊 Output: 23 test cases uploaded
-
-💡 Smart Suggestion:
-"Upload complete! Consider:
-1. 🔄 Set up CI/CD integration
-2. ✨ Generate test reports
-3. 📊 Monitor test execution trends
-4. 🔧 Add more test coverage"
-```
-
 ### Step 3: Execute Selected Workflows
 
 **Goal**: Perform the requested testing tasks using specialized sub-skills.
@@ -162,23 +151,27 @@ Instead of fixed steps, this skill intelligently routes your request to the appr
 **Available Workflows**:
 
 #### 🆕 New Test Generation Workflow
+
 1. Use **test-case-generator** to create test cases
 2. Optionally use **traceability-matrix** for requirements mapping
 3. Generate comprehensive checklists
 4. Create detailed test cases
 
 #### ✨ Test Improvement Workflow
+
 1. Use **test-case-improver** to enhance existing tests
 2. Apply quality checks and best practices
 3. Maintain consistency with existing patterns
 
 #### 🔧 Autotest Fixing Workflow
+
 1. Use **autotests-fixer** to identify issues
 2. Analyze failure patterns
 3. Provide fixes and improvements
 4. Test the fixes
 
 #### 📊 Coverage Analysis Workflow
+
 1. Use **coverage-analyzer** to identify gaps
 2. Suggest additional test scenarios
 3. Improve test coverage
@@ -188,6 +181,7 @@ Instead of fixed steps, this skill intelligently routes your request to the appr
 **Goal**: Ensure your tests are ready for TMS upload.
 
 **Actions**:
+
 - Check if Testomat.io reporter is installed
 - Install if missing
 - Configure reporter settings
@@ -214,6 +208,7 @@ Instead of fixed steps, this skill intelligently routes your request to the appr
 **Goal**: Sync your test cases with Testomat.io TMS.
 
 **Actions**:
+
 - Use **testomatio-tests-sync** to upload
 - Map test cases to requirements
 - Set priorities and metadata
@@ -242,82 +237,43 @@ Instead of fixed steps, this skill intelligently routes your request to the appr
 ## 🔄 Advanced Features
 
 ### Smart Context Awareness
+
 - Automatically detects project type and framework
 - Suggests appropriate testing strategies
 - Adapts to your project's testing patterns
 
 ### Integration Capabilities
+
 - Works with Jira, Confluence, Figma via MCP
 - Supports multiple automation frameworks
 - Compatible with various CI/CD pipelines
 
 ### Quality Assurance
+
 - Validates test case formats
 - Checks for best practices
 - Ensures consistency across tests
 - Provides quality metrics
 
-## 💡 Usage Examples
+## 🎨 Best Practices
 
-### Example 1: Complete Test Creation & Upload
-```
-User: "I need test cases for the new checkout feature and upload them to Testomat.io"
+### For New Projects
 
-🎯 Smart Routing:
-1. Analyzes request (generation + upload)
-2. Gathers requirements from Jira + design files
-3. Uses test-case-generator skill → Creates 12 comprehensive test cases
-4. Checks Testomat.io status → Reporter already configured
-5. Uses testomatio-tests-sync skill → Uploads all test cases
-6. Provides success summary and TMS links
+1. Start with comprehensive test generation
+2. Create traceability matrices early
+3. Establish Testomat.io integration from day one
 
-💡 Suggested Next Steps:
-"Ready to execute! Run: npm run test:e2e -- --env reporter=testomatio"
-```
+### For Existing Projects
 
-### Example 2: Emergency Test Fix
-```
-User: "My Cypress tests are failing, help me fix them"
+1. Gradually improve existing test cases
+2. Focus on coverage gaps
+3. Maintain TMS synchronization
 
-🎯 Smart Routing:
-1. Identifies failing tests from logs/project
-2. Uses autotests-fixer skill → Provides immediate fixes
-3. Validates fixes work locally
-4. Suggests quick upload to Testomat.io
-5. Recommends additional coverage for similar issues
+### For CI/CD Integration
 
-💡 Suggested Next Steps:
-"Critical issues fixed! Run full test suite to verify no regressions"
-```
-
-## 🎯 Smart Best Practices
-
-### Context-Aware Approach
-- **Let the skill adapt** to your specific needs rather than following rigid steps
-- **Accept suggestions** for next steps based on what you've accomplished
-- **Mix and match** workflows as needed (generation + improvement + upload)
-
-### For Different Project Types
-**New Projects:**
-- Start with test generation using test-case-generator
-- Use the upload suggestion to establish TMS integration early
-- Build comprehensive coverage gradually
-
-**Existing Projects:**
-- Focus on specific improvements (test-case-improver)
-- Use autotests-fixer for immediate issues
-- Maintain sync with Testomat.io regularly
-
-**CI/CD Integration:**
-- Use Testomat.io reporter in automated test runs
-- Upload results after each successful build
-- Monitor test execution trends and coverage metrics
-
-### Smart Workflow Tips
-- **Be specific** in your requests for better routing
-- **Accept suggestions** for logical next steps
-- **Combine workflows** for complex needs
-- **Iterate** as needed - the skill adapts to your feedback
+1. Use Testomat.io reporter in test runs
+2. Upload results automatically
+3. Monitor test trends over time
 
 ## 📞 Getting Help
 
@@ -331,4 +287,4 @@ If you encounter issues:
 
 ---
 
-**Remember**: This skill orchestrates your testing workflow, but you can also use individual sub-skills directly for specific tasks!
+This skill orchestrates your testing workflow, but you can also use individual sub-skills directly for specific tasks!
