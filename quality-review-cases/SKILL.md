@@ -90,6 +90,21 @@ Deliver the final Quality Review summary to the user with:
 - Prioritized improvement recommendations.
 - Overall health score with star rating.
 
+> Based on the Quality Review Summary, determine and propose concrete next actions.
+
+**Next Steps:**
+1. Improve test cases:
+  * Apply fixes based on identified quality issues and recommendations.
+  * Incorporate any user-provided comments or notes (if available).
+  * If `improve-cases` skill is available, invoke it with:
+    - The prioritized list of issues.
+    - Target test cases or suites.
+    - Expected improvements (e.g., coverage, readability, stability).
+
+2. Clarify scope (if needed):
+  * Ask the user for confirmation before making large-scale or breaking changes.
+  * Request missing context if recommendations cannot be applied directly.
+
 ---
 
 ## Quality Scoring Methodology
