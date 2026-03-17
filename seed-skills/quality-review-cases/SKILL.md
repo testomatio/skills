@@ -13,11 +13,11 @@ This skill performs a comprehensive quality assessment of test suites, providing
 
 ## When to Use
 
-Trigger this skill when user wants:
-- Overall assessment of their test suite quality.
-- Quality gate check before a release.
-- Answers to "how good are my tests?" or "provide test quality review", etc.
-- Test case quality review, test audit, or test health check.
+**Trigger this skill whenever user mentions:**
+- Test quality assessment, test health check, test audit
+- "How good are my tests?", "test quality review", "review test suite quality", "test audit", "test health check", or similar.
+- Test case review, test case audit, analyze test quality
+- Any variation of: test suite health, test quality score.
 
 ---
 
@@ -82,7 +82,7 @@ Evaluate each manual test using criteria from `./references/QUALITY_CRITERIA.md`
 
 Compile all findings into a structured Quality Report using the template from `./references/REPORT_TEMPLATES.md`.
 
-### Step 6: Present Quality Review Summary
+### Step 5: Present Quality Review Summary
 
 Deliver the final Quality Review summary to the user with:
 - Executive summary of test suite health.
