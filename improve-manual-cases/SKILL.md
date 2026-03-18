@@ -103,7 +103,8 @@ Apply improvements to each test:
 - Fix grammar and spelling only.
 
 **Step Improvements:**
-- Ensure each step has explicit Expected Result
+- Ensure each step has explicit expected result:
+  - Use nested format: "- Step action..." with indented "_Expected_: ..."
 - Make actions specific and reproducible
 - Add measurable pass/fail criteria
 - Ensure results are directly relevant to the step action
@@ -113,8 +114,10 @@ Apply improvements to each test:
 **Unambiguity Improvements:**
 - Replace generic terms with specific, testable language.
 - Avoid subjective terms ("should work", "might fail").
-- Include specific data values, boundaries, or conditions.
 - Ensure steps can be verified objectively.
+- Mention proper test metadata fields:
+  - Include type: `manual` in test metadata.
+  - Use proper priority values: `low`, `normal`, `important`, `high`, `critical`.
 
 ### Step 5: Save Changes
 

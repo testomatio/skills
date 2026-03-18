@@ -1,17 +1,11 @@
 <!-- suite
-id: @S0a913eee
-emoji: 
+id: @S0a913xxx
+emoji: 🔐
+tags: smoke, regression
 -->
 # Home Page Validation
 
-## PURPOSE
--------
-Verify that a guest user can view all critical UI elements on the Home page and ensure proper functionality of interactive components.
-
-## COVERAGE
---------
-- Page title verification
-- Footer copyright text & links visibility verification
+Verify that a guest user can view all critical UI elements on the Home page.
 
 ## PREREQUISITES & SETUP
 --------------------
@@ -33,41 +27,41 @@ Verify that a guest user can view all critical UI elements on the Home page and 
    - Ensure browser window is maximized
 
 <!-- test
-id: @Ts37c7ttt
+id: @Ts37c7xxx
 priority: normal
-tags: @smoke
+tags: smoke
 labels: Manual
 -->
-# Verify Browser Tab Title
+# Verify browser tab title
 
 ## Description:
-Verify that the browser tab displays the correct title when accessing the Home page.
+Navigate to application base URL. Verify that the browser tab displays the correct title.
 
 ## Preconditions:
 1. Navigate to application base URL: "http://site.com"
 
 ## Steps:
-* Wait for page to fully load.
-   *Expected*: Page is loaded.
-   *Expected*: Title is displayed correctly with needed text.
-* Observe the browser tab title.
-   *Expected*: Browser tab title contains "UI Test Automation Playground".
+* Observe the browser tab title
+  _Expected_: Title contains "UI Test Automation Playground"
 
 <!-- test
-id: @T693f9c26
+id: @T693f9xxx
 priority: normal
+tags: smoke
+labels: Manual
 -->
-# Verify Footer copyright text & links visibility 
+# Verify footer copyright text & links visibility 
 
 ## Description:
-Verify that the footer has correct copyright text & active links
+Navigate to application base URL. Verify that the footer has correct copyright text and active links.
 
 ## Preconditions:
 1. Navigate to application base URL: "http://site.com"
 
 ## Steps:
-* Wait for page to fully load.
-   *Expected*: Page is loaded.
-* Observe the browser tab title.
-   *Expected*: Footer has correct copyright text.
-   *Expected*: Footer has active links.
+* Scroll to footer section
+  _Expected_: Footer is visible
+* Verify copyright text
+  _Expected_: Copyright text is correct (e.g., "© 2024 Company Name")
+* Verify footer links are active
+  _Expected_: All links are clickable and navigate to correct pages
