@@ -1,9 +1,9 @@
 ---
-name: testomatio-flow
-description: Orchestrate the complete test case lifecycle from requirements to Testomat.io TMS. Generate test cases, improve existing ones, add reporters, upload to TMS, write new autotests, fix autotests, analyze coverage. Use this skill when you need to manage the entire testing workflow including generation, improvement, coverage, and sync with Testomat.io or do one of the tasks mentioned above.
+name: testing-flow
+description: Orchestrate the complete test case lifecycle from requirements to uploading to TMS (Test Management System). Generate test cases, improve existing ones, analyze test coverage, add test reporter, upload to TMS, write new autotests, fix/heal autotests. Use this skill when you need to manage the entire testing workflow including generation, improvement, coverage, and sync with Testomat.io or do one of these tasks.
 ---
 
-# Testomatio Flow - Complete Test Lifecycle Management
+# Testing Flow - Complete Test Lifecycle Management
 
 This powerful skill orchestrates your entire testing workflow, guiding you from initial requirements to final test case management in Testomat.io TMS.
 
@@ -11,11 +11,13 @@ This powerful skill orchestrates your entire testing workflow, guiding you from 
 
 Trigger this skill when you need to:
 
-- Generate test cases from requirements and push them to Testomat.io
-- Improve existing test cases and upload updates
-- Add Testomat.io reporter to your project
+- Generate test cases from requirements
+- Push test cases to Testomat.io or any other TMS (Test Management System)
+- Improve existing test cases and upload updates to TMS
+- Add test reporter to your project (testomat.io reporter or any other)
 - Write new autotests
-- Fix autotests and sync coverage
+- Fix/heal autotests
+- Check test coverage
 - Manage the complete test lifecycle in one go
 
 ## 🚀 Dynamic Workflow
@@ -29,82 +31,62 @@ The skill analyzes your request and intelligently routes tasks to appropriate su
 #### **Test Generation Flow**
 
 ```
-User: "Generate test cases for user registration"
+User: asks to generate/create test cases or check list
 ↓
-Uses test-case-generator skill
+Use `test-case-generator` skill to proceed with test case, check list generation
 ↓
-Skill suggests: "Test cases generated! Would you like to:
-1. ⬆️ Upload to Testomat.io now
+After previous step fully completed, suggest next actions:
+1. ⬆️ Upload generated test cases to Testomat.io
 2. 🔧 Add Testomat.io reporter to your automation project
-3. ✨ Improve test quality
-4. 📊 Analyze coverage gaps"
+3. 📊 Analyze coverage gaps
 ```
 
-#### **Test Improvement Flow**
+<!-- 4. Generate autotests for test cases -->
+
+#### **Test cases Improvement Flow**
 
 ```
-User: "Improve existing tests"
+User: aks for test cases improvement
 ↓
-Uses test-case-improver skill
+Use `test-case-improver` skill to proceed with test case improvement
 ↓
-Skill suggests: "Tests improved! Next steps:
-1. ⬆️ Upload updated tests to Testomat.io
-2. 🔧 Fix failing autotests
-3. 📊 Check coverage improvements
-4. ✨ Generate more edge cases"
+After previous step fully completed, suggest next actions:
+1. ⬆️ Upload updated test cases to Testomat.io
+2. 🔧 Generate autotests for test cases
 ```
 
-#### **Autotest Fixing Flow**
+#### **Sync test cases, check list to Testomat.io Flow**
 
 ```
-User: "Fix failing UI tests"
+User: asks to sync test cases or check list to Testomat.io
 ↓
-Uses autotests-fixer skill
+Use `testomatio-sync-cases` skill to proceed with test case sync
 ↓
-Skill suggests: "Tests fixed! Ready to:
-1. 🔄 Re-run tests to verify
-2. ⬆️ Upload fixes to Testomat.io
-3. ✨ Add more test coverage
-4. 🔧 Optimize test performance"
+After previous step fully completed, suggest next actions
 ```
 
-#### **Test Coverage Analysis Flow**
+#### **Add test reporter (or Testomat.io reporter) to your automation project Flow**
 
 ```
-User: "Analyze test coverage gaps"
+User: asks to add test reporter to your automation project (or Testomat.io reporter)
 ↓
-Uses coverage-analyzer skill
+Use `testomatio-reporter-setup` skill to proceed with test reporter setup
 ↓
-Skill suggests: "Coverage analysis complete! Next steps:
-1. ✨ Generate more test cases
-2. 🔧 Fix missing test cases
-3. ⬆️ Upload updated tests to Testomat.io
-4. 📊 Monitor coverage trends"
-```
-
-#### **Write new autotests Flow**
-
-```
-User: "Write new autotests"
-↓
-Uses autotests-generator skill
-↓
-Skill suggests: "Autotests generated! Next steps:
-1. 🔧 Add Testomat.io reporter to your automation project"
+After previous step fully completed, suggest next actions
 ```
 
 ## 🛠️ Available Sub-Skills
 
 The skill orchestrates these specialized capabilities:
 
-| Skill                     | Purpose                                            |
-| ------------------------- | -------------------------------------------------- |
-| **test-case-generator**   | Generate new test cases from requirements          |
-| **test-case-improver**    | Improve existing test cases quality                |
-| **traceability-matrix**   | Create traceability between requirements and tests |
-| **testomatio-tests-sync** | Upload test cases to Testomat.io TMS               |
-| **autotests-fixer**       | Fix failing automated tests                        |
-| **coverage-analyzer**     | Analyze and improve test coverage                  |
+| Skill                         | Purpose                                             |
+| ----------------------------- | --------------------------------------------------- |
+| **test-case-generator**       | Generate new test cases from requirements           |
+| **test-case-improver**        | Improve existing test cases quality                 |
+| **testomatio-sync-cases**     | Upload test cases to Testomat.io TMS                |
+| **testomatio-reporter-setup** | Add Testomat.io reporter to your automation project |
+
+<!-- TODO: coverage-analyzer, autotests-fixer, traceability-matrix -->
 
 ## 🎯 Smart Task Routing
 
