@@ -1,5 +1,5 @@
 ---
-name: improve-manual-cases
+name: test-case-improver
 description: Analyze and improve existing markdown manual test cases for clarity, structure, and Test Management Tool format compliance.
 license: MIT
 metadata:
@@ -7,7 +7,7 @@ metadata:
   version: 1.0.0
 ---
 
-# IMPROVE-MANUAL-CASES SKILL: What I do
+# TEST-CASE-IMPROVER SKILL: What I do
 
 Analyze and improve existing markdown manual test cases to make them clearer and more understandable for QA team:
 - Improve test titles for clarity.
@@ -171,22 +171,17 @@ Output a summary of what was improved:
 
 **Improve all test cases:**
 ```
-Use improve-manual-cases to enhance my test descriptions
+Use test-case-improver to enhance my test descriptions
 ```
 
 **Standardize test format:**
 ```
-Use improve-manual-cases to standardize all test cases to Testomat.io format
-```
-
-**Improve specific folder:**
-```
-Use improve-manual-cases to improve test cases from the "./manual-test" folder only
+Use test-case-improver to standardize all test cases to Testomat.io format
 ```
 
 **Improve specific file:**
 ```
-Use improve-manual-cases to improve test cases from the "./manual-test/home-page.test.md" file
+Use test-case-improver to improve test cases from the "./manual-test/home-page.test.md" file
 ```
 
 ---
