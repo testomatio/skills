@@ -95,13 +95,7 @@ Steps:
    _Expected_: List includes "manual" option.
 ```
 
-#### 2.1 Validate Test Case Format
-
-If test case format is unclear:
-- Ask user to clarify the steps.
-- Request additional context if needed.
-
-#### 2.2 Handle Ambiguous Steps
+#### 2.1 Handle Ambiguous Steps
 
 For each step, classify its clarity level:
 - **Clear** => proceed normally.
@@ -167,22 +161,18 @@ Always prioritize:
 - Duplicate selectors or logic that already exist
 - Generate “temporary” code that requires refactoring later
 
-#### 3.2 Apply Test Design Principles
+#### 3.2 Follow Framework Patterns
 
-Apply best practices where applicable:
-* **Single Responsibility Principle:**
-  - Each test should validate one logical flow.
+Apply these principles when writing tests:
+- **One test, one flow** - Each test validates a single scenario
+- **Separation of concerns:**
+  - Tests => assertions and flow control.
+  - Page Objects => UI interactions.
+  - Utils => reusable logic.
+- **Extend, don't modify** - Add to existing components without changing stable code
+- **Use fixtures** for setup, authentication, and shared state
 
-* **Separation of Concerns:**
-  - Tests → assertions and flow
-  - Page Objects → UI interactions
-  - Utils → reusable logic
-
-* **Open/Closed Principle:**
-  - Extend existing components without modifying stable code.
-
-* **Dependency Management:**
-  - Use fixtures/hooks for setup and shared state.
+> See [POM Best Practices](./references/POM_BEST_PRACTICES.md) for detailed patterns
 
 #### 3.3 Generate Assertions
 
@@ -222,6 +212,8 @@ Apply fixes in the following priority order:
 - Prefer stable selectors (`data-testid`, `aria-label`, etc).
 - Avoid overly complex or deeply nested selectors.
 
+> See [POM Best Practices - Locator Strategy](./references/POM_BEST_PRACTICES.md#locator-strategy)
+
 **2. Resolve Timing Issues**
 - Add explicit waits for elements to be visible, enabled, or attached.
 - Use framework-native waiting mechanisms (avoid hard sleeps).
@@ -240,7 +232,8 @@ Apply fixes in the following priority order:
 **Healing Rules:**
 - Apply one category of fix at a time and re-run the test.
 - Do not apply multiple unrelated fixes in a single attempt.
-- Limit healing to 3 iterations.
+- Limit healing to 3 iterations total.
+- After 3 failed attempts, stop and ask user for guidance.
 
 #### 4.3 Handle Unresolved Failures
 
@@ -267,6 +260,26 @@ A test is considered **stable** if:
 Once stability criteria are met:
 - Save the automation script to the appropriate project location.
 - Ensure consistency with project structure and naming conventions.
+
+#### 4.6 Stop Conditions
+
+Stop healing and ask user when:
+- **Same locator fails 3 times** - UI may have changed significantly.
+- **Timing issues persist** - Page may require different load strategy.
+- **Flow doesn't match manual steps** - Test case or app may need adjustment.
+- **Data/state issues** - Preconditions may be missing from test case.
+
+Example prompt to user:
+```
+❓ Test keeps failing after 3 attempts. Last error: [brief description]
+- Tried: [what was attempted]
+- Possible causes: [your analysis]
+
+Should we:
+1. Continue debugging together
+2. Save current version and mark as needs review
+3. Skip this test case for now
+```
 
 ---
 
@@ -312,6 +325,13 @@ Re-run the test after adjustments:
   - Apply minimal fixes (max 1-2 attempts).
   - Focus only on issues introduced during this step.
 
+#### 5.5 Save Integrated Test
+
+When integration is complete:
+- Save final test file to project
+- Follow naming conventions (e.g., `*.spec.ts`, `*.test.js`)
+- Use consistent folder structure
+
 ---
 
 ### Step 6: Final Verification
@@ -330,50 +350,18 @@ Execute a minimal set of related tests to ensure integration:
 
 After completing the conversion, output a structured summary:
 
-``` TODO: move to references???
-Manual-to-Automation Conversion Complete:
-
-**Test Overview:**
-- File: tests/e2e/custom-statuses.spec.ts
-- Scenario: "Custom statuses are set up by default"
-- Framework: Playwright
-
-**Implementation Details:**
-* Page Objects:
-    - SettingsPage (reused).
-    - CustomStatusesPage (created).
-* Reuse Strategy:
-    - Reused existing navigation and settings logic.
-    - Added new methods for custom statuses flow.
-* Test Data:
-    - Inlined (small dataset).
-    - No existing external data pattern detected.
-
-**Stability:**
-    - Status: ✅ Stable.
-    - Passed multiple runs: Yes.
-    - Healing applied: No.
-
-**Assumptions & Notes:**
-    - ⚠️ Assumed "Custom statuses block" is clickable via visible label.
-    - ⚠️ Assumed default option includes "manual".
-
-**Issues:**
-    - ❓ None.
-
-**Next steps:**
-1. Review generated test at: tests/e2e/custom-statuses.spec.ts
-2. (Optional) Run full suite: ...
-3. (Optional) Refine selectors if UI changes frequently.
-```
+> See [Final Summary Template](./references/FINAL_SUMMARY_TEMPLATE.md) for reference
 
 ---
 
 ## References
-TODO:???
+
 | Description | File |
 |-------------|------|
+| Final Summary Template | ./references/FINAL_SUMMARY_TEMPLATE.md |
 | POM Best Practices | ./references/POM_BEST_PRACTICES.md |
+| Playwright Best Practices | ./references/PLAYWRIGHT_BEST_PRACTICES.md |
+| CodeceptJS Best Practices | ./references/CODECEPTJS_BEST_PRACTICES.md |
 | Framework Config Templates | ./references/FRAMEWORK_TEMPLATES.md |
 | Test Data Management | ./references/TEST_DATA_MANAGEMENT.md |
 
@@ -453,16 +441,6 @@ Agent: Refactoring to match project standards...
 Agent: ✅ All done!
 ```
 
-### With Clarification
-
-```
-Agent: ❓ Step 3 "Click the submit button" - there are 3 buttons on this page.
-Which one should I use?
-1. Login button
-2. Reset button
-3. Cancel button
-```
-
 ### Framework Not Detected
 
 ```
@@ -472,6 +450,35 @@ Agent: Couldn't detect automation framework in your project.
 2. CodeceptJS
 3. Cypress
 4. Other (specify)
+```
+
+### Multi-Page Flow
+
+```
+Agent: Detected Playwright with existing POM structure.
+Agent: Found 4 reusable Page Objects: LoginPage, DashboardPage, SettingsPage, UsersPage.
+Agent: Converting multi-step manual test...
+Agent: ✅ Generated: tests/e2e/user-management.spec.ts
+Agent: Test passes! ✅
+Agent: Integration complete. ✅
+
+Summary:
+- Page Objects: LoginPage, DashboardPage, SettingsPage (reused), UsersPage (extended)
+- Assumptions: ⚠️ UsersPage.userTable uses standard data-testid pattern
+- Status: ✅ Stable
+```
+
+### Complex Step Clarification
+
+```
+Agent: ❓ Step 5 "Click the item to open details" - found 2 similar elements:
+   - Row #1: "John Doe" (data-testid="user-row-0")
+   - Row #2: "Jane Smith" (data-testid="user-row-1")
+   
+Should I click:
+1. First item (John Doe)
+2. Second item (Jane Smith)
+3. Both items in sequence
 ```
 
 ---
@@ -485,3 +492,5 @@ Agent: Couldn't detect automation framework in your project.
 | Reuse components | Check for existing POMs |
 | Rollback if stuck | Keep working version |
 | Final verification | Run related suite only |
+| Run single test | `npx playwright test path/to/spec.ts` |
+| Run single test | `npx codeceptjs run path/to/test.js` |
