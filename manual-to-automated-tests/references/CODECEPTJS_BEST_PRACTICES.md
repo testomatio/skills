@@ -3,11 +3,11 @@
 ## Project Structure
 
 ```
+pages/                # Page Objects (Gherkin steps)
+data/                 # Test data files
+helpers/               # Custom helpers
+steps/                # Custom step definitions
 tests/
-  ├── pages/           # Page Objects (Gherkin steps)
-  ├── steps/           # Custom step definitions
-  ├── data/            # Test data files
-  ├── helpers/         # Custom helpers
   └── *.test.js        # Test files
 ```
 
