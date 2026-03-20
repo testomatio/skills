@@ -362,7 +362,6 @@ After completing the conversion, output a structured summary:
 | POM Best Practices | ./references/POM_BEST_PRACTICES.md |
 | Playwright Best Practices | ./references/PLAYWRIGHT_BEST_PRACTICES.md |
 | CodeceptJS Best Practices | ./references/CODECEPTJS_BEST_PRACTICES.md |
-| Framework Config Templates | ./references/FRAMEWORK_TEMPLATES.md |
 | Test Data Management | ./references/TEST_DATA_MANAGEMENT.md |
 
 ---
