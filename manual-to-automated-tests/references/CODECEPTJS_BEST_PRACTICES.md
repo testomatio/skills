@@ -25,34 +25,19 @@ project-root/
 ├── .env.example                   # Environment template
 ├── package.json                   # Scripts and dependencies
 │
-├── tests/                         # Test specifications
-│   ├── auth/
-│   │   └── login.test.js
-│   ├── products/
-│   │   └── product.test.js
+├── tests/                    # Test specifications (grouped by feature or scope)
+│   ├── beta/                 # Main/regression suite
+│   |    ├── auth/
+│   |    ├── products/
+│   ├── prod/                 # Smoke/production checks
 │   └── ...
 │
-├── pages/                         # Page Objects (locators & basic actions)
-│   ├── BasePage.js
-│   ├── LoginPage.js
-│   ├── DashboardPage.js
-│   └── index.js
-│
-├── steps/                         # Custom step definitions (Actor methods)
-│   ├── steps_file.js              # Default generated steps
-│   ├── auth.steps.js              # Authentication steps
-│   ├── product.steps.js           # Product-related steps
-│   └── index.js
-│
-├── helpers/                       # Custom helpers
-│   ├── ApiHelper.js               # REST API helper
-│   ├── DatabaseHelper.js          # Database operations
-│   └── index.js
-│
-├── data/                          # Test data files
-│   ├── users.js
-│   ├── products.js
-│   └── index.js
+├── src/ (optional but preferred for larger projects)
+│   ├── pages/                # Page Objects (locators + simple actions only)
+│   ├── steps/                # Custom steps (business flows)
+│   ├── helpers/              # API clients, DB helpers, utilities
+│   ├── testData/             # Test data, constants, enums
+│   └── plugins/              # Custom plugins
 │
 ├── plugins/                       # Custom plugins
 │   └── customPlugin.js
@@ -61,11 +46,55 @@ project-root/
 └── log/                           # CodeceptJS logs
 ```
 
+### Alternative (Flat) Structure
+
+For smaller or legacy projects, folders may exist at root level:
+
+```
+pages/
+steps/
+helpers/
+data/ (or testData/)
+plugins/
+```
+
+✔️ This is acceptable, but grouping under src/ is preferred for scalability and separation of concerns.
+
+---
+
+## Naming rules
+
+No abbreviations — always write full words:
+
+| Wrong | Correct |
+|-------|---------|
+| `Nav` | `Navigation` |
+| `Btn` | `Button` |
+| `Pg`  | `Page` |
+
+Locator names must include the **element type** as a suffix — the name should answer both "what is it?" and "what kind of thing?":
+
+| Wrong (no type) | Correct (with type) |
+|-----------------|---------------------|
+| `compareOverview` | `compareOverviewSection` |
+| `finishRun` | `finishRunButton` |
+
 ---
 
 ## Page Objects
 
-**Rule**: Pages are dumb containers - only locators and simple actions. Never put complex logic in Pages.
+**Rule**: Pages are dumb containers - only locators and simple actions. Never put complex logic in Pages or mix surfaces in one file.
+
+Example-1:
+
+```
+settingsLabels.page.ts      — labels list/index page
+settingsLabelForm.page.ts   — create/edit label form
+setLabelsPanel.page.ts      — "Set Labels" panel on tests page
+```
+
+Example-2:
+
 
 ```javascript
 // pages/LoginPage.js
@@ -113,6 +142,12 @@ module.exports = {
 }
 ```
 
+### Register New Page Objects
+
+After creating a new page object file, add it to:
+1. `codecept.conf.ts` - `include` section
+2. `steps.d.ts` - type declarations
+
 ### Locator Strategy
 
 **Priority Order (use top to bottom):**
@@ -130,13 +165,81 @@ module.exports = {
 I.click('Submit')
 I.fillField('Email', 'user@test.com')
 I.seeElement({ name: 'submit-button' })
-I.click({ xpath: '//button[contains(@class, "primary")]' })
 
 // With test IDs (using custom locator)
 I.click({ testId: 'submit-form-btn' })
 
 // Avoid - CSS class only when necessary
 I.click('.btn-primary.submit-form')
+```
+
+#### Reusing Locators
+
+Before creating a new locator, always search in:
+- `src/pages/`
+- `pages/`
+- `components/`
+- etc.
+(If a locator for the same element already exists — reuse it)
+
+**Avoid duplicates:** (e.g. `reportButton` vs `combinedReportButton`) - They create confusion, inconsistency, and maintenance issues.
+
+#### Locator Best Practices
+
+**Be specific:**
+- ❌ Never use locate("*") (too broad, generates `//*[...]`).
+  - ✅ Always specify a tag: locate("div"), locate("button"), etc.
+
+**Avoid positional selectors:**
+- ❌ Never use `.at(n)` unless absolutely necessary. These break when the DOM changes.
+  - ✅ Prefer: `id`, `aria-*`, `data-*`, `withText()`, `inside()`.
+
+**Use correct assertions:**
+- ❌ Avoid `I.see()`
+  - ✅ Use I.seeElement()
+
+#### XPath & Locator Behavior Notes
+
+`inside()`:
+- Uses `ancestor::` (matches any ancestor in the tree).
+- Can lead to false positives
+  - ✅ Always narrow with a specific parent (class, role, etc.)
+
+`withChild()`:
+- Uses `child::` (direct children only)
+`- ✅ Use when validating parent → child relationships
+
+`withText()`:
+- Uses substring matching (`contains()`)
+- ⚠️ Can match unintended elements
+  - ✅ Ensure test data text is unique
+
+### Tab Active State Verification
+
+After clicking a tab, always verify it is active. Different implementations use different indicators - try to inspect the DOM before writing locators
+Common patterns:
+- `aria-selected="true"`
+- `.active` class
+
+The method belongs in the page object of the surface that owns the tabs:
+
+```typescript
+private generateActiveTabLocator(tabName: string) {
+  return locate('[role="tab"][aria-selected="true"]').withText(tabName);
+}
+
+checkThatTabIsActive(tabName: string) {
+  const activeTab = this.generateActiveTabLocator(tabName);
+  I.waitForElement(activeTab, timeouts.THREE);
+  I.seeElement(activeTab);
+}
+```
+
+In the test, call it immediately after each tab click:
+
+```typescript
+requirementsPage.clickOnSourceTab();
+requirementsPage.checkThatTabIsActive("Source");
 ```
 
 ---
@@ -373,6 +476,63 @@ invalid.forEach((data) => {
 })
 ```
 
+### Constants & Test Data Usage
+
+Prefer using shared constants, enums, or test data instead of hardcoded values in tests.
+
+Avoid hardcoding user data, timeouts, or configuration values when a reusable option exists. This improves readability, consistency, and maintainability.
+
+Use values from dedicated test data or config files, for example:
+
+```typescript
+import { timeouts } from "../testData/timeout";
+
+I.waitForElement(locator, timeouts.THREE); // 3s
+```
+
+### API in Preconditions, UI for Test Steps
+
+- **Before hook**: use API (`createUserApi`) to create test data: user, project, payment, etc.
+- **Scenario body**: use UI interactions — that is what the test is verifying
+- Exception: simple navigation to a starting URL in Before is acceptable
+
+```typescript
+Before(async ({ createUserApi }) => {
+  // Create data via API — fast and reliable
+  const user = await createUserApi.createUser("Ted", "admin", 200);
+});
+
+Scenario("...", async ({ project }) => {
+  // Interact via UI — this is what we're testing
+  project.openListItems(projectId);
+  project.clickOnAddButton();
+});
+```
+
+### UI User Navigation
+
+Prefer UI navigaton instead fo URL shortcuts.
+If a step says "Navigate to Settings" — implement it with UI clicks, not `I.amOnPage(...)`.
+
+```typescript
+// WRONG
+I.amOnPage(`/settings/`);
+
+// CORRECT
+settings.openNavigationPage();
+```
+
+Exception: `openNavigationPage()` and similar helper methods in page objects that exist specifically for direct navigation (e.g. as a test precondition) are fine.
+
+### Key formatting rules
+
+- One blank line between every action in Scenario body.
+- No step comments inside Scenario body — method names must be self-documenting.
+- No magic strings in test body — extract to `const` at top of file.
+- No long `projectData.x.y.z.w` chains in test body — extract to named `const`.
+- `Before`: API token setup + UI login + navigate to starting point.
+- `After`: API cleanup only (no UI).
+
 ---
 
 ## Advanced Patterns
@@ -540,6 +700,13 @@ module.exports = DebugHelper
 8. **Never ignore flaky tests** - Fix immediately with proper waits
 9. **Never use CSS-only locators when semantic ones are available** - Prioritize `{ name: 'button' }` over `.btn-primary`
 10. **Never skip test cleanup** - Use After hooks to clean up state
+
+### Code Smells from Legacy Code (Do Not Repeat)
+
+* Hardcoded waits (like `I.wait(n)`).
+* Inline cleanup inside test scenarios (`// cleanup`).
+* Direct use of locators in test files instead of page objects.
+* Hardcoded IDs and config values in tests.
 
 ---
 
