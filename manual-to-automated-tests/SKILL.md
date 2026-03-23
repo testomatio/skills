@@ -38,6 +38,10 @@ Trigger this skill when user wants to:
 **If no framework detected:**
     - Ask user to confirm the automation framework.
 
+If framework is PLAYWRIGHT or CODECEPTJS use corresponding best pracices from the references.
+> See [CODECEPTJS Best Practices](./references/CODECEPTJS_BEST_PRACTICES.md)
+> See [PLAYWRIGHT Best Practices](./references/PLAYWRIGHT_BEST_PRACTICES.md)
+
 #### 1.2 Identify Excluded Paths
 
 Before scanning the project, identify folders that may contain deprecated or irrelevant code based on naming patterns:
@@ -281,6 +285,66 @@ Should we:
 3. Skip this test case for now
 ```
 
+#### 4.7 MCP Verification (If Available)
+
+If the user has MCP Playwright configured, use these verification methods for complex UI elements:
+
+**A — DOM Inspection Before Writing Locators**
+
+Before creating new locators, inspect the actual DOM to ensure accuracy:
+```typescript
+// Use MCP browser_evaluate:
+document.querySelector('.some-class').outerHTML
+document.querySelectorAll('[role="switch"]').length
+```
+
+**B — Steps Mode Execution**
+
+Run tests with verbose step output to verify XPath targeting:
+```bash
+npx codeceptjs run --grep "@TxxxxxxX" --steps
+# or
+npx playwright test --grep "@TxxxxxxX" --ui
+```
+
+**C — MCP Live Replay (Required for Complex Components)**
+
+For dropdowns, modals, toggles, and any complex UI components:
+1. Reproduce each test step in MCP Playwright browser
+2. After each action, call `browser_snapshot()` to confirm UI state matches expected behavior
+
+**D — Assertions as Proof of Correctness**
+
+Map action types to required assertions:
+
+| Action type | Required assertion |
+|------------|-------------------|
+| Save / submit | Toast or success message visible |
+| Open dialog / dropdown | Dialog or dropdown visible |
+| Fill field | `I.seeInField` inside method |
+| Navigation | Page header or URL confirms destination |
+| Move / assign / counter change | Updated counter or list entry visible |
+
+When verifying against Expected Results, ensure assertions prove the ER literally:
+- ER says **"each"** => check ALL items, not just one.
+- ER says **"shared view"** => check the combination of elements that together prove it.
+- ER says **"independent results"** => check every environment panel, not just the first.
+
+**E — Spec-to-Code Mapping Table**
+
+Present verification results as a two-column table:
+
+| Step (from spec comments) | Actions in test |
+|---------------------------|-----------------|
+| 1. Navigate to the 'Settings' page | `basePage.clickOnNavigationMenuButton("Settings")` |
+| 2. Click the 'Settings' button | `runsPage.clickOnSettingsButton()` |
+
+Left column = step exactly as written in the manual test.
+Right column = the actual method call(s) that implement it.
+Every spec step must have a row. If a step has no implementation — flag it explicitly.
+
+**Exit Condition:** Run the test twice in a row without failures before marking verification complete.
+
 ---
 
 ### Step 5: Align & Integrate Test Code
@@ -308,6 +372,8 @@ Handle test data based on existing project patterns:
   - Keep test data inline.
 
 Do NOT introduce new data management patterns unless explicitly requested.
+
+> See [Test Data Management](./references/TEST_DATA_MANAGEMENT.md) for details.
 
 #### 5.3 Validate Fixtures and Hooks Usage
 
@@ -421,7 +487,7 @@ or
 
 ## Examples
 
-### Basic Conversion
+### Basic Conversion by Use Case Text
 
 ```
 User: Convert this manual test to Playwright:
@@ -434,10 +500,24 @@ User: Convert this manual test to Playwright:
 Agent: Got it! Detected Playwright project.
 Agent: Creating test using existing LoginPage...
 Agent: ✅ Test created: tests/e2e/login.spec.ts
-Agent: Running test...
+Agent: Verify test code...
 Agent: ✅ Test passed!
 Agent: Refactoring to match project standards...
 Agent: ✅ All done!
+```
+
+### Basic Conversion by Specific Files
+
+**User Request:**
+
+```
+User: Use manual-to-automated-tests skill for CodeceptJS framework to write automation 
+script "tests/prod/test-payment-1.ts" based on manual steps below. Use "good-test.ts"
+as reference for proper patterns and avoid mistakes from "bad-test.ts" legacy code example.
+
+Agent: Got it! Detected Playwright project.
+...
+Agent: ✅ All done! See Summary report above...
 ```
 
 ### Framework Not Detected
@@ -449,35 +529,6 @@ Agent: Couldn't detect automation framework in your project.
 2. CodeceptJS
 3. Cypress
 4. Other (specify)
-```
-
-### Multi-Page Flow
-
-```
-Agent: Detected Playwright with existing POM structure.
-Agent: Found 4 reusable Page Objects: LoginPage, DashboardPage, SettingsPage, UsersPage.
-Agent: Converting multi-step manual test...
-Agent: ✅ Generated: tests/e2e/user-management.spec.ts
-Agent: Test passes! ✅
-Agent: Integration complete. ✅
-
-Summary:
-- Page Objects: LoginPage, DashboardPage, SettingsPage (reused), UsersPage (extended)
-- Assumptions: ⚠️ UsersPage.userTable uses standard data-testid pattern
-- Status: ✅ Stable
-```
-
-### Complex Step Clarification
-
-```
-Agent: ❓ Step 5 "Click the item to open details" - found 2 similar elements:
-   - Row #1: "John Doe" (data-testid="user-row-0")
-   - Row #2: "Jane Smith" (data-testid="user-row-1")
-   
-Should I click:
-1. First item (John Doe)
-2. Second item (Jane Smith)
-3. Both items in sequence
 ```
 
 ---
