@@ -61,9 +61,9 @@ Rules:
 #### 1.3 Analyze Existing Solutions
 
 Explore the project to identify reusable components:
-- **Page Objects**: Find existing locators and methods that can be reused (like `src/`, `pages/`, `page-objects/`, etc).
+- **Page Objects**: Find existing locators and methods that can be reused (like `src/pages`, `pages/`, `page-objects/`, etc).
 - **Fixtures/Hooks**: Identify setup/teardown patterns.
-- **Test Data**: Check for existing data management (constants, CSV, JSON).
+- **Test Data**: Check for existing data management (constants, CSV, JSON from `test-data`, `src/testData`, etc).
 - **Utils Functions**: Look for helper functions that can be reused (like `utils/`, `helpers/`, etc).
 
 > Prioritize files and folders with names containing: `test`, `spec`, `page`, `fixture`, `helper`.
@@ -87,17 +87,41 @@ If project structure is unclear or no relevant files are found:
 
 ### Step 2: Parse Manual Test Cases
 
-Receive manual test case input from user. Example format:
+Receive manual test case input from user **or from extracted comment blocks in source files (see "2.0 Normalize Input Structure")**.
+
+Supported input formats:
+- Plain text manual test cases.
+- Markdown-formatted steps.
+- Comment-based test cases extracted from code files (e.g., `//`, `/* */`).
+
+#### 2.0 Normalize Input Structure
+
+Before parsing, normalize input into a consistent structure:
+- `summary` (or scenario title).
+- `preconditions` (optional).
+- `steps` (required).
+
+For comment-based inputs:
+- Treat comment markers (`//`, `*`, `-`) as structural hints.
+- Convert bullet points into ordered steps.
+- Bind `_Expected:_` blocks to the preceding step.
+- Merge multiline expected results into a single logical expectation.
+
+Example normalization:
 
 ```md
-Summary/Description: Custom statuses are set up by default
-
-Steps:
-1. Navigate to the 'Settings' tab in the left sidebar
-2. Open the 'Custom statuses' tab
-3. Click once on the ${Custom statuses} block
+* Navigate to page  
+  _Expected:_ Page opens
+* Click once on the ${Custom statuses} block
    _Expected_: List includes "manual" option.
 ```
+
+**Preserve Original Comments (MANDATORY):** DO NOT delete or rewrite original manual test comments.
+Instead:
+- Keep them as-is in the file
+- Generate automation code below or alongside them
+- Add a marker:
+    - `// === AUTO-GENERATED TEST (based on steps above) ===` to separate a new code
 
 #### 2.1 Handle Ambiguous Steps
 
