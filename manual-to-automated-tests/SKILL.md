@@ -530,14 +530,20 @@ Agent: Refactoring to match project standards...
 Agent: ✅ All done!
 ```
 
-### Basic Conversion by Specific Files
+### Basic Conversion by Comments in File
 
 **User Request:**
 
 ```
-User: Use manual-to-automated-tests skill for CodeceptJS framework to write automation 
-script "tests/prod/test-payment-1.ts" based on manual steps below. Use "good-test.ts"
-as reference for proper patterns and avoid mistakes from "bad-test.ts" legacy code example.
+Use manual-to-automated-tests skill for CodeceptJS framework to write automation 
+script "tests/plan-for-guest.test.ts" based on manual steps below in this file as comments (leaving comments in the file for further analysis). Set a specific "smoke" tag for this test.  
+Use as reference for an extra proper examples: 
+* `tests/payment-methods.test.ts` - Canonical test file with team approved format.
+* `src/pages/paymentMethods.page.ts`- Good described payment page object.
+Avoid mistakes from legacy code examples:
+* `src/pages/paymentOutdated.page.ts` - Outdated example with an old patterns.
+
+Finally, verify that the generated test is passed on - `BASE_URL = 'https://test.com/'` and provide final review for user.
 
 Agent: Got it! Detected Playwright project.
 ...
