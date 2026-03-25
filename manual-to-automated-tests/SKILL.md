@@ -21,24 +21,34 @@ Trigger this skill when user wants to:
 
 ---
 
+## Skill Checklist
+
+Complete ALL items in order:
+
+1. [ ] **Analyze Project Architecture** => Detect framework (1.1), identify excluded paths (1.2), find reusable components (1.3).
+2. [ ] **Understand Manual Test** => Normalize input (2.0), handle ambiguous steps (2.1), detect inconsistencies (2.2).
+3. [ ] **Write Test Code** => Implement using existing POM/patterns (3.1-3.2), add assertions (3.3), output code (3.4).
+4. [ ] **Verify & Heal** => Execute test (4.1), heal if fails - locators → timing → assertions → flow (4.2), max 3 attempts.
+5. [ ] **Code Review & Align** => Ensure structure compliance (5.1), manage test data & fixtures (5.2), run related tests and output summary (5.3 & 5.4).
+
+---
+
 ## Workflow: Convert Manual Tests to Automation
 
 ### Step 1: Analyze Project Architecture
 
 #### 1.1 Detect Automation Framework
 
-* Identify which testing framework is used in the project:
-    - Supported frameworks: `Playwright`, `CodeceptJS`, `Cypress`, `WebdriverIO`, `Jest`, `Mocha`
+**If user provides framework** (e.g., "use CodeceptJS" or "Playwright project"):
+- Trust user's choice => Skip to Step 2.
 
-> If the framework is unclear, inspect the repository structure, dependencies, configuration files, and `package.json` scripts to determine which framework is used or ask the user which framework the project uses.
+**If no framework provided:**
+- Inspect project: `package.json`, config files, test directory structure (supported: `Playwright`, `CodeceptJS`, `Cypress`, `WebdriverIO`, `Jest`, `Mocha`).
+  - If unclear => Ask user: `❓ Which automation framework should I use?`
 
-**If framework is specified by user:**
-    - Trust user's choice and proceed.
+> For Playwright/CodeceptJS => apply corresponding best practices from references
 
-**If no framework detected:**
-    - Ask user to confirm the automation framework.
-
-If framework is PLAYWRIGHT or CODECEPTJS use corresponding best pracices from the references.
+**Framework references** (apply after Step 1.1 detection):
 > See [CODECEPTJS Best Practices](./references/CODECEPTJS_BEST_PRACTICES.md)
 > See [PLAYWRIGHT Best Practices](./references/PLAYWRIGHT_BEST_PRACTICES.md)
 
@@ -47,6 +57,7 @@ If framework is PLAYWRIGHT or CODECEPTJS use corresponding best pracices from th
 Before scanning the project, identify folders that may contain deprecated or irrelevant code based on naming patterns:
 - `deprecated/`, `legacy/`, `old/`, `backup/`, `__backup__/`.
 - `archive/`, `tmp/`, `temp/`.
+- files with `...outdated` suffix.
 - Versioned folders like `v1/`, `v2/` (if newer versions exist).
 
 > Limit analysis depth to 2-3 directory levels unless deeper traversal is required. Stop scanning once sufficient reusable components are identified.
@@ -85,7 +96,7 @@ If project structure is unclear or no relevant files are found:
 
 ---
 
-### Step 2: Parse Manual Test Cases
+### Step 2: Understand Manual Test Cases Task
 
 Receive manual test case input from user **or from extracted comment blocks in source files (see "2.0 Normalize Input Structure")**.
 
@@ -104,7 +115,7 @@ Before parsing, normalize input into a consistent structure:
 For comment-based inputs:
 - Treat comment markers (`//`, `*`, `-`) as structural hints.
 - Convert bullet points into ordered steps.
-- Bind `_Expected:_` blocks to the preceding step.
+- Bind `_Expected:_` or `Expected Results` blocks to the preceding step.
 - Merge multiline expected results into a single logical expectation.
 
 Example normalization:
@@ -118,10 +129,10 @@ Example normalization:
 
 **Preserve Original Comments (MANDATORY):** DO NOT delete or rewrite original manual test comments.
 Instead:
-- Keep them as-is in the file
-- Generate automation code below or alongside them
+- Keep them as-is in the file.
+- Generate automation code below or alongside them.
 - Add a marker:
-    - `// === AUTO-GENERATED TEST (based on steps above) ===` to separate a new code
+  - `// === AUTO-GENERATED TEST (based on steps above) ===` to separate a new code
 
 #### 2.1 Handle Ambiguous Steps
 
@@ -223,224 +234,88 @@ Avoid:
 
 ---
 
-### Step 4: Verify Test Script
+### Step 4: Verify & Heal Test
+
+Run the generated test to verify correctness:
 
 #### 4.1 Execute Test
 
-Run the generated test to verify correctness:
-- If test **passes consistently** => Proceed to Step 5.
-- If test **fails** => Start healing process.
+- If **passes** => Proceed to "Step 5".
+- If **fails** => Start healing (4.2).
 
 #### 4.2 Heal Failed Tests
 
-Apply fixes in the following priority order:
+Apply fixes in priority order:
+1. **Fix Locators** - Prefer stable selectors (`data-testid`, `aria-label`), avoid deeply nested XPath.
+2. **Resolve Timing** - Use framework-native waits, avoid hard sleeps.
+3. **Adjust Assertions** - Match actual app behavior, not assumptions.
+4. **Fix Flow** - Verify navigation, preconditions, missing steps.
 
-**1. Fix Locators (Highest Priority)**
-- Check if selectors are incorrect, outdated, or too brittle.
-- Prefer stable selectors (`data-testid`, `aria-label`, etc).
-- Avoid overly complex or deeply nested selectors.
+**OPTIONALY (only Playwright based frameworks)** - Try to use Playwright MCP (If Available) For complex UI (dropdowns, modals, toggles) checks and healing:
+1. **DOM inspection** → `document.querySelector(...).outerHTML`
+2. **Steps mode** → `npx codeceptjs run --grep "@Tag" --steps`
+3. **Live replay** → Use MCP Playwright, call `browser_snapshot()` after each action
 
-> See [POM Best Practices - Locator Strategy](./references/POM_BEST_PRACTICES.md#locator-strategy)
+**Rules:**
+- Apply one category at a time, re-run after each.
+- **Max 3 healing attempts** total.
+- After 3 failures => stop, document issues, ask user for guidance.
 
-**2. Resolve Timing Issues**
-- Add explicit waits for elements to be visible, enabled, or attached.
-- Use framework-native waiting mechanisms (avoid hard sleeps).
-- Ensure proper page/state synchronization before actions.
+#### 4.3 Stability Criteria & Save
+Test is **stable** when:
+- Passes 1-2 consecutive runs.
+- No hard waits.
+- Resilient locators.
 
-**3. Adjust Assertions**
-- Verify expected results match actual application behavior.
-- Replace overly strict or incorrect assertions with meaningful checks.
-- Ensure assertions validate real outcomes, not assumptions.
-
-**4. Fix Flow Issues**
-- Validate navigation steps and action sequence.
-- Ensure preconditions (login, setup, data state) are correct.
-- Check for missing steps in the flow.
-
-**Healing Rules:**
-- Apply one category of fix at a time and re-run the test.
-- Do not apply multiple unrelated fixes in a single attempt.
-- Limit healing to 3 iterations total.
-- After 3 failed attempts, stop and ask user for guidance.
-
-#### 4.3 Handle Unresolved Failures
-
-If the test is still failing after 3 attempts:
-
-- Stop further modifications.
-- Provide the best current version of the test.
-- Clearly document unresolved issues:
-  - What failed
-  - What was attempted
-  - Possible reasons
-- Ask the user for clarification or guidance.
-
-#### 4.4 Define Stability Criteria
-
-A test is considered **stable** if:
-- It passes multiple consecutive runs (at least 1-2 times).
-- It does not rely on hard waits (`sleep`, `timeout` hacks).
-- Locators are resilient and not overly fragile.
-- Assertions validate meaningful outcomes.
-
-#### 4.5 Save Stable Version
-
-Once stability criteria are met:
-- Save the automation script to the appropriate project location.
-- Ensure consistency with project structure and naming conventions.
-
-#### 4.6 Stop Conditions
-
-Stop healing and ask user when:
-- **Same locator fails 3 times** - UI may have changed significantly.
-- **Timing issues persist** - Page may require different load strategy.
-- **Flow doesn't match manual steps** - Test case or app may need adjustment.
-- **Data/state issues** - Preconditions may be missing from test case.
-
-Example prompt to user:
-```
-❓ Test keeps failing after 3 attempts. Last error: [brief description]
-- Tried: [what was attempted]
-- Possible causes: [your analysis]
-
-Should we:
-1. Continue debugging together
-2. Save current version and mark as needs review
-3. Skip this test case for now
-```
-
-#### 4.7 MCP Verification (If Available)
-
-If the user has MCP Playwright configured, use these verification methods for complex UI elements:
-
-**A — DOM Inspection Before Writing Locators**
-
-Before creating new locators, inspect the actual DOM to ensure accuracy:
-```typescript
-// Use MCP browser_evaluate:
-document.querySelector('.some-class').outerHTML
-document.querySelectorAll('[role="switch"]').length
-```
-
-**B — Steps Mode Execution**
-
-Run tests with verbose step output to verify XPath targeting:
-```bash
-npx codeceptjs run --grep "@TxxxxxxX" --steps
-# or
-npx playwright test --grep "@TxxxxxxX" --ui
-```
-
-**C — MCP Live Replay (Required for Complex Components)**
-
-For dropdowns, modals, toggles, and any complex UI components:
-1. Reproduce each test step in MCP Playwright browser
-2. After each action, call `browser_snapshot()` to confirm UI state matches expected behavior
-
-**D — Assertions as Proof of Correctness**
-
-Map action types to required assertions:
-
-| Action type | Required assertion |
-|------------|-------------------|
-| Save / submit | Toast or success message visible |
-| Open dialog / dropdown | Dialog or dropdown visible |
-| Fill field | `I.seeInField` inside method |
-| Navigation | Page header or URL confirms destination |
-| Move / assign / counter change | Updated counter or list entry visible |
-
-When verifying against Expected Results, ensure assertions prove the ER literally:
-- ER says **"each"** => check ALL items, not just one.
-- ER says **"shared view"** => check the combination of elements that together prove it.
-- ER says **"independent results"** => check every environment panel, not just the first.
-
-**E — Spec-to-Code Mapping Table**
-
-Present verification results as a two-column table:
-
-| Step (from spec comments) | Actions in test |
-|---------------------------|-----------------|
-| 1. Navigate to the 'Settings' page | `basePage.clickOnNavigationMenuButton("Settings")` |
-| 2. Click the 'Settings' button | `runsPage.clickOnSettingsButton()` |
-
-Left column = step exactly as written in the manual test.
-Right column = the actual method call(s) that implement it.
-Every spec step must have a row. If a step has no implementation — flag it explicitly.
-
-**Exit Condition:** Run the test twice in a row without failures before marking verification complete.
+**Save** to project location or user provided file location with proper naming conventions.
 
 ---
 
-### Step 5: Align & Integrate Test Code
+### Step 5: Code Review & Final Verification
 
-#### 5.1 Ensure Project Structure Compliance
+#### 5.1 Code Review & Alignment
 
-Verify that generated code follows project conventions:
-- Page Objects contain only UI interaction logic.
-- Tests contain flow and assertions only.
-- Utilities contain reusable helper logic.
+Verify generated code follows project conventions:
+- **POM** => UI interactions only.
+- **Tests** => flow + assertions only.
+- **Utils** => reusable helper logic.
 
-If minor adjustments are needed:
-- Move misplaced locators or methods to correct locations.
-- Align naming with existing conventions.
+Move misplaced code to correct locations. **Do NOT refactor existing code.**
 
-**Do NOT perform large-scale refactoring.**
+#### 5.2 Test Data & Fixtures
 
-#### 5.2 Manage Test Data
+Maximum reuse existing "test-data" variables if exist:
+- Use centralized test data if project has it (JSON/CSV/constants).
+- Reuse authentication/setup fixtures.
+- Don't duplicate setup inside tests.
 
-Handle test data based on existing project patterns:
-- If project uses centralized test data (constants, JSON, CSV):
-  - Follow the same approach.
+#### 5.3 Final Run & Mapping Table
 
-- If no such pattern exists:
-  - Keep test data inline.
+Execute 1-2 related tests to confirm integration.
 
-Do NOT introduce new data management patterns unless explicitly requested.
+**Show Spec-to-Code Mapping:**
 
-> See [Test Data Management](./references/TEST_DATA_MANAGEMENT.md) for details.
+| Manual Step | Automation Action |
+|-------------|-------------------|
+| Navigate to Settings | `basePage.clickOnNavigationMenuButton("Settings")` |
 
-#### 5.3 Validate Fixtures and Hooks Usage
+**Exit condition:** Test passes 2 consecutive runs.
 
-Ensure proper use of existing fixtures/hooks:
-- Reuse authentication flows if available.
-- Use shared setup/teardown mechanisms.
-- Avoid duplicating setup logic inside tests.
+#### 5.4 Skill Summary
 
-#### 5.4 Verify Post-Integration Stability
-
-Re-run the test after adjustments:
-
-- If **passes** => Proceed to Step 6
-- If **fails**:
-  - Apply minimal fixes (max 1-2 attempts).
-  - Focus only on issues introduced during this step.
-
-#### 5.5 Save Integrated Test
-
-When integration is complete:
-- Save final test file to project
-- Follow naming conventions (e.g., `*.spec.ts`, `*.test.js`)
-- Use consistent folder structure
+Output structured summary (see [Final Summary Template](./references/FINAL_SUMMARY_TEMPLATE.md))
 
 ---
 
-### Step 6: Final Verification
+## PostHook: Final Verification
 
-Execute a minimal set of related tests to ensure integration:
-- Tests in the same file or directory.
-- Tests covering the same feature or module.
+After skill completes, optionally run these verification steps:
 
-> Avoid running the entire test suite unless explicitly required.
+1. **Confirm test file exists** at expected path
+2. **Run test once more** to ensure stability
+3. **Check for test artifacts** (screenshots, reports) if applicable
 
-**Do NOT modify unrelated tests.**
-
----
-
-### Final Summary
-
-After completing the conversion, output a structured summary:
-
-> See [Final Summary Template](./references/FINAL_SUMMARY_TEMPLATE.md) for reference
+This helps catch edge cases where test passes during healing but fails on clean run.
 
 ---
 
@@ -460,27 +335,18 @@ After completing the conversion, output a structured summary:
 
 ### Recoverable Issues
 
-* **Unclear step in manual test**
+* **Manual test case invalid/incomplete**
   - Mark with ❓ and ask user for clarification.
-  - Do not guess; request more context.
+  - Report which steps are unclear.
+  - Request complete test case before proceeding.
 
-* **Missing Page Object**
-  - Create a new Page Object following project conventions.
-  - Ask user to confirm the structure.
-
-* **Test data not found**
-  - Ask user where test data should come from.
-  - Use placeholder values with warning if needed.
+* **Framework detection failed**
+  - ❓ Ask user to specify framework explicitly.
 
 ### Blocking Issues
 
-* **Framework detection failed**
-  - Ask user to specify framework explicitly.
-  - Stop conversion until framework is confirmed.
-
-* **Manual test case invalid/incomplete**
-  - Report which steps are unclear.
-  - Request complete test case before proceeding.
+* **Test Execution Problems**
+  - If no option to execute test after 3 attempt => Stop and catch the error.
 
 ---
 
@@ -500,12 +366,6 @@ or
 2. Create new LoginPage
 3. Skip login step
 ```
-
-### Language Style
-
-- Use emojis occasionally for readability (✅ ❌ ❓ 🚀 💡).
-- Use non-formal, friendly language.
-- Be concise and direct.
 
 ---
 
