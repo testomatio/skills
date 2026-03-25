@@ -7,6 +7,10 @@ metadata:
   version: 1.0.0
 ---
 
+# ACTIVE STEP: 1/5 (Analyze Project Architecture)
+# Previous: ⏳ (not started)
+# Next: → Step 2: Understand Manual Test
+
 # MANUAL-TO-AUTOMATED-TESTS SKILL: What I do
 
 This skill converts manual test cases into production-ready automation test scripts. I analyze your existing automation framework, follow manual test steps, and generate maintainable tests using automation testing best practices.
@@ -304,18 +308,6 @@ Execute 1-2 related tests to confirm integration.
 #### 5.4 Skill Summary
 
 Output structured summary (see [Final Summary Template](./references/FINAL_SUMMARY_TEMPLATE.md))
-
----
-
-## PostHook: Final Verification
-
-After skill completes, optionally run these verification steps:
-
-1. **Confirm test file exists** at expected path
-2. **Run test once more** to ensure stability
-3. **Check for test artifacts** (screenshots, reports) if applicable
-
-This helps catch edge cases where test passes during healing but fails on clean run.
 
 ---
 
