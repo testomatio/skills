@@ -1,5 +1,5 @@
 ---
-name: testomatio-sync-cases
+name: sync-cases
 description: Synchronize Markdown test scenarios between local project and Test Management Tool (Testomat.io). Supports custom directories, labels, and advanced import/export options.
 inputs:
   action:

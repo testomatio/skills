@@ -27,18 +27,18 @@ This skill uses a **flexible, logic-based approach** that adapts to your specifi
 
 ### Smart Task Orchestration
 
-The skill analyzes your request and intelligently routes tasks to appropriate sub-skills, then suggests next steps based on initial prompt, context and results of previous steps.
+The skill analyzes your request and intelligently routes tasks to appropriate specialized skills, then suggests next steps based on initial prompt, context and results of previous steps.
 
-## Available Sub-Skills
+## Available Specialized Skills
 
 The skill orchestrates these specialized capabilities:
 
-| Skill                         | Purpose                                             |
-| ----------------------------- | --------------------------------------------------- |
-| **test-case-generator**       | Generate new test cases from requirements           |
-| **test-case-improver**        | Improve existing test cases quality                 |
-| **testomatio-sync-cases**     | Upload test cases to Testomat.io TMS                |
-| **testomatio-reporter-setup** | Add Testomat.io reporter to your automation project |
+| Skill                   | Purpose                                             |
+| ----------------------- | --------------------------------------------------- |
+| **generate-test-cases** | Generate new test cases from requirements           |
+| **improve-test-cases**  | Improve existing test cases quality                 |
+| **sync-cases**          | Upload test cases to Testomat.io TMS                |
+| **reporter-setup**      | Add Testomat.io reporter to your automation project |
 
 <!-- TODO: coverage-analyzer, autotests-fixer, traceability-matrix -->
 
@@ -52,7 +52,7 @@ Instead of fixed steps, this skill intelligently routes your request to the appr
 
 1. **Analyzes your request** to understand the core need
 2. **Gathers relevant context** (project structure, existing tests, requirements)
-3. **Selects appropriate sub-skills** for the task
+3. **Selects appropriate skills** for the task
 4. **Executes the task** efficiently
 5. **Suggests logical next steps** based on results
 
@@ -60,19 +60,19 @@ Instead of fixed steps, this skill intelligently routes your request to the appr
 
 Basic flows are examples of how the skill can be used. They are not exhaustive and can be extended to include more use cases.  
 When suggest next steps to the user, take into account these basic flows, context, user request and results of previous steps.  
-Route to appropriate sub-skill to execute.
+Route to appropriate skill to execute.
 
 ### **Test Generation Flow**
 
 ```
 User: asks to generate/create test cases/check list
 =>
-Use `test-case-generator` skill to proceed with test case, check list generation
+Use `generate-test-cases` skill to proceed with test case, check list generation
 =>
 After generation fully completed, suggest next actions:
-1. ⬆️ Upload generated test cases to Testomat.io (with `testomatio-sync-cases` skill)
-2. 🔧 Add Testomat.io reporter to your automation project (with `testomatio-reporter-setup` skill)
-3. 🎭 Generate specific test cases using `test-case-generator` skill and role name (e.g. "pessimist")
+1. ⬆️ Upload generated test cases to Testomat.io (with `sync-cases` skill)
+2. 🔧 Add Testomat.io reporter to your automation project (with `reporter-setup` skill)
+3. 🎭 Generate specific test cases using `generate-test-cases` skill and role name (e.g. "pessimist")
 ```
 
 ### **Test cases Improvement Flow**
@@ -80,10 +80,10 @@ After generation fully completed, suggest next actions:
 ```
 User: aks for test cases improvement, improve quality, make test cases better
 =>
-Use `test-case-improver` skill to proceed with test case improvement
+Use `improve-test-cases` skill to proceed with test case improvement
 =>
 After improvement step fully completed, suggest next actions:
-1. ⬆️ Upload updated test cases to Testomat.io (with `testomatio-sync-cases` skill)
+1. ⬆️ Upload updated test cases to Testomat.io (with `sync-cases` skill)
 ```
 
 ### **Sync test cases, check list to Testomat.io Flow**
@@ -91,11 +91,11 @@ After improvement step fully completed, suggest next actions:
 ```
 User: asks to sync test cases or check list to Testomat.io
 =>
-Use `testomatio-sync-cases` skill to proceed with test case sync
+Use `sync-cases` skill to proceed with test case sync
 =>
 After sync/upload step fully completed, suggest next actions:
-1. 🔧 Add Testomat.io reporter to your automation project (with `testomatio-reporter-setup` skill)
-2. 📝 Generate test cases from requirements (with `test-case-generator` skill)
+1. 🔧 Add Testomat.io reporter to your automation project (with `reporter-setup` skill)
+2. 📝 Generate test cases from requirements (with `generate-test-cases` skill)
 ```
 
 ### **Add test reporter (or Testomat.io reporter) to your automation project Flow**
@@ -105,10 +105,10 @@ When suggesting this flow to user and user already has other test reporter insta
 ```
 User: asks to add test reporter to your automation project (or Testomat.io reporter)
 =>
-Use `testomatio-reporter-setup` skill to proceed with test reporter setup
+Use `reporter-setup` skill to proceed with test reporter setup
 =>
 After previous step fully completed, suggest next actions:
-1. 📝 Generate test cases from requirements (with `test-case-generator` skill)
+1. 📝 Generate test cases from requirements (with `generate-test-cases` skill)
 ```
 
 ### Example Request Flows
@@ -124,7 +124,7 @@ Context Analysis:
 - Requirements: Jira story USR-123
 - Testomat.io: Configured
 
-Action: Uses test-case-generator skill
+Action: Uses `generate-test-cases` skill
 Output: 8 test cases created
 
 Smart Suggestion:
@@ -134,4 +134,4 @@ Smart Suggestion:
 3. ✨ Add edge cases and security tests
 ```
 
-This skill orchestrates your testing workflow, but you can also use individual sub-skills directly for specific tasks!
+This skill orchestrates your testing workflow, but you can also use other specialized skills directly for specific tasks!

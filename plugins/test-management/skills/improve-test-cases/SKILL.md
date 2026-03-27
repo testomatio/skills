@@ -1,5 +1,5 @@
 ---
-name: test-case-improver
+name: improve-test-cases
 description: Analyze and improve existing markdown manual test cases for clarity, structure, and Test Management Tool format compliance.
 license: MIT
 metadata:

@@ -1,5 +1,5 @@
 ---
-name: test-case-generator
+name: generate-test-cases
 description: Generate test cases and checklists for software testing. Use this skill whenever the user asks to create test cases, test scenarios, test plans, checklists, QA documentation, or mentions testing activities like "write tests for feature", "create a test checklist", "generate test scenarios from requirements", or similar. This skill works better if user provides documentation, requirements etc or it can create test cases based on the user prompt without any additional context.
 ---
 

@@ -1,5 +1,5 @@
 ---
-name: testomatio-reporter-setup
+name: reporter-setup
 description: Set up Testomat.io test reporting to project. Configure automation framework (like Playwright, CodeceptJS, Mocha, Jest, WebdriverIO, etc.) reporters to connect the local test suite with Testomat.io TMS.
 license: MIT
 metadata:
