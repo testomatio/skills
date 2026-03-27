@@ -3,6 +3,7 @@
   "owner": {
     "name": "Testomatio.io"
   },
+  "description": "Testomatio.io plugins and skills for managing tests, test cases, test automation, results, coverage etc",
   "plugins": [
     {
       "name": "test-management",
