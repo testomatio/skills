@@ -1,40 +1,30 @@
-# QA Agent Skills (by Testomat.io)
+# Testomatio AI plugins marketplace
 
-AI agent skills for test management workflows with [Testomat.io](https://testomat.io). These skills bring the power of AI coding agents to your testing process — design tests, automate them, review quality, track coverage, and sync everything with your test management system.
+AI plugins (skills) for test management workflows with [Testomat.io](https://testomat.io). These plugins bring the power of AI coding agents to your testing process — design tests, automate them, review quality, track coverage, and sync everything with your test management system.
 
-## What Are Skills?
+<!-- TODO: rename repo from "skills" to "plugins" or "marketplace" -->
 
-Skills are structured instructions for AI coding agents (Claude Code, Opencode, Cursor, etc.) that teach them how to work with your testing workflow. Unlike simple prompts, skills provide deep knowledge about:
+## Usage
 
-- Testomat.io markdown format for test cases
-- Testing best practices and techniques
-- How to use `check-tests` CLI for synchronization
-- Test design methodologies
-- Test automation patterns
-- QA process management
+### Claude Code
 
-## Why Agent Skills vs. Testomat.io UI Prompts?
+1. Add the marketplace:
 
-| Aspect | Testomat.io UI | Agent Skills (Local) |
-|--------|----------------|---------------------|
-| Where it runs | Browser | Terminal, IDE |
-| Access to code | No | Full codebase access |
-| Access to files | Limited | Full file system |
-| AI Model | Standard | Opus/Sonnet (more powerful) |
-| Context | Single test/suite | Entire project + code |
-| Integration | GUI-based | Git workflow, CLI |
-| Shareability | Via Testomat.io | Git repo, team sharing |
+```bash
+/plugin marketplace add testomatio/skills
+```
 
-## Contributing
+2. Install plugin:
 
-1. Fork the repository
-2. Create a new skill directory with a `SKILL.md` file
-3. Follow the skill format (see existing skills for reference)
-4. Submit a pull request
+```bash
+/plugin install test-management@testomatio/skills
+```
 
-## License
+3. Use the plugin:
 
-MIT
+```bash
+/test-management
+```
 
 ## Links
 
