@@ -1,0 +1,8 @@
+{
+  "name": "testomatio-test-management",
+  "description": "Testomatio.io plugin for test management",
+  "version": "0.0.1",
+  "author": {
+    "name": "Testomat.io"
+  }
+}
