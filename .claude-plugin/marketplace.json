@@ -5,12 +5,12 @@
   },
   "plugins": [
     {
-      "name": "test-management-plugin",
+      "name": "test-management",
       "source": "./plugins/test-management",
       "description": "Adds a /test-management skill for test management"
     },
     {
-      "name": "test-automation-plugin",
+      "name": "test-automation",
       "source": "./plugins/test-automation",
       "description": "Adds a /test-automation skill for test automation (create, heal, sync results, etc)"
     }
