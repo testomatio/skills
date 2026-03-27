@@ -37,6 +37,16 @@ Complete ALL items in order:
 
 ---
 
+## Available Sub-Skills
+
+The skill orchestrates these specialized capabilities:
+
+| Skill                               | Purpose                                             |
+| ----------------------------------- | --------------------------------------------------- |
+| **automation-debug-tests**          | Step-by-step debug instruction to fix failed steps in test |
+
+---
+
 ## Workflow: Convert Manual Tests to Automation
 
 ### Step 1: Analyze Project Architecture
@@ -70,8 +80,9 @@ List all potentially excluded paths and ask the user to confirm: `Should these f
 
 Rules:
 - Do not automatically exclude ambiguous folders without confirmation.
-- If the user does not respond, exclude only clearly deprecated folders (e.g., `__backup__/`, `deprecated/`).
-- Always prioritize user-specified exclusions over auto-detected ones.
+- If the user does not respond, exclude only clearly deprecated folders (e.g., `__backup__/`, `deprecated/`, `outdated/`, `legacy`, etc).
+
+**Always prioritize user-specified exclusions over auto-detected ones**.
 
 #### 1.3 Analyze Existing Solutions
 
@@ -81,7 +92,7 @@ Explore the project to identify reusable components:
 - **Test Data**: Check for existing data management (constants, CSV, JSON from `test-data`, `src/testData`, etc).
 - **Utils Functions**: Look for helper functions that can be reused (like `utils/`, `helpers/`, etc).
 
-> Prioritize files and folders with names containing: `test`, `spec`, `page`, `fixture`, `helper`.
+> Prioritize files and folders with names containing: `test`, `spec`, `page`, `fixture`, `helper`, `test-data`.
 
 **Automatically exclude from analysis:**
 - Dependency folders (like `node_modules`, etc).
@@ -92,11 +103,11 @@ If project structure is unclear or no relevant files are found:
 - Ask the user: `Which directories contain your test files, page objects, and shared utilities?`
 (Allowing to override or specify custom paths)
 
-**Step 1 Summary (Log):** After completing analysis, output a summary:
-- Detected framework (or user-specified)
-- Reusable components found (Page Objects, fixtures, utils)
-- Excluded paths (if any)
-- Next action
+**Step 1 Summary (Log):** After completing analysis, output a short overview:
+- Detected framework (or user-specified).
+- Reusable components found (Page Objects, fixtures, utils).
+- Excluded paths (if any).
+- Next action.
 
 ---
 
@@ -128,15 +139,14 @@ Example normalization:
 * Navigate to page  
   _Expected:_ Page opens
 * Click once on the ${Custom statuses} block
-   _Expected_: List includes "manual" option.
+  _Expected_: List includes "manual" option.
 ```
 
-**Preserve Original Comments (MANDATORY):** DO NOT delete or rewrite original manual test comments.
+**Preserve Original Comments with user e2e steps/results (MANDATORY):** DO NOT delete or rewrite original manual test comments.
 Instead:
 - Keep them as-is in the file.
 - Generate automation code below or alongside them.
-- Add a marker:
-  - `// === AUTO-GENERATED TEST (based on steps above) ===` to separate a new code
+- Add a marker: `// === AUTO-GENERATED TEST (based on steps above) ===` to separate a new automation code.
 
 #### 2.1 Handle Ambiguous Steps
 
@@ -156,8 +166,8 @@ Mark assumptions in output using ⚠️:
 For unclear steps: 
 - Mark with ❓ and ask the user: `❓ Can you clarify what this step means?`.
 
-Avoid blocking the entire flow if only one step is unclear.
-Continue processing other steps where possible.
+**Avoid blocking the entire flow if only one step is unclear**.
+**Continue processing other steps where possible**.
 
 #### 2.3 Detect Potential Inconsistencies
 
@@ -170,7 +180,7 @@ If something seems inconsistent or unlikely:
 - Flag it with ⚠️.
 - Ask the user for confirmation: `It seems this step or expected result may not match typical system behavior. Should we proceed as described or adjust it?`.
 
-Do NOT stop processing unless the step is completely blocking.
+**Do NOT stop processing unless the step is completely blocking**.
 
 ---
 
@@ -186,7 +196,7 @@ Choose the simplest implementation that aligns with the existing project archite
 
 * **If partial structure exists:**
   - Extend existing components where appropriate.
-  - Add missing methods or locators in the correct places.
+  - Add missing methods or locators to existing POM classes or create a new one.
   - Keep consistency with current design.
 
 * **If no structure exists:**
@@ -195,25 +205,24 @@ Choose the simplest implementation that aligns with the existing project archite
   - Avoid over-engineering (no unnecessary abstractions).
 
 Always prioritize:
-1. Consistency with the project
-2. Readability
-3. Maintainability
+1. Consistency with the project.
+2. Readability.
+3. Maintainability.
 
 **Do NOT:**
-- Ignore existing Page Objects in favor of inline locators
-- Duplicate selectors or logic that already exist
-- Generate “temporary” code that requires refactoring later
+- Ignore existing Page Objects in favor of inline locators.
+- Duplicate selectors or logic that already exist.
 
 #### 3.2 Follow Framework Patterns
 
 Apply these principles when writing tests:
-- **One test, one flow** - Each test validates a single scenario
+- **One test, one flow** - Each test validates a single scenario.
 - **Separation of concerns:**
   - Tests => assertions and flow control.
   - Page Objects => UI interactions.
   - Utils => reusable logic.
-- **Extend, don't modify** - Add to existing components without changing stable code
-- **Use fixtures** for setup, authentication, and shared state
+- **Extend, don't modify** - Add to existing components without changing stable code.
+- **Use fixtures** for setup, authentication, and shared state.
 
 > See [POM Best Practices](./references/POM_BEST_PRACTICES.md) for detailed patterns
 
@@ -230,7 +239,7 @@ Avoid:
 - Weak assertions (e.g., only checking page load).
 - Over-asserting irrelevant details.
 
-#### 3.4 Output Test Code
+#### 3.5 Save Suggested Test Code
 
 - Generate complete, runnable test code.
 - Ensure it integrates with the existing framework.
@@ -244,26 +253,39 @@ Run the generated test to verify correctness:
 
 #### 4.1 Execute Test
 
+**Standard execution:**
+- Run test command (`npx playwright test`, `npx codeceptjs run`, etc.)
 - If **passes** => Proceed to "Step 5".
 - If **fails** => Start healing (4.2).
 
+**Optional: MCP Step-by-Step Execution (if MCP tools available)**
+- Use "step-by-step" execution mode (Playwright MCP, CodeceptJS `run_step_by_step` MCP) for detailed execution tracking.
+- Collect: step results, timing, trace files (DOM, screenshots, logs).
+- Use this for debugging complex flows or when you need granular execution data.
+
 #### 4.2 Heal Failed Tests
 
-Apply fixes in priority order:
+When a test has fails, apply fixes in priority order:
 1. **Fix Locators** - Prefer stable selectors (`data-testid`, `aria-label`), avoid deeply nested XPath.
 2. **Resolve Timing** - Use framework-native waits, avoid hard sleeps.
 3. **Adjust Assertions** - Match actual app behavior, not assumptions.
 4. **Fix Flow** - Verify navigation, preconditions, missing steps.
 
-**OPTIONALY (only Playwright based frameworks)** - Try to use Playwright MCP (If Available) For complex UI (dropdowns, modals, toggles) checks and healing:
-1. **DOM inspection** → `document.querySelector(...).outerHTML`
-2. **Steps mode** → `npx codeceptjs run --grep "@Tag" --steps`
-3. **Live replay** → Use MCP Playwright, call `browser_snapshot()` after each action
+**Use MCP for healing (If Configured & Available): OPTIONALY (only Playwright, CodeceptJS based frameworks)** - Try to use MCP for complex UI (dropdowns, modals, toggles) checks, debugging and healing:
+1. **DOM inspection** → `document.querySelector(...).outerHTML`.
+2. **Steps mode** → `npx codeceptjs run --grep "@Tag" --steps`.
+3. **Live replay** → Use MCP Playwright, call `browser_snapshot()` after each action.
+
+**(Use MCP only when standard fixes are insufficient, not as a first step)**.
 
 **Rules:**
-- Apply one category at a time, re-run after each.
+- Apply updates one-by-one: one issue, error at a time, re-run after each.
 - **Max 3 healing attempts** total.
 - After 3 failures => stop, document issues, ask user for guidance.
+- Finish when test passes.
+
+> When you don't understand the root cause of test problem/-s, ask the about using **automation-debug-tests** skill to diagnose and fix. 
+**!!!Use only in critical situations**.
 
 #### 4.3 Stability Criteria & Save
 Test is **stable** when:
@@ -271,7 +293,7 @@ Test is **stable** when:
 - No hard waits.
 - Resilient locators.
 
-**Save** to project location or user provided file location with proper naming conventions.
+**Save Fixed Code** to project location or user provided file location with proper naming conventions.
 
 ---
 
