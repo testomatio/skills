@@ -60,4 +60,5 @@ DIFF_*.md
 PR_*.md
 QUICKSTART_*.md
 test.spec.js
-scripts/
+
+# scripts/ - uncooment if you want to ignore all scripts
