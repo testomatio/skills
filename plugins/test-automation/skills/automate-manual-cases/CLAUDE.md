@@ -1,4 +1,4 @@
-# manual-to-automated-tests Skill
+# automate-manual-cases Skill
 
 ## Overview
 Converts manual test cases into automation test scripts following POM pattern.

@@ -1,5 +1,5 @@
 ---
-name: manual-to-automated-tests
+name: automate-manual-cases
 description: Convert manual test cases into automation test scripts. Analyze existing test architecture and generate scalable, maintainable automated tests following Page Object Model (POM) and automation patterns.
 license: MIT
 metadata:
@@ -7,7 +7,7 @@ metadata:
   version: 1.0.0
 ---
 
-# MANUAL-TO-AUTOMATED-TESTS SKILL: What I do
+# AUTOMATE-MANUAL-CASES SKILL: What I do
 
 This skill converts manual test cases into production-ready automation test scripts. I analyze your existing automation framework, follow manual test steps, and generate maintainable tests using automation testing best practices.
 
@@ -410,7 +410,7 @@ Agent: ✅ All done!
 **User Request:**
 
 ```
-Use manual-to-automated-tests skill for CodeceptJS framework to write automation 
+Use automate-manual-cases skill for CodeceptJS framework to write automation 
 script "tests/plan-for-guest.test.ts" based on manual steps below in this file as comments (leaving comments in the file for further analysis). Set a specific "smoke" tag for this test.  
 Use as reference for an extra proper examples: 
 * `tests/payment-methods.test.ts` - Canonical test file with team approved format.
