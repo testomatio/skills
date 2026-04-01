@@ -7,10 +7,6 @@ metadata:
   version: 1.0.0
 ---
 
-# ACTIVE STEP: 1/5 (Analyze Project Architecture)
-# Previous: ⏳ (not started)
-# Next: → Step 2: Understand Manual Test
-
 # MANUAL-TO-AUTOMATED-TESTS SKILL: What I do
 
 This skill converts manual test cases into production-ready automation test scripts. I analyze your existing automation framework, follow manual test steps, and generate maintainable tests using automation testing best practices.
@@ -34,6 +30,11 @@ Complete ALL items in order:
 3. [ ] **Write Test Code** => Implement using existing POM/patterns (3.1-3.2), add assertions (3.3), output code (3.4).
 4. [ ] **Verify & Heal** => Execute test (4.1), heal if fails - locators → timing → assertions → flow (4.2), max 3 attempts.
 5. [ ] **Code Review & Align** => Ensure structure compliance (5.1), manage test data & fixtures (5.2), run related tests and output summary (5.3 & 5.4).
+
+### Progress
+* STEP: 1/5 (Analyze Project Architecture)
+* Previous: ⏳ (not started)
+* Next: → Step 2: Understand Manual Test
 
 ---
 

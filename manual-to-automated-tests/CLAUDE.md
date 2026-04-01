@@ -5,12 +5,13 @@ Converts manual test cases into automation test scripts following POM pattern.
 
 ## Step Tracking
 
-**Current step is tracked in SKILL.md header.** After completing each step, UPDATE the header:
+**Current step is tracked in SKILL.md header.** After completing each step, UPDATE the "### Progress" step:
 
 ```markdown
-# ACTIVE STEP: 2/5 (Understand Manual Test)
-# Previous: ✅ Step 1: Analyze Project Architecture
-# Next: → Step 3: Write Test Code
+### Progress
+* STEP: 2/5 (Understand Manual Test)
+* Previous: ✅ Step 1: Analyze Project Architecture
+* Next: → Step 3: Write Test Code
 ```
 
 **Step Flow:**
