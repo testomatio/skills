@@ -45,14 +45,17 @@ Generate **checklist** prior to **test cases** generation even if user request s
    Understand what you're testing, what artifacts are provided, what the user wants to achieve.  
    Then **show sources** (briefly, no details) from which you gathered the information. **Ask user** if he wants to add or change anything. Go to step 2 only after approval.
 
-2. **Ask user to choose role**.
+2. **Ask for type of testing**.
+   **Ask user about type of tests required** (smoke, regression, acceptance, etc.). Go to step 3 only after approval.
+
+3. **Ask user to choose role**.
    **Ask if user wants to enable specific role** (refer to [roles](#roles)) or just proceed with default one.  
-   Show each role name and short description thus user can make proper decision. Go to step 3 only after approval.
+   Show each role name and short description thus user can make proper decision. Go to step 4 only after approval.
 
-3. **Generate checklist**.
-   **Generate and show a categorized structured checklist**. **Wait for user approval:** ask if the user wants to add/remove/change anything in the checklist or proceed to test cases generation. Go to step 4 only after approval.
+4. **Generate checklist**.
+   **Generate and show a categorized structured checklist**. **Wait for user approval:** ask if the user wants to add/remove/change anything in the checklist or proceed to test cases generation. Go to step 5 only after approval.
 
-4. **Generate detailed test cases**.
+5. **Generate detailed test cases**.
    Convert approved checklist into detailed test cases.
 
 ---
@@ -95,7 +98,7 @@ If any **unclear** state => ask user to clarify what he want. Ask to connect to 
 
 If **not enough information** => ask user to provide more information.
 
-[Wait for user confirmation about sources and test type before proceeding to Step 2.]
+[Wait for user confirmation about sources before proceeding to Step 2.]
 
 ### Step 1.1: Show gathered context to user (briefly) and ask for approval
 
@@ -118,11 +121,11 @@ I've gathered information from the following sources:
 
 [Wait for user approval before proceeding to Step 2.]
 
-### Step 2: Ask for type of testing and specific role
-
-#### Type of testing
+### Step 2: Ask for type of testing
 
 **Ask user about type of tests required: smoke, regression, feature acceptance, etc.**
+
+Suggest more types based on gathered context.
 
 Example:
 
@@ -135,7 +138,9 @@ Example:
 4. ✏️ other
 ```
 
-#### Role
+[Wait for user approval before proceeding to Step 3.]
+
+### Step 3: Ask for specific role
 
 **Show the roles names and short description (as markdown table) and let user choose** the default one or the specific one.
 
@@ -145,7 +150,6 @@ Example:
 | ------------------ | ---------------------------------------- |
 | **⚙️ default**     | **balanced** approach                    |
 | **🌈 optimist**    | focus on **positive** flows, happy path  |
-| **😱 drama-queen** | **negative** flows mostly                |
 | **🤓 nerd**        | **details**, dependencies, perfectionist |
 | **🔪 psycho**      | **edge cases**                           |
 | **🔐 pentest**     | **security**                             |
@@ -163,6 +167,8 @@ Ask the user to choose a testing role:
 2. Ask the user to select one role:
    - If the user does not specify, use **⚙️ default**.
    - If the user selects "🔧 other", ask them to define a custom role.
+
+Better to give user **select options**. Also propose recommended role based on context.
 
 Example:
 
@@ -187,9 +193,9 @@ Example:
 
 Choose **default** in case user does not specify role.
 
-[Wait for user approval before proceeding to Step 3.]
+[Wait for user approval before proceeding to Step 4.]
 
-### Step 3: Generate Checklist
+### Step 4: Generate Checklist
 
 Create a **hierarchical, categorized, well-structured checklist** based on the gathered information and user choices.
 
@@ -208,7 +214,7 @@ Example:
 
 **Show generated checklist to user and ask for approval.**
 
-### Step 3.1: Wait for Approval
+### Step 4.1: Wait for Approval
 
 **Show the checklist and ask if checklist is good or user wants to modify it.**
 
@@ -216,9 +222,9 @@ Example:
 In case user wants more details, enable **nerd role**.
 
 **Wait for user approval**.
-If user modifies checklist => go to step 3.
+If user modifies checklist => go to step 4.
 If user not satisfied with result => go to step 1 and ask for more details about feature(s) under test or testing type, role, etc.
-If user approves checklist => go to step 4.
+If user approves checklist => go to step 5.
 
 Example:
 
@@ -231,7 +237,7 @@ Example:
 4. ✏️ Type anything you want to change
 ```
 
-### Step 4: Generate Detailed Test Cases
+### Step 5: Generate Detailed Test Cases
 
 **Proceed with this step only after user approval of checklist.**
 
@@ -252,7 +258,7 @@ Rules:
 
 **Don't change the user's source code. Only generate .md files with test cases.**
 
-### Step 5: Show summary results
+### Step 6: Show summary results
 
 Show summary results to user terminal. Include any relevant information you think is important. E.g. amount of test cases generated, amount of test suites, etc. Better to use markdown table. It should be concise and easy to read.
 
@@ -306,14 +312,14 @@ When the user provides an existing test cases example and/or asks for "similar" 
 1. Gather information about feature X
    - analyze all available sources
    - interact with user
-   - ask for test type (smoke, regression, feature acceptance, etc.)
-2. Show information from step 1 to user and ask for approval or changes
+2. Show gathered information to user and ask for approval or changes
    - ask if user wants to add/remove/modify anything
+3. Ask for test type (smoke, regression, feature acceptance, etc.)
+4. Ask for role (default, optimist, drama-queen, etc.)
+5. Generate hierarchical structured checklist for feature X
+6. Display checklist in terminal and ask for user approval
    - ask about amount of cases / level of details (more, less, keep as is)
-3. Ask for generation role (default, optimist, drama-queen, etc.)
-4. Generate hierarchical structured checklist for feature X
-5. Display checklist in terminal and ask for user approval
-6. On approval, generate detailed test cases for feature X and save to `test-cases-feature-x.md`
+7. On approval, generate detailed test cases for feature X and save to `test-cases-feature-x.md`
 
 ### Example 2
 
@@ -324,11 +330,11 @@ When the user provides an existing test cases example and/or asks for "similar" 
 1. Gather information about feature X
    - analyze all available sources
    - interact with user
-   - ask for test type (smoke, regression, feature acceptance, etc.)
-2. Show information from step 1 to user and ask for approval or changes
+2. Show gathered information to user and ask for approval or changes
    - ask if user wants to add/remove/modify anything
+3. Ask for test type (smoke, regression, feature acceptance, etc.)
+4. Ask for generation role (default, optimist, drama-queen, etc.)
+5. Generate hierarchical structured checklist for feature X
+6. Display checklist in terminal and ask for user approval
+   - ask if user wants to proceed
    - ask about amount of cases / level of details (more, less, keep as is)
-3. Ask for generation role (default, optimist, drama-queen, etc.)
-4. Generate hierarchical structured checklist for feature X
-5. Display checklist in terminal
-6. Ask if user wants to proceed
