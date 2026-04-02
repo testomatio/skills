@@ -24,7 +24,18 @@ Full plugin experience with the `/test-management` command:
 ```bash
 /plugin marketplace add testomatio/skills
 /plugin install test-management@testomatio/skills
+
+# then you may invoke plugin
 /test-management
+
+# call skill directly
+/test-management:generate-test-cases
+
+# call skill without plugin mention
+/generate-test-cases
+
+# or skill will be invoked automatically when using prompt like
+# "generate test cases for login feature"
 ```
 
 ### Cursor
@@ -33,8 +44,8 @@ Full plugin experience with the `/test-management` command:
 
 **Option 1 — Remote Rule (easiest):**
 1. Open Cursor Settings (`Cmd+Shift+J` / `Ctrl+Shift+J`)
-2. Go to **Rules** → **Add Rule** → **Remote Rule (GitHub)**
-3. Paste: `https://github.com/testomatio/skills`
+2. Go to **Rules/Skills/Subagents** → **New** → **Add from GitHub/GitLab**
+3. Paste: `https://github.com/testomatio/skills.git`
 
 **Option 2 — Manual Install (Project-level):**
 ```bash
@@ -52,7 +63,7 @@ cp -r _tmp/skills/* ~/.cursor/skills/
 rm -rf _tmp
 ```
 
-### OpenCode
+### OpenCode IN PROGRESS
 
 ```bash
 # Project-level
@@ -64,7 +75,7 @@ mkdir -p ~/.opencode/skills
 cp -r skills/* ~/.opencode/skills/
 ```
 
-### VS Code / Copilot
+### VS Code / Copilot IN PROGRESS
 
 ```bash
 # Install to your configured skills directory
@@ -72,7 +83,7 @@ cp -r skills/* ~/.vscode/skills/
 # or
 cp -r skills/* .vscode/skills/
 ```
-
+<!-- 
 ### Generic Agent Skills Installation
 
 Any tool supporting the Agent Skills standard can install from the `skills/` directory:
@@ -134,7 +145,7 @@ I need to test a new shopping cart feature. Here are the requirements:
 - Calculate totals with tax
 
 Generate test cases, set up the test reporter, and sync everything to Testomat.io.
-```
+``` -->
 
 ## Repository Structure
 
@@ -160,8 +171,3 @@ testomatio/skills
 - [Testomat.io Documentation](https://docs.testomat.io)
 - [check-tests CLI](https://github.com/testomatio/check-tests)
 - [Markdown Import/Export Guide](https://docs.testomat.io/project/import-export/download-tests-as-files/download-manual-tests-as-files/)
-- [Agent Skills Standard](https://agentskills.io)
-
-## License
-
-MIT
