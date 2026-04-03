@@ -245,7 +245,7 @@ If user prompted checklist generation only (not test cases), ask user if he want
 
 Rules:
 
-- When generating steps, **strictly follow the format described in the `./reference/test-case-format.md` file.**
+- When generating steps, **strictly follow the format described in the `./references/test-case-format.md` file.**
 - If multiple features to test or whole product => put generated test cases of each feature in separate file.
 - Step should consist of **action** (with optional test data) and **expected result**.
 - All checks/verifications/assertions should be in **expected result**, not as separate steps.
