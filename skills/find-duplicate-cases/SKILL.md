@@ -40,6 +40,7 @@ Compare all extracted tests to identify potential duplicates.
 - Normalize step wording where possible.
 - Ignore framework syntax (`describe`, `Scenario`, `it`, etc.) when analyzing intent.
 - Treat parameterized values (emails, IDs, usernames) as variable data.
+- Treat tests from different levels that have a similar title as different tests. E.g. API test with "Product CRUD" title in is different from UI test with "Product CRUD" title, as they check integration of different elements.
 
 2) Compare tests using multiple similarity signals:
 - **Title similarity**.
