@@ -2,167 +2,67 @@
 
 AI skills for test management workflows with [Testomat.io](https://testomat.io). These skills bring the power of AI coding agents to your testing process — design tests, automate them, review quality, track coverage, and sync everything with your test management system.
 
-Follows the [Agent Skills open standard](https://agentskills.io) — compatible with Claude Code, Cursor, VS Code/Copilot, OpenCode, and more.
+## Quick Start
+
+`npx skills add testomatio/skills`
 
 ## Available Skills
 
-| Skill | Description |
-|-------|-------------|
-| `generate-test-cases` | Generate test cases and checklists from requirements, tickets, or feature descriptions |
-| `improve-test-cases` | Analyze and improve existing markdown test cases for clarity and Testomat.io format compliance |
-| `sync-cases` | Synchronize Markdown test scenarios between local project and Testomat.io |
-| `find-duplicate-cases` | Find duplicate, near-duplicate, and overlapping test cases across your test suite |
+### Test Management
+
+| Skill                  | Description                                                                                  |
+| ---------------------- | -------------------------------------------------------------------------------------------- |
+| `generate-test-cases`  | Generate test cases and checklists from requirements, tickets, or feature descriptions       |
+| `improve-test-cases`   | Analyze and improve existing markdown test cases for clarity                                 |
+| `find-duplicate-cases` | Find duplicate, near-duplicate, and overlapping test cases                                   |
+| `sync-cases`           | Synchronize Markdown test scenarios between local project and Testomat.io                    |
+| `testomatio-flow`      | Orchestrate complete test case lifecycle: generate, improve, analyze coverage, upload to TMS |
+
+### Automation
+
+| Skill            | Description                                                                                          |
+| ---------------- | ---------------------------------------------------------------------------------------------------- |
 | `reporter-setup` | Set up Testomat.io test reporting for your automation framework (Playwright, CodeceptJS, Jest, etc.) |
-| `testomatio-flow` | Orchestrate complete test case lifecycle: generate, improve, analyze coverage, upload to TMS |
+
+---
 
 ## Installation
 
-### Claude Code (Plugin with Marketplace)
+### Universal Installation (Recommended)
 
-Full plugin experience with the `/test-management` command:
-
-```bash
-/plugin marketplace add testomatio/skills
-/plugin install test-management@testomatio/skills
-
-# then you may invoke plugin
-/test-management
-
-# call skill directly
-/test-management:generate-test-cases
-
-# call skill without plugin mention
-/generate-test-cases
-
-# or skill will be invoked automatically when using prompt like
-# "generate test cases for login feature"
-```
-
-### Cursor
-
-**Note:** Agent Skills in Cursor require the **Nightly** release channel (Settings → Beta → Update Channel → Nightly).
-
-**Option 1 — Remote Rule (easiest):**
-1. Open Cursor Settings (`Cmd+Shift+J` / `Ctrl+Shift+J`)
-2. Go to **Rules/Skills/Subagents** → **New** → **Add from GitHub/GitLab**
-3. Paste: `https://github.com/testomatio/skills.git`
-
-**Option 2 — Manual Install (Project-level):**
-```bash
-cd your-project
-git clone https://github.com/testomatio/skills.git _tmp_skills
-cp -r _tmp_skills/skills/* .cursor/skills/
-rm -rf _tmp_skills
-```
-
-**Option 3 — Global Install (all projects):**
-```bash
-mkdir -p ~/.cursor/skills
-git clone https://github.com/testomatio/skills.git _tmp
-cp -r _tmp/skills/* ~/.cursor/skills/
-rm -rf _tmp
-```
-
-### OpenCode IN PROGRESS
+The easiest way to install these skills across any supported AI agent (Cursor, Claude Code, GitHub Copilot, Cline, agentic tools, etc.) is using the [`skills`](https://skills.sh) CLI. It provides an interactive menu to select the skills you need and choose whether to install them globally or for your current project.
 
 ```bash
-# Project-level
-mkdir -p .opencode/skills
-cp -r skills/* .opencode/skills/
-
-# Global
-mkdir -p ~/.opencode/skills
-cp -r skills/* ~/.opencode/skills/
+npx skills add testomatio/skills
 ```
 
-### VS Code / Copilot IN PROGRESS
+To update your installed skills later:
 
 ```bash
-# Install to your configured skills directory
-cp -r skills/* ~/.vscode/skills/
-# or
-cp -r skills/* .vscode/skills/
-```
-<!-- 
-### Generic Agent Skills Installation
-
-Any tool supporting the Agent Skills standard can install from the `skills/` directory:
-
-```bash
-cp -r skills/* <agent-config-dir>/skills/
+npx skills update
 ```
 
-Common agent directories:
-- `.cursor/skills/` — Cursor
-- `.claude/skills/` — Claude Code / OpenCode
-- `.agents/skills/` — OpenCode fallback
-- `.codex/skills/` — OpenAI Codex
-
-## Usage Examples
-
-### Generate Test Cases
-
-```
-Generate test cases for a user login feature with email and password authentication.
-Include tests for valid login, invalid credentials, locked accounts, and password reset.
-```
-
-### Improve Existing Tests
-
-```
-Review and improve the test cases in tests/login/.
-Make sure they follow Testomat.io markdown format best practices.
-```
-
-### Find Duplicate Tests
-
-```
-Find duplicate or overlapping test cases in my test suite.
-Show recommendations for which tests to merge or remove.
-```
-
-### Sync to Testomat.io
-
-```
-Sync all markdown test cases from tests/ to my Testomat.io project.
-Use labels "smoke" and "regression".
-```
-
-### Set Up Test Reporter
-
-```
-Add Testomat.io reporter to my Playwright test suite.
-I want to see test results in my Testomat.io dashboard after each run.
-```
-
-### Complete Workflow (testomatio-flow)
-
-```
-I need to test a new shopping cart feature. Here are the requirements:
-- Add items to cart
-- Update quantities
-- Remove items
-- Calculate totals with tax
-
-Generate test cases, set up the test reporter, and sync everything to Testomat.io.
-``` -->
+For other ways of installation see [installation details](./docs/install-details.md)
 
 ## Repository Structure
 
 ```
 testomatio/skills
 ├── skills/                    # Agent-agnostic skills (canonical source)
+│   ├── find-duplicate-cases/
 │   ├── generate-test-cases/
 │   ├── improve-test-cases/
-│   ├── sync-cases/
-│   ├── find-duplicate-cases/
 │   ├── reporter-setup/
-│   └── hello/
+│   ├── sync-cases/
+│   └── ...
 └── plugins/                   # Claude Code plugin wrappers
-    └── test-management/
-        └── skills/
-            ├── testomatio-flow/    # Plugin-specific orchestrator
-            └── [symlinks to ../../skills/*]
+    ├── test-management/
+    │   └── skills/
+    │       └── [symlinks to ../../skills/*]
+    ├── test-automation/
+    │   └── skills/
+    │       └── [symlinks to ../../skills/*]
+    └── ...
 ```
 
 ## Links

@@ -149,7 +149,7 @@ Example:
 | Role               | Description                              |
 | ------------------ | ---------------------------------------- |
 | **⚙️ default**     | **balanced** approach                    |
-| **🌈 optimist**    | focus on **positive** flows, happy path  |
+| **🌈 optimist**    | **positive** flows, happy path  |
 | **🤓 nerd**        | **details**, dependencies, perfectionist |
 | **🔪 psycho**      | **edge cases**                           |
 | **🔐 pentest**     | **security**                             |
