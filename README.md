@@ -28,8 +28,6 @@ AI skills for test management workflows with [Testomat.io](https://testomat.io).
 
 ## Installation
 
-### Universal Installation (Recommended)
-
 The easiest way to install these skills across any supported AI agent (Cursor, Claude Code, GitHub Copilot, Cline, agentic tools, etc.) is using the [`skills`](https://skills.sh) CLI. It provides an interactive menu to select the skills you need and choose whether to install them globally or for your current project.
 
 ```bash
@@ -42,7 +40,7 @@ To update your installed skills later:
 npx skills update
 ```
 
-For other ways of installation see [installation details](./docs/install-details.md)
+For other ways of installation see [installation details](./docs/install-details.md).
 
 ## Repository Structure
 
