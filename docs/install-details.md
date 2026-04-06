@@ -5,7 +5,7 @@
 [Codex](#codex)
 [Cursor](#cursor)
 
-### Most agentic tools (Claude Code, Cursor, Cline and others)
+### Most agentic tools (Claude Code, Cursor, Cline, VS Code and others)
 
 ```bash
 npx skills add testomatio/skills
