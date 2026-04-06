@@ -40,6 +40,12 @@ To update your installed skills later:
 npx skills update
 ```
 
+### Claude Code
+
+For better skills management you can use Claude Code plugin marketplace.
+
+[Follow instructions](./docs/install-details.md#claude-code) to install plugins.
+
 For other ways of installation see [installation details](./docs/install-details.md).
 
 ## Repository Structure
