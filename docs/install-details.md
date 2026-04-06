@@ -1,3 +1,22 @@
+# Testomatio skills installation details
+
+[Most agentic tools](#most-agentic-tools)
+[Claude Code](#claude-code)
+[Codex](#codex)
+[Cursor](#cursor)
+
+### Most agentic tools (Claude Code, Cursor, Cline and others)
+
+```bash
+npx skills add testomatio/skills
+```
+
+To update your installed skills later:
+
+```bash
+npx skills update
+```
+
 ### Claude Code (plugin with marketplace)
 
 For Claude Code skills are grouped into plugins which could be installed from the marketplace.
@@ -39,18 +58,6 @@ generate-test-cases
 3. Paste: `https://github.com/testomatio/skills.git`
 
 <img height="300" alt="Cursor install skills" src="./docs/resources/skill-install-Cursor.png">
-
-### OpenCode IN PROGRESS
-
-```bash
-# Project-level
-mkdir -p .opencode/skills
-cp -r skills/* .opencode/skills/
-
-# Global
-mkdir -p ~/.opencode/skills
-cp -r skills/* ~/.opencode/skills/
-```
 
 ### VS Code / Copilot IN PROGRESS
 
