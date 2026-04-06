@@ -46,6 +46,16 @@ For better skills management you can use Claude Code plugin marketplace.
 
 [Follow instructions](./docs/install-details.md#claude-code) to install plugins.
 
+### Codex
+
+Easiest way to install skills for Codex is to chat with Codex and ask something like:
+
+`install skills from https://github.com/testomatio/skills/tree/master/skills`
+
+or trigger `Skill Installer` in Codex chat and provide the same link `https://github.com/testomatio/skills/tree/master/skills`.
+
+
+### Other
 For other ways of installation see [installation details](./docs/install-details.md).
 
 ## Repository Structure
