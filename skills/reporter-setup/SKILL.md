@@ -7,7 +7,7 @@ metadata:
   version: 1.0.0
 ---
 
-# TESTOMATIO-REPORTER-SETUP SKILL: What I do
+# REPORTER-SETUP SKILL: What I do
 
 This skill configures Testomat.io reporter in your automation project and sends test results to your testing workspace.
 
@@ -233,7 +233,7 @@ If the error still persists after 3 attempts:
 **Global Setup Command:** Install @testomatio/reporter to my project and import tests to TMS.
 
 ```
-Use testomatio-reporter-setup skill to install reporter and import tests to TMS
+Use reporter-setup skill to install reporter and import tests to TMS
 ```
 
 ### Basic Setup (Playwright)
