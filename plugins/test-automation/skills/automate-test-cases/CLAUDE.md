@@ -19,7 +19,7 @@ Converts manual test cases into automation test scripts following POM pattern.
 2. **Step 2:** Understand Manual Test (normalize input, handle ambiguous steps)
 3. **Step 3:** Write Test Code (implement, add assertions)
 4. **Step 4:** Verify & Heal (execute, fix if fails - max 3 attempts)
-5. **Step 5:** Code Review & Final Verification (align, run, summary)
+5. **Step 5:** Finalization (align, run, summary)
 
 **Important:**
 - NEVER skip steps - complete each before moving to next
