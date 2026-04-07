@@ -85,14 +85,6 @@ exports.config = {
 };
 ```
 
-For making screenshots on failed tests add the following hook to "wdio.conf.js":
-
-```js
-afterTest: function (test, context, { error }) {
-  if (error) browser.takeScreenshot()
-}
-```
-
 **Run:** `npx @testomatio/reporter run 'npx wdio wdio.conf.js'`
 
 ### Jest

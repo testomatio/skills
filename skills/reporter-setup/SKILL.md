@@ -34,11 +34,19 @@ Identify which testing framework is used in the project: `Playwright`, `Codecept
 - Configure based on detected framework.
 
 **If no framework and Config detected:**
-Ask user in "Interactive Setup" mode: 
+Ask user in "Interactive Setup" mode:
+
 ```
-❓ No test framework detected. Do you want to:
-1. **Specify framework manually** to set up in current project.
-2. **Configure Framework** by Testomat.io reporter - Yes?.
+❓ No test framework was detected in your project.
+
+To continue, please choose how to proceed:
+
+**Specify a framework manually**. Available frameworks:  
+  - Playwright
+  - CodeceptJS
+  - Jest
+  - Mocha
+  - WebdriverIO
 ```
 
 > Move to Step 2 (Install reporter) after filling all gaps.
@@ -69,7 +77,7 @@ npm install @testomatio/reporter --save-dev
 ```js
 reporter: [
   ['@testomatio/reporter/playwright'],
-  // another user's reports...
+  // another user's reporters...
 ],
 ```
 
@@ -89,23 +97,6 @@ plugins: {
  
 ### Step 3: Configure Credentials
 
-<<<<<<< HEAD:skills/reporter-setup/SKILL.md
-Check for existing `.env` file with "TESTOMATIO" token:
-
-- **If token exists**: Use it (no action needed)
-- **If no token**: DO NOT ask the user to paste the API key into the chat! This prevents sensitive tokens from being sent in the AI prompt. Instead, generate and instruct the user to run a terminal command to securely add the token to their `.env` file.
-
-Provide the user with a command similar to this to run in their terminal:
-
-```bash
-echo "TESTOMATIO=<YOUR_API_KEY_HERE>" >> .env
-echo "TESTOMATIO_URL=https://app.testomat.io" >> .env
-```
-
-Ask the user to confirm once they have executed the command or manually updated the `.env` file. Do not proceed to the next step until they confirm.
-
-> **Best Practice:** Use `.env` file instead of passing token as command variable.
-=======
 Check if "TESTOMATIO" API key exists in `.env`:
 - **If exists**: Use it (no action needed).
 - **If missing**: Add to `.env` token placeholder (format: `tstmt_xxxxx`) :
@@ -116,15 +107,9 @@ TESTOMATIO=tstmt_xxxxx
 ```
 
 And ask user to manually replace the placeholder by "Project Reporting API key" value.
->>>>>>> [REPORTER SETUP SKILL] Review fixes:plugins/test-management/skills/reporter-setup/SKILL.md
 
 #### Get API Key (if user doesn’t have it)
 
-<<<<<<< HEAD:skills/reporter-setup/SKILL.md
-Run tests with reporter to verify configuration:
-
-- First run: use HTML report mode for quick verification (by "HTML Reports" references instruction).
-=======
 Ask the user to manually replace the placeholder by correct Testomat.io API key.
 They can find it in users' Testomat project:
 ```
@@ -137,18 +122,20 @@ OR Create a new project: `Navigate to Settings -> Project -> copy "Project Repor
 ### Step 4: Verify Setup
 
 Run your tests with the Testomat.io reporter to ensure everything is configured correctly.
->>>>>>> [REPORTER SETUP SKILL] Review fixes:plugins/test-management/skills/reporter-setup/SKILL.md
 
 #### ✅ Debug Mode (Preferred)
 
-Use Debug mode to capture reporter output locally **for only 1-2 tests** to verify that data is generated correctly before sending it to Testomat.io.
-Enable debug pipe by setting the environment variable and check that debug file was created:
+Use Debug mode to capture reporter output locally **for only 1-2 tests**. This helps verify that data is generated correctly before sending it to Testomat.io.
+
+Enable Debug pipe by setting the environment variable:
 
 ```bash
-TESTOMATIO_DEBUG=1 npx <your-test-command> replay ./debug-file.json
+TESTOMATIO_DEBUG=1 npx <your-test-command>
 ```
 
-**More info** you can find in [Testomat.io DEBUG Pipe](./references/TESTOMATIO_DEBUG_PIPE.md) 
+**After running,** read the test execution logs to detect whether the Testomat.io reporter is enabled and configured correctly.
+
+(More info you can find in [Testomat.io DEBUG Pipe](./references/TESTOMATIO_DEBUG_PIPE.md) )
 
 #### 🧾 HTML Report Mode (Alternative)
 
