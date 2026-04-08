@@ -34,7 +34,7 @@ Complete ALL items in order:
 ### Progress
 * STEP: 1/5 (Analyze Project Architecture)
 * Previous: ⏳ (not started)
-* Next: → Step 2: Understand Manual Test
+* Next ➡️ Step 2: Understand Manual Test Cases Task.
 
 ---
 

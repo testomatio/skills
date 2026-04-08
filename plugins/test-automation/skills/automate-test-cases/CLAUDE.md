@@ -11,7 +11,7 @@ Converts manual test cases into automation test scripts following POM pattern.
 ### Progress
 * STEP: 2/5 (Understand Manual Test)
 * Previous: ✅ Step 1: Analyze Project Architecture
-* Next: → Step 3: Write Test Code
+* Next ➡️ Step 3: Write Test Code.
 ```
 
 **Step Flow:**

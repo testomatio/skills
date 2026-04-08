@@ -1,6 +1,6 @@
 ---
 name: automation-debugging-tests
-description: Diagnose and fix failing automated tests. Analyze failures, inspect DOM, identify root causes, and apply targeted fixes following a systematic healing methodology.
+description: Diagnose and fix failing automated tests. Analyze failures, inspect DOM, identify root causes, and apply targeted fixes following a systematic healing methodology. Use test framework tools and MCP/CLI debug modes where available.
 license: MIT
 metadata:
   author: Testomat.io
@@ -9,7 +9,7 @@ metadata:
 
 # AUTOMATION-DEBUGGING-TESTS SKILL: What I do
 
-This skill diagnoses and fixes failing automated tests. I analyze test failures, inspect the application state, identify root causes, and apply targeted fixes following a systematic healing methodology.
+This skill systematically diagnoses and heals failing automated tests. It analyzes test results using framework-native tools, inspects the application state, identifies root causes, and applies targeted fixes following a structured healing methodology. Where available, it leverages MCP snapshots and CLI debug modes to enhance test inspection and repair.
 
 ## When to Use
 
@@ -17,7 +17,7 @@ Trigger this skill when:
 - A test fails during execution.
 - User asks to: "debug this test", "fix failing test", "heal test", etc.
 - Test passes locally but fails in CI.
-- Flaky tests that need stabilization.
+- Flaky or intermittent tests need stabilization.
 
 ---
 
@@ -32,129 +32,61 @@ Complete ALL items in order:
 
 ---
 
-## Workflow: Debug & Heal Failing Tests
+## Debug & Healing Workflow
 
 ### Step 1: Analyze Failure
 
-#### 1.1 Identify Framework
+1. **Identify framework** - Determines available debug tools.
+  - Playwright: CLI debug, trace viewer, MCP snapshots.
+  - CodeceptJS: `--steps` mode, CDP inspection.
+  - Cypress: devTools, screenshots on failure.
+  - WebdriverIO: Selenium logs.
+2. **Capture error type** - Categorize for priority fixing:
+  - Locator (element missing/unreachable).
+  - Timing (timeout/race).
+  - Assertion (expected ≠ actual).
+  - Flow (navigation, preconditions).
+  - Infrastructure (CI/browser/network).
+3. **Gather failure context** - Collect:
+  - Full stack trace & error message.
+  - Screenshot / video.
+  - Test name, file, line number.
+  - Test data & environment (browser, viewport, CI/local).
 
-- **Playwright** - Use trace viewer, codegen, debug mode.
-- **CodeceptJS** - Use --steps mode, CDP.
-- **Cypress** - Use devTools, screenshot on failure.
-- **WebdriverIO** - Use selenium-standalone logs.
-
-#### 1.2 Capture Error Type
-
-Categorize the failure:
-- **Locator failure** - Element not found, not visible, not clickable.
-- **Timing failure** - Timeout, race condition, element appeared too late.
-- **Assertion failure** - Expected vs actual value mismatch.
-- **Flow failure** - Wrong navigation, missing preconditions, state issues.
-- **Infrastructure failure** - Browser crash, network error, config issue.
-
-#### 1.3 Gather Failure Context
-
-Collect:
-- Error message (full stack trace).
-- Screenshot (if available).
-- Test name, file, line number.
-- Test data used.
-- Environment (browser, viewport, CI/local).
-
-**Step 1 Summary:** Output failure category and initial hypothesis.
+**Step 1 Overview:** Hypothesis for root cause and likely fix type.
 
 ---
 
 ### Step 2: Inspect & Diagnose
 
-#### 2.1 DOM Inspection
+1. **DOM Inspection:**
+  - Playwright: `page.locator('selector').evaluate(el => el.outerHTML)`.
+  - CodeceptJS: `I.executeScript(() => document.querySelector('.selector').outerHTML)`.
+  - MCP snapshot: capture live DOM state for complex elements
+2. **Network & Console Logs:**
+  - Capture console: `page.on('console', msg => console.log(msg.text()))`.
+  - Capture request failures: `page.on('requestfailed', r => console.log(r.failure().errorText))`.
+3. **Trace Analysis (Playwright):**
+  - CLI: `npx playwright show trace.zip`.
+  - Inspect timing/order of clicks, navigation, network requests.
+4. **Compare Expected vs Actual:**
+  - Check assertion values against test spec, not assumptions.
 
-Use framework-specific tools:
-
-**Playwright:**
-```bash
-# Open browser in debug mode
-npx playwright test --debug
-
-# Inspect element
-page.locator('selector').evaluate(el => el.outerHTML)
-
-# Get all matching elements
-page.locator('selector').count()
-```
-
-**CodeceptJS:**
-```javascript
-// In test or debug console
-I.executeScript(() => document.querySelector('.selector').outerHTML)
-```
-
-**General pattern:**
-```javascript
-// Inspect target element
-const html = await page.locator('your-selector').first().evaluate(el => el.outerHTML);
-console.log(html);
-```
-
-#### 2.2 Network & Console Logs
-
-```javascript
-// Capture console logs
-page.on('console', msg => console.log(msg.text()));
-
-// Capture network failures
-page.on('requestfailed', request => console.log(request.failure().errorText));
-```
-
-#### 2.3 Trace Analysis
-
-**Playwright trace:**
-```bash
-npx playwright show trace.zip
-```
-
-Look for:
-- Click happened before element visible.
-- Navigation happened before assertion.
-- Network request pending during assertion.
-
-#### 2.4 Compare Expected vs Actual
-
-For assertion failures:
-- What was expected?
-- What was actual?
-- Is the expected value correct?
-
-If expected value seems wrong:
-    - Ask user to confirm expected results.
-
-**Step 2 Summary:** Output root cause and recommended fix category.
+**Step 2 Overview:** Root cause + recommended fix category (locator, timing, assertion, flow).
 
 ---
 
 ### Step 3: Apply Fix
 
-#### 3.1 Fix Locators (Priority 1)
+#### 3.1 Fix Locators
 
-**Choose stable selectors in this order:**
-1. `data-testid` - Most reliable.
-2. `aria-label` / `aria-*` - Accessible and stable.
-3. `role` + accessible name - Semantic.
-4. `id` - Unique identifiers.
-5. Text content - For links, buttons, labels.
-6. CSS/XPath - Last resort only.
+**Fix priority order:** Locators → Timing → Assertions → Flow
 
-**Common locator fixes:**
+1. **Locator Fixes (Priority 1):**
+  - Use stable selectors (`data-testid` → `aria-labe`l → `role` → `id` → `text` → `CSS/XPath`)
+  - Re-fetch elements if stale, scroll into view if hidden, filter `.first()` for multiple matches.
 
-| Issue | Fix |
-|-------|-----|
-| Element not found | Add wait, check if element exists |
-| Element not visible | Scroll into view, check overlay |
-| Element not clickable | Wait for enabled state, check for overlays |
-| Multiple matches | Add more specific filter, use `.first()` |
-| Stale element | Re-fetch element before action |
-
-**Example:**
+Example:
 ```typescript
 // Before (fragile)
 await page.click('.parent .child .btn-primary:nth-child(2)');
@@ -163,47 +95,20 @@ await page.click('.parent .child .btn-primary:nth-child(2)');
 await page.getByRole('button', { name: 'Submit' }).click();
 ```
 
-#### 3.2 Fix Timing (Priority 2)
+2. **Timing Fixes (Priority 2):**
+  - Framework-native waits: `waitFor`, `waitForNavigation`, `waitForLoadState('networkidle')`.
+  - Avoid hard sleeps: like `sleep(5000)` or `wait(2)`.
 
-**Use framework-native waits:**
+Example:
 
-**Playwright:**
 ```typescript
-// Wait for element visible
-await page.getByTestId('modal').waitFor({ state: 'visible' });
-
-// Wait for navigation
-await page.waitForURL('/dashboard/**');
-
-// Wait for network idle
-await page.waitForLoadState('networkidle');
-```
-
-**CodeceptJS:**
-```javascript
-I.waitForElement('#modal', 5);
-I.waitForNavigationVisible();
-I.waitForResponse(response => response.status() === 200);
-```
-
-**Avoid:**
-- `sleep(5000)` - Hard waits
-- `wait(2)` - CodeceptJS version of hard wait
-- Implicit waits that are too short
-
-**Fix race conditions:**
-```typescript
-// Before: assertion before element ready
-await page.click('button');
-expect(await page.locator('.result').textContent()).toBe('Success');
-
-// After: wait for element
-await page.click('button');
 await page.locator('.result').waitFor();
 expect(await page.locator('.result').textContent()).toBe('Success');
 ```
 
-#### 3.3 Fix Assertions (Priority 3)
+3. **Assertion Fixes (Priority 3):**
+  - Use contains/regex for flexible matching.
+  - Confirm expected values with spec.
 
 **Common assertion fixes:**
 
@@ -214,7 +119,7 @@ expect(await page.locator('.result').textContent()).toBe('Success');
 | Timing issue | Add wait before assertion |
 | Multiple elements | Use `.first()` or `.nth(0)` |
 
-**Example:**
+Example:
 ```typescript
 // Before: exact match fails on whitespace
 await expect(page.locator('.title').textContent()).toBe('Hello World');
@@ -223,31 +128,9 @@ await expect(page.locator('.title').textContent()).toBe('Hello World');
 await expect(page.locator('.title')).toContainText('Hello');
 ```
 
-#### 3.4 Fix Flow (Priority 4)
-
-Check for:
-- Missing login/Setup
-- Wrong navigation order
-- Missing test data
-- State pollution from previous tests
-
-**Fix missing preconditions:**
-```typescript
-// Before: assumes logged in
-test('create item', async ({ page }) => {
-  await page.goto('/items/new'); // fails - not authenticated
-});
-
-// After: ensure login
-test('create item', async ({ page }) => {
-  await page.goto('/login');
-  await page.fill('#email', 'test@test.com');
-  await page.click('button[type="submit"]');
-  await page.goto('/items/new');
-});
-```
-
-**Step 3 Summary:** Output applied fix and re-run command
+4. **Flow Fixes (Priority 4):**
+  - Ensure preconditions: login setup, navigation order, missing test-data.
+  - Isolate test state from prior runs.
 
 ---
 
@@ -268,7 +151,6 @@ npx codeceptjs run path/to/test.js
 
 Test is stable when:
 - Passes 2 consecutive runs.
-- No hard waits.
 - Uses resilient locators.
 - Proper waits for dynamic content.
 
@@ -277,38 +159,15 @@ Test is stable when:
 - Applied fix.
 - Verification result.
 
-**Step 4 Summary:** Output final status, fix applied, stability check
+**Step 4 Overview:** Output final status, fix applied, stability check
 
 ---
 
-## MCP Integration (Optional)
+## MCP & Advanced Debagging Tools (Optional)
 
 When MCP tools are available, use them for complex debugging:
-
-### Playwright MCP
-
-```javascript
-// After each action - capture snapshot
-browser_snapshot();
-
-// Inspect element
-document.querySelector('.selector').outerHTML;
-
-// Count elements
-document.querySelectorAll('[role="button"]').length;
-```
-
-### CodeceptJS MCP
-
-```bash
-# Run in steps mode
-npx codeceptjs run --grep "@tag" --steps
-
-# Use CDP for inspection
-I.executeScript(() => {
-  return document.querySelector('.selector')?.outerHTML;
-});
-```
+- **Playwright MCP:** Live snapshots, element count, DOM inspection, after each action.
+- **CodeceptJS MCP:** CDP-based inspection, `--steps` mode for live debugging.
 
 **Use MCP when:**
 - Standard fixes don't resolve the issue.
@@ -380,12 +239,12 @@ Provide structured updates:
 
 ```
 🔍 Analyzing failure...
-   - Error: Element not found
-   - Context: Login test, line 42
+  - Error: Element not found
+  - Context: Login test, line 42
    
 🔧 Applying fix...
-   - Issue: Selector too broad
-   - Fix: Using getByRole('button', { name: 'Login' })
+  - Issue: Selector too broad
+  - Fix: Using getByRole('button', { name: 'Login' })
    
 ✅ Test passed! (Run 1/2)
 ```
@@ -396,11 +255,8 @@ Provide structured updates:
 
 | Action | Command |
 |--------|---------|
-| Debug Playwright | `npx playwright test --debug` |
 | Run CodeceptJS steps | `npx codeceptjs run --steps` |
 | View Playwright trace | `npx playwright show trace.zip` |
-| Run single test | `npx playwright test path` |
-| Run single test | `npx codeceptjs run path` |
 
 ---
 
