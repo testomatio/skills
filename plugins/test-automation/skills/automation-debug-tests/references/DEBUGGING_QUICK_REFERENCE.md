@@ -50,12 +50,15 @@ I.waitForResponse(response => response.status() === 200);
 
 ### Fix Race Conditions
 
-Wait for element before assertion.
+**Goal:** Ensure assertions happen after dynamic content updates.
+**Strategy:** Use `expect` with Playwright’s built-in waiting, or `locator.waitFor()` only if needed.
 
 ```typescript
-await page.click('button');
-await page.locator('.result').waitFor();
-expect(await page.locator('.result').textContent()).toBe('Success');
+// Click triggers dynamic update
+await page.getByRole('button', { name: 'Submit' }).click();
+
+// Wait for result text to appear (optional, only if dynamically loaded)
+await expect(page.getByTestId('result')).toHaveText('Success'); // automatically waits
 ```
 
 **What to Avoid:**

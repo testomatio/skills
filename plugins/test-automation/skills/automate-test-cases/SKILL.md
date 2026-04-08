@@ -264,7 +264,7 @@ Verify the generated test by executing it and fixing issues if needed.
 - If test **passes** → proceed to Step 5  
 - If test **fails** → start healing (4.2)  
 
-> ⚠️ Do NOT run all tests. Limit execution to the generated test to avoid excessive logs and noise.
+> ⚠️ **Do NOT run all tests**. Limit execution to the generated test to avoid excessive logs and noise.
 
 #### 4.2 Heal Failed Tests
 
