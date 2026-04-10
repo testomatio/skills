@@ -21,15 +21,6 @@
 
 ## Locator Strategy
 
-### Priority Order
-
-1. Stable test attributes (e.g., data-testid).
-2. Accessibility attributes (aria-label, aria-*).
-3. Semantic roles with names.
-4. Unique identifiers (id).
-5. Visible text.
-6. CSS/XPath (last resort).
-
 ### Guidelines
 
 - Prefer selectors that are stable and independent of UI layout.

@@ -12,11 +12,11 @@
 
 ### Common Locator Issues
 
-| Problem | Bad | Good |
-|---------|-----|------|
-| Deep nesting | `.parent .child .grandchild` | `[data-testid="target"]` |
-| Index-based | `button:nth-child(2)` | `getByRole('button', { name: 'Submit' })` |
-| Partial text | `button:contains("Save")` | `getByText('Save', { exact: true })` |
+|     Problem     | Avoid | Prefer |
+|-----------------|-------|--------|
+| Deep nesting    | `.parent .child .grandchild` | `[data-testid="target"]` |
+| Index-based     | `button:nth-child(2)` | `getByRole('button', { name: 'Submit' })` |
+| Partial text    | `button:contains("Save")` | `getByText('Save', { exact: true })` |
 | Dynamic classes | `.btn-primary-123` | `[data-testid="save-btn"]` |
 
 ### Element State Issues

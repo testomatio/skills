@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-# PostHook: Final verification after skill completes
+# PostHook: Final execution after skill completes
 # Usage: ./scripts/post-hook.sh [test-file-path]
 #
 
 set -e
 
 echo "=========================================="
-echo "POST-HOOK: Final Verification"
+echo "POST-HOOK: Final Execution"
 echo "=========================================="
 
 # Default test file from argument or environment

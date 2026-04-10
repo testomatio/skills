@@ -33,7 +33,7 @@ Complete ALL items in order:
 
 ### Progress
 * STEP: 1/5 (Analyze Project Architecture)
-* Previous: ⏳ (not started)
+* Previous: ⏳ (none)
 * Next ➡️ Step 2: Understand Manual Test Cases Task.
 
 ---
@@ -284,19 +284,18 @@ Fix failures iteratively, one issue at a time.
 
 **Limits:**
 - Max **3 healing attempts**  
-- If still failing => stop and report issues 
+- If still failing => stop and report issues
+
+> When the root cause of a failure remains unclear or requires deeper investigation, consider using the **automation-debug-tests** skill for structured, step-by-step diagnosis and fixes.
 
 #### Optional: Advanced Debugging (MCP)
 
-**Use only when standard healing is insufficient**.
+Use advanced debugging tools and MCPs **when available** to improve diagnosis efficiency.
 
-If deeper debugging is needed and tools are available:
+**If MCP/debug tools are available:**
 - Inspect DOM (`document.querySelector(...).outerHTML`).
 - Use step-by-step execution.
-- Capture logs, screenshots, or traces during debug. 
-
-> When you don't understand the root cause of test problem/-s, ask the about using **automation-debug-tests** skill to diagnose and fix. 
-**!!!Use only in critical situations**.
+- Capture logs, screenshots, or traces during debug.
 
 #### 4.3 Stability Criteria & Save
 

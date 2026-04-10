@@ -3,76 +3,44 @@
 Use this template after completing the conversion process:
 
 ```
-Manual-to-Automation Conversion Complete:
-
-**Test Overview:**
-- File: [path/to/test.spec.ts]
-- Scenario: "[Test case title]"
+**Summary:**
 - Framework: [Playwright/CodeceptJS/Cypress]
+- Tests generated: [N]
+- Passed: [N]
+- Needs review: [N]
 
-**Implementation Details:**
-- Page Objects:
-    - [PageName] ([reused/created/extended])
-    - [PageName] ([reused/created/extended])
-- Reuse Strategy:
-    - [What was reused from existing codebase]
-    - [What was created/added]
-- Test Data:
-    - [inline/external fixtures/JSON]
-    - [Pattern used or "no existing pattern detected"]
+**Generated Files:**
+- [path/to/test1.spec.ts] ✅
+- [path/to/test2.spec.ts] ⚠️ ([issue])
+- [path/to/test3.spec.ts] ✅
 
-**Stability:**
-- Status: ✅ Stable / ⚠️ Needs Review
-- Passed multiple runs: Yes/No
-- Healing applied: Yes/No (N attempts)
-
-**Assumptions & Notes:**
-- ⚠️ [Any assumptions made during conversion]
-
-**Issues:**
-- ❓ [Unresolved items requiring clarification]
+**Key Issues:**
+[Short description of main problems, if any]
 
 **Next steps:**
-1. Review generated test at: [path]
-2. (Optional) Run full suite: [command]
-3. (Optional) Refine selectors if UI changes frequently
+...
 ```
 
-## Example Summary
+## Example Final Summary
 
 ```
-Manual-to-Automation Conversion Complete:
-
-**Test Overview:**
-- File: tests/e2e/custom-statuses.spec.ts
-- Scenario: "Custom statuses are set up by default"
+**Summary:**
 - Framework: Playwright
+- Tests generated: 10
+- Passed: 8
+- Needs review: 2
 
-**Implementation Details:**
-- Page Objects:
-    - SettingsPage (reused)
-    - CustomStatusesPage (created)
-- Reuse Strategy:
-    - Reused existing navigation and settings logic
-    - Added new methods for custom statuses flow
-- Test Data:
-    - Inlined (small dataset)
-    - No existing external data pattern detected
+**Generated Files:**
+- tests/e2e/test1.spec.ts ✅
+- tests/e2e/test2.spec.ts ⚠️ (locator issue)
+- tests/e2e/test3.spec.ts ✅
+...
 
-**Stability:**
-- Status: ✅ Stable
-- Passed multiple runs: Yes
-- Healing applied: No
-
-**Assumptions & Notes:**
-- ⚠️ Assumed "Custom statuses block" is clickable via visible label
-- ⚠️ Assumed default option includes "manual"
-
-**Issues:**
-- ❓ None
+**Key Issues:**
+- 2 tests have unstable locators
+- 1 test has assumption on missing step details
 
 **Next steps:**
-1. Review generated test at: tests/e2e/custom-statuses.spec.ts
-2. (Optional) Run full suite: npm test
-3. (Optional) Refine selectors if UI changes frequently
+- Review ⚠️ tests
+- Run full suite if needed
 ```

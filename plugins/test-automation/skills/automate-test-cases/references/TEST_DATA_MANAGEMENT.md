@@ -21,36 +21,6 @@ When deciding where to store test data:
 
 **Priority:** Start local - Extract only when reuse is clear.
 
-### 3. JSON/CSV Files Example
-
-```typescript
-// data/users.json
-[
-  { "email": "user1@test.com", "role": "admin" },
-  { "email": "user2@test.com", "role": "user" }
-]
-```
-
-```typescript
-// Load in tests
-import users from '../data/users.json'
-
-// Use user.email, user.role
-```
-
-### 4. Environment-Based Data Example
-
-```typescript
-// Environment variables
-const baseUrl = process.env.BASE_URL || 'http://localhost:3000'
-const apiUrl = process.env.API_URL || 'http://localhost:8080'
-
-// secrets.json (gitignored)
-{
-  "apiKey": process.env.SECRET_API_KEY
-}
-```
-
 ## Data Structure Guidelines
 
 - Use clear, descriptive names for all data variables.

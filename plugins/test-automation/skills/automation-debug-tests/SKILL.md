@@ -1,13 +1,13 @@
 ---
-name: automation-debugging-tests
-description: Diagnose and fix failing automated tests. Analyze failures, inspect DOM, identify root causes, and apply targeted fixes following a systematic healing methodology. Use test framework tools and MCP/CLI debug modes where available.
+name: automation-debug-tests
+description: Diagnose and fix failing automated tests. Analyzes failures, inspects DOM, identifies root causes, and applies targeted fixes using framework tools and MCP/CLI debug modes. Use when tests fail, are flaky, or behave inconsistently (e.g., pass locally but fail in CI).
 license: MIT
 metadata:
   author: Testomat.io
   version: 1.0.0
 ---
 
-# AUTOMATION-DEBUGGING-TESTS SKILL: What I do
+# AUTOMATION-DEBUG-TESTS SKILL: What I do
 
 This skill systematically diagnoses and heals failing automated tests. It analyzes test results using framework-native tools, inspects the application state, identifies root causes, and applies targeted fixes following a structured healing methodology. Where available, it leverages MCP snapshots and CLI debug modes to enhance test inspection and repair.
 

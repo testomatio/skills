@@ -1,6 +1,6 @@
 # Playwright Best Practices
 
-- This guide provides high-level Playwright-specific guidance.
+- This document provides high-level Playwright-specific recommendations.
 - It does not replace general testing or POM best practices.
 - It helps the agent align with Playwright capabilities and conventions.
 - Prefer adapting to the existing project over enforcing new patterns.
@@ -32,7 +32,11 @@
 2. Labels (form inputs).
 3. Visible text.
 4. Test-specific attributes (data-testid).
-5. CSS/XPath (last resort).
+5. CSS selectors.
+
+**Note:** Prefer consistency within the project:
+- If the project relies on semantic locators => follow that pattern.
+- If it uses test IDs => prefer `data-testid` as the primary selector.
 
 **Prefer stability over brevity.**
 **Avoid selectors tied to layout or styling.**
@@ -47,93 +51,23 @@ await page.getByLabel('Email').fill('user@test.com')
 await page.locator('.btn-primary.submit-form').click()
 ```
 
-### Test IDs
-
-**Purpose:** Use `data-testid` only when semantic locators are insufficient.
-
-Use cases:
-- Dynamic UI elements.
-- Non-accessible components.
-- Repeated structures (lists, tables).
-- Table pattern (recommended):
-  - Assign unique identifiers per row: `data-testid = "row_<id>"`.
-
-### Soft Assertions
-
-**Purpose:** Validate multiple checks in a single test without stopping at the first failure.
-**When to use:** Non-critical verifications, data table rows, optional UI elements, or reporting multiple UI issues in one test.
-**When not to use:** Core workflow steps where failure must block the test.
-
-```typescript
-// utils/soft-assert.ts
-import { test as base } from '@playwright/test'
-
-const softExpect = base.expect.configure({ soft: true })
-
-export { softExpect }
-
-// Usage in tests:
-await softExpect(page.getByTestId('name')).toHaveText('John')
-await softExpect(page.getByTestId('email')).toHaveText('john@test.com')
-```
-
 ---
 
 ## Fixtures
 
-- Playwright provides built-in fixtures (e.g., page, context, request).
-- These are optional and project-dependent.
-- Do not assume custom fixtures exist.
-
-**Guidelines:**
-- Use fixtures only if already present in the project.
-- Do not introduce complex dependency injection unless required.
-
----
-
-## TypeScript Path Aliases
-
-Use path aliases to be clear in import lines.
-
-```json
-// tsconfig.json
-{
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@pages/*": ["src/pages/*"],
-      "@utils/*": ["utils/*"],
-      ...
-    }
-  }
-}
-```
+- Playwright provides built-in fixtures (e.g., `page`, `context`, `request`).
+- Projects may define custom fixtures for setup, authentication, or shared state:
+  - Reuse existing fixtures when they are present in the project.
+  - If no fixture structure exists, simple tests can interact directly without introducing abstraction.
+  - Introduce new fixtures only when they clearly improve reuse, readability, or test setup consistency.
 
 ---
 
 ## API Testing
 
-### ApiHelper Utility
+Playwright supports both API and UI interactions via `request`.
 
-Use Api helper to separate reusable behavior.
-
-```typescript
-// utils/ApiHelper.ts
-import { APIRequestContext } from '@playwright/test'
-
-export class ApiHelper {
-  constructor() {...}
-
-  async get<T>(endpoint: string, headers?: Record<string, string>): Promise<T> {
-    ...
-  }
-...
-}
-```
-
-### API + UI Testing Pattern
-
-- Playwright supports both API and UI interactions.
+**Best practices:**
 - Prefer API for:
   - Test setup.
   - Test teardown.
@@ -141,24 +75,19 @@ export class ApiHelper {
 
 - Use UI for:
   - Behavior validation.
-  - User-facing flows.
+  - End-user flows.
 
-**Example (abstract):**
-- SETUP data via API.
-- VERIFY behavior via UI.
+**Pattern:**
+- SETUP via API.
+- VERIFY via UI.
 
 ---
 
 ## Test Tags & Filtering
 
-| Tag | Purpose | Command |
-|-----|---------|---------|
-| `@P0` | Critical - must pass | `npx playwright test --grep @P0` |
-| `@P1` | High priority | `npx playwright test --grep @P1` |
-| `@P2` | Medium priority | `npx playwright test --grep @P2` |
-| `@Smoke` | Smoke test suite | `npx playwright test --grep @Smoke` |
-| `@Regression` | Full regression | `npx playwright test --grep @Regression` |
-| `@Slow` | Slow tests | `npx playwright test --grep -v @Slow` |
+- Test tagging and filtering are project-specific.
+- If the project already uses tags (e.g., @Smoke, @Regression, @P0), follow existing conventions.
+- Do not introduce new tagging systems unless explicitly required.
 
 ---
 
@@ -175,7 +104,7 @@ export class ApiHelper {
 
 ## Anti-Patterns (Avoid)
 
-1. **Never hardcode test data** - use DataGenerator or JSON test data files.
+1. **Avoid embedding test data directly in test logic** - Prefer centralized test data (JSON, factories, or generators) for reuse and maintainability.
 2. **Never share state between tests** - each test is isolated.
 3. **Never ignore flaky tests** - fix immediately with proper waits.
 4. **Never use arbitrary `sleep()`** - use explicit waits instead.
@@ -187,7 +116,6 @@ export class ApiHelper {
 ## Best Practices Checklist
 
 - [ ] Use `test.step()` for reporting and trace analysis
-- [ ] Tag all tests with `@P0`/`@P1`/`@P2` for priority
 - [ ] Use API for setup/teardown over UI when possible
 - [ ] Keep tests independent - each test sets up its own state
 - [ ] Use test data instead of hardcode
