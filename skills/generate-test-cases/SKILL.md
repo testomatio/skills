@@ -245,7 +245,6 @@ If user prompted checklist generation only (not test cases), ask user if he want
 
 Rules:
 
-- When generating steps, **strictly follow the format described in the `./references/test-case-format.md` file.**
 - If multiple features to test or whole product => put generated test cases of each feature in separate file.
 - Step should consist of **action** (with optional test data) and **expected result**.
 - All checks/verifications/assertions should be in **expected result**, not as separate steps.
@@ -255,6 +254,7 @@ Rules:
 - **Think like a tester**. Consider not just what works, but what could break.
 - **Consider the user**. Focus on user-facing functionality first.
 - **Be adaptable**. Adjust depth, detail, testing type and other parameters based on user feedback.
+- **Keep scope**. Test only the functionality under test but not the related entities. If feature linked to other features, don't test them if user didn't ask for it explicitly.
 
 **Don't change the user's source code. Only generate .md files with test cases.**
 
@@ -274,16 +274,13 @@ Checklist should have hierarchical and categorized structure.
 
 ### Test cases format (saved to .md file(s))
 
-- Strictly follow the `./reference/test-case-format.md` format.
-  Exception: user specify format in the prompt. In this case, follow the user's format.
-
-- **IMPORTANT: NEVER generate test or suite IDs** - Do NOT include `id: @T...` or `id: @S...` fields in your output.
-  These IDs are server-generated and should NOT be created by this skill.
-  The format reference file shows IDs in examples, but you must NOT generate them.
-
-- If reasonable, add test metadata like priority, preconditions, test data, labels, tags based on analyzed information and context.
-
-- Files naming: `test-cases-feature-name.md`
+- Strictly follow the `./references/test-case-format.md` format. Exception: user specify format in the prompt. In this case, follow the user's format.
+- Files naming: `test-cases-feature-name.md`.
+- **IMPORTANT:** **Strictly follow the `./references/test-case-format.md` format** for **suites**, **tests** and **steps**.
+- Always use suite block. (e.g. `<!-- suite ... -->`).
+- If required, put `tags:` and `labels:` inside **each** `<!-- test ... -->` metadata block (see [test metadata](./references/test-case-format.md#test-metadata)). Not only on the suite block.
+- If reasonable, add test metadata like priority, preconditions, test data, labels, tags based on analyzed information and context. For **priority** use values from the [reference metadata](./references/test-case-format.md#test-metadata)
+- **IMPORTANT: NEVER generate Testomat.io test or suite IDs** - Do NOT include `id: @T...` or `id: @S...` fields in your output. These IDs are server-generated and should NOT be created by this skill. The format reference file shows IDs in examples, but you must NOT generate them.
 
 ### Matching Existing Test Case Formats
 
