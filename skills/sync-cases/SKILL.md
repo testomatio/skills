@@ -1,125 +1,81 @@
 ---
 name: sync-cases
 description: Synchronize Markdown test scenarios between local project and Test Management Tool (Testomat.io). Supports custom directories, labels, and advanced import/export options.
-inputs:
-  action:
-    description: "Operation Sync command: push | pull (optional - inferred from user intent if not provided)"
-    required: false
-  testDir:
-    description: "Directory for manual tests (default: manual-tests)"
-    required: false
+license: MIT
+metadata:
+  author: Testomat.io
+  version: 1.0.0
 ---
 
-## SYNC-CASES SKILL: What I do
+# SYNC-CASES SKILL: What I do
 
 This skill enables synchronization of Markdown test scenarios between your local project and Testomat.io Test Management System.
-Use when users want to pull tests from Testomat.io to local Markdown files, push local Markdown tests to Testomat.io (Importing or exporting test scenarios).
 
 Test Cases Sync Jornay: 
 - Export test cases from Testomat.io.
 - Bulk editing manual tests in IDE or refactoring test cases.
 - Further push back to the Testomat.io.
 
-### When to Use This Skill
+## When to Use
 
-Trigger this skill when user mentions:
-- **Pull/Export/Download**: "pull tests", "export from Testomat.io", "download tests", "get tests from TMS" => pull action.
-- **Push/Upload/Import**: "push tests", "upload tests to Testomat.io", "import to Testomat.io" => push action.
-
-> If any unclear state => ask user to clarify the initial action!
-
----
-
-## Error Handling
-
-### Recoverable Situations
-
-Attempt recovery before failing when:
-* **Missing `TESTOMATIO` token**
-  - Ask the user to provide it.
-  - Tell them they can obtain it from their Testomat.io project: **Settings -> Project -> "Project Reporting API key"** value
-  - Example link: `https://testomat.io/projects/<project-id>/settings/project`
-  - If the user cannot find the token:
-    - Ask them to open an existing Testomat.io project and copy the key from **Settings → Project -> "Project Reporting API key"** value.
-    - Or create a new project in Testomat.io and copy the **Project Reporting API key** from the same page.
-
-* No markdown files found
-  - Confirm directory or ask user to specify another path.
-
-### Hard Fail (STOP immediately)
-
-Stop execution and return a clear human-readable error if:
-- User refuses to provide TESTOMATIO token.
-- Cannot create `.env` file
-- Directory creation fails.
-- User repeatedly provides invalid action parameter after clarification.
-- No markdown files found after confirming directory with user.
-- CLI sync(push/pull) command fails (network/auth/401/403/etc.).
-
-**If something fails after multiple attempts, return a clear, human-readable error message that describes the actual error/failure.**
+Trigger this skill when user wants to:
+- **Pull/Export/Download** tests from Testomat.io to local Markdown files
+- **Push/Upload/Import** local Markdown tests to Testomat.io
+- Bulk edit manual tests in IDE or refactor test cases in local files
+- Sync refactored test cases back to Testomat.io
 
 ---
 
-## References
+## Workflow: Sync Test Cases
 
-| Description | File |
-|-------------|------|
-| Testomat.io CLI Commands Documentation | ./references/TESTOMATIO_CLI.md |
+### Step 1: Environment Setup
 
----
+#### Check Testomat.io Token
 
-## Prerequisites: Environment Setup
+Check if "TESTOMATIO" token was provided as input:
+- If not provided, check for `.env` file in project root.
+  - If still not found => ❓ ask user for token.
 
-Before running sync operations, ensure the environment is properly configured.
+#### Save Credentials to .env File
 
-### 1. Check Testomatio Token
-
-1. Check if "TESTOMATIO" token was provided as input.
-2. If not provided, check for `.env` file in project root for "TESTOMATIO" token.
-3. If still not found => ask user for token.
-
-### 2. Save Credentials to .env File
-
-Save credentials to `.env` file:
+Best Practice to save credentials into `.env` file:
 
 ```env
 TESTOMATIO=tstmt_xxxxx
+...
 ```
 
-### 3. Install check-tests Package
+#### Get API Key (if user doesn't have it)
 
-To avoid using `npx` which triggers security warnings, install `check-tests` as a local dependency:
+Ask the user to obtain it from Testomat.io project:
+- Navigate to **Settings → Project → Project Reporting API key**
+_( Project path example by "project-id": `https://app.testomat.io/projects/<project-id>/settings/project` )_
+
+### Step 2: Install check-tests Package
+
+Prefer installing "check-tests" package locally to ensure consistent and secure execution:
 
 ```bash
-npm install check-tests --save-dev
+npm install check-tests@stable --save-dev
 ```
 
-### 4. Configure Testomat.io Sync Operations
+Then run `pull` or `push` commands using the local version.
 
-Key environment variables:
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `TESTOMATIO` | API key (format: tstmt_xxxxx) | Yes |
-| `TESTOMATIO_WORKDIR`| Working directory for relative file paths | No |
-| `TESTOMATIO_PREPEND_DIR` | Directory to prepend to paths | No |
+### Step 3: Pull or Push Operations
 
-For complete CLI options, environment variables, and advanced examples, see **references** file.
+#### Pull Changes
 
----
-
-## Testomatio Sync Testcase Supported Operations: What I execute
-
-### Pull Changes
-
-1) Ensure `testDir` exists; otherwise create `manual-tests` folder in the project.
-2) Retrieves test scenarios from Testomat.io and saves them as Markdown files locally.
+Retrieves test scenarios from Testomat.io and saves them as Markdown files locally.
 
 **Use Cases:**
 - Export tests from TMS to markdown for bulk editing in IDE
 - Backup test cases locally
-- Refactoring test cases offline
+- Refactor test cases offline
 
-**Basic Command:**
+**Pre-Pull:**
+- Ensure `testDir` exists; otherwise create `manual-tests` folder
+
+**Command:**
 ```bash
 npx check-tests pull -d <directory>
 # or if installed locally
@@ -130,32 +86,27 @@ npx check-tests pull -d <directory>
 ```bash
 # Pull tests to default manual-tests folder
 npx check-tests pull -d manual-tests
-# or if installed locally
-./node_modules/.bin/check-tests pull -d manual-tests
 ```
 
-**More examples**: See "Pull Basic Usage" section from references.
+**More examples** you can find in "Pull" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
 
----
-
-### Warning Before Push
+#### Warning Before Push
 
 Before push, warn user about potential risks:
 - Save and commit local changes.
 - Pull latest changes from Testomat.io first to avoid overwriting.
 
-### Push Changes
+#### Push Changes
 
-1) Ensure the user has saved all updates and has files to send to the server.
-2) Upload local Markdown tests into Testomat.io.
+Uploads local Markdown tests into Testomat.io.
 
 **Use Cases:**
-- Mass create test cases in Testomat.io from markdown files
-- Import bulk-edited tests back to TMS
-- Sync refactored test cases to Testomat.io
+- Mass create test cases in Testomat.io from markdown files.
+- Import bulk-edited tests back to TMS.
+- Sync refactored test cases to Testomat.io.
 
-**Pre-Push Validation**:
-1. Ensure at least one test `.test.md` file exists.
+**Pre-Push Validation:**
+1. Ensure at least one test `.test.md` file exists
 2. Ensure file contains valid test blocks:
 
 ```md
@@ -171,7 +122,7 @@ labels: ...
 
 ```
 
-**Basic Command:**
+**Command:**
 ```bash
 npx check-tests push -d <directory>
 # or if installed locally
@@ -182,24 +133,60 @@ npx check-tests push -d <directory>
 ```bash
 # Push tests from manual-tests folder
 npx check-tests push -d manual-tests
-# or if installed locally
-./node_modules/.bin/check-tests push -d manual-tests
 ```
 
-**More examples**: See "Push Basic Usage" section from references.
+**More examples** you can find in "Push" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
 
 ---
 
-## Example: Skill Real Usage
+## Final Summary Example
+
+After completing sync operations, output a short log-style summary:
+
+```
+Sync Complete:
+- Action: pull/push
+- Directory: manual-tests
+- Tests synced: 15
+- Status: Success
+```
+
+---
+
+## Error Handling
+
+### Recovery
+
+Attempt recovery before failing when:
+- **Missing `TESTOMATIO` token**
+  - Ask the user to provide it
+  - Show where to find it in Testomat.io
+
+- **No markdown files found**
+  - Confirm directory or ask user to specify another cases path
+
+### Hard Fail (Stop immediately)
+
+Stop execution if:
+- Cannot create `.env` file by system.
+- Directory creation fails.
+- CLI sync command fails (network/auth/401/403).
+
+---
+
+## References
+
+| Description                  | File                                |
+| ---------------------------- | ----------------------------------- |
+| Testomat.io CLI Commands     | ./references/TESTOMATIO_CLI.md     |
+
+---
+
+## Examples
 
 **Pull tests:**
 ```
-Use sync-cases skill to pull tests from Testomat.io
-```
-
-**Pull with custom folder:**
-```
-Use sync-cases to pull tests in folder "manual-tests"
+Use sync-cases skill to pull tests from Testomat.io in folder manual-tests
 ```
 
 **Push tests:**
@@ -208,12 +195,16 @@ Use sync-cases to push tests to Testomat.io
 ```
 
 **Bulk test case edit workflow:**
-- "Use sync-cases skill to pull tests from Testomat.io, I need to bulk edit them in IDE"
-- (Save some user updates)
-- "Use sync-cases skill to push the updated tests back to Testomat.io"
+1. Use sync-cases to pull tests from Testomat.io
+2. Edit tests in IDE
+3. Use sync-cases to push the updated tests back to Testomat.io
 
-**Result:**
+---
 
-```
-✔ Test scenarios successfully synced with the Test Management Tool!
-```
+## Quick Commands
+
+| Action | Command |
+|--------|---------|
+| Install | `npm install check-tests --save-dev` |
+| Pull | `npx check-tests pull -d <directory>` |
+| Push | `npx check-tests push -d <directory>` |
