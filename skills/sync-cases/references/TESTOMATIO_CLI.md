@@ -2,6 +2,26 @@
 
 This document provides comprehensive information about all CLI options and environment variables available in the check-tests sync command.
 
+## Prerequisites
+
+### Install check-tests Package
+
+To avoid using `npx` which triggers security warnings, install `check-tests` as a local dependency:
+
+```bash
+npm install check-tests --save-dev
+```
+
+Then use the local binary:
+```bash
+./node_modules/.bin/check-tests <command>
+```
+
+Or use npx with the local installation:
+```bash
+npx check-tests <command>
+```
+
 ## Usage
 
 The sync process supports two operations:
@@ -9,15 +29,18 @@ The sync process supports two operations:
 
 ```bash
 # if we have preset of Testomatio env in `.env`
-npx -y check-tests@latest pull [options]
+npx check-tests pull [options]
+# or if installed locally
+./node_modules/.bin/check-tests pull [options]
 ```
 
 - **Push** - Send local Markdown test updates to Testomat.io.
 
 ```bash
 # if we have preset of Testomatio env in `.env`
-npx -y check-tests@latest push [options]
-
+npx check-tests push [options]
+# or if installed locally
+./node_modules/.bin/check-tests push [options]
 ```
 
 ## Environment Variables
@@ -38,7 +61,6 @@ The tool supports loading environment variables from `.env` files using dotenv (
 
 ```env
 TESTOMATIO=your-api-key
-TESTOMATIO_URL=https://app.testomat.io
 ...
 ```
 
@@ -71,36 +93,42 @@ TESTOMATIO_URL=https://app.testomat.io
 
 ```bash
 # Export the latest test scenarios from Testomat.io to root project dir
-npx -y check-tests@latest pull
+npx check-tests pull
+# or if installed locally
+./node_modules/.bin/check-tests pull
 
 # Export the latest test scenarios from Testomat.io to local project, folder manual-tests
-npx -y check-tests@latest pull -d manual-tests 
+npx check-tests pull -d manual-tests
+# or if installed locally
+./node_modules/.bin/check-tests pull -d manual-tests
 
 # Analyze Playwright tests with TypeScript
-npx -y check-tests@latest pull -d manual-tests --keep-structure
+npx check-tests pull -d manual-tests --keep-structure
 
 # if we can't use variables from the `.env` file, set it to command line
-TESTOMATIO=tstmt_xxxxx npx -y check-tests@latest pull
+TESTOMATIO=tstmt_xxxxx npx check-tests pull
 ```
 
 ### Push Basic Usage
 
 ```bash
 # Import current local test in Markdown format to Testomat.io
-npx -y check-tests@latest push
+npx check-tests push
+# or if installed locally
+./node_modules/.bin/check-tests push
 
 # Import current local test in Markdown format to Testomat.io by specific folder
-npx -y check-tests@latest push -d manual-tests
+npx check-tests push -d manual-tests
 
 # Import current local test in Markdown format to Testomat.io, with prepend dir option
-TESTOMATIO_PREPEND_DIR="backend-tests" npx -y check-tests@latest push --no-empty
+TESTOMATIO_PREPEND_DIR="backend-tests" npx check-tests push --no-empty
 
 # Apply labels to all imported tests
-TESTOMATIO_LABELS="smoke,regression" npx -y check-tests@latest push
+TESTOMATIO_LABELS="smoke,regression" npx check-tests push
 
 # Apply labels with values using label:value format
-TESTOMATIO_LABELS="severity:high,feature:auth,team:frontend" npx -y check-tests@latest push
+TESTOMATIO_LABELS="severity:high,feature:auth,team:frontend" npx check-tests push
 
 # if we can't use variables from the `.env` file, set it to command line
-TESTOMATIO=tstmt_xxxxx npx -y check-tests@latest push
+TESTOMATIO=tstmt_xxxxx npx check-tests push
 ```

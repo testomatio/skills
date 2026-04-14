@@ -10,7 +10,7 @@ inputs:
     required: false
 ---
 
-## TESTOMATIO-SYNC-CASES SKILL: What I do
+## SYNC-CASES SKILL: What I do
 
 This skill enables synchronization of Markdown test scenarios between your local project and Testomat.io Test Management System.
 Use when users want to pull tests from Testomat.io to local Markdown files, push local Markdown tests to Testomat.io (Importing or exporting test scenarios).
@@ -68,32 +68,38 @@ Stop execution and return a clear human-readable error if:
 
 ---
 
-## Precondition: Environment Handling Logic
+## Prerequisites: Environment Setup
 
-### Check Testomatio Token
+Before running sync operations, ensure the environment is properly configured.
 
-1. Check if `TESTOMATIO` token was provided as input.
-2. If not provided, check for `.env` file in project root for `TESTOMATIO` token.
+### 1. Check Testomatio Token
+
+1. Check if "TESTOMATIO" token was provided as input.
+2. If not provided, check for `.env` file in project root for "TESTOMATIO" token.
 3. If still not found => ask user for token.
 
-### .env File Best Practice
+### 2. Save Credentials to .env File
 
 Save credentials to `.env` file:
 
 ```env
 TESTOMATIO=tstmt_xxxxx
-TESTOMATIO_URL=https://app.testomat.io
-...
 ```
 
-### Configure Testomat.io Sync Operations
+### 3. Install check-tests Package
+
+To avoid using `npx` which triggers security warnings, install `check-tests` as a local dependency:
+
+```bash
+npm install check-tests --save-dev
+```
+
+### 4. Configure Testomat.io Sync Operations
 
 Key environment variables:
 | Variable | Description | Required |
 |----------|-------------|----------|
 | `TESTOMATIO` | API key (format: tstmt_xxxxx) | Yes |
-| `TESTOMATIO_URL` | Server URL | No |
-| `TESTOMATIO_LABELS` | Comma-separated labels | No |
 | `TESTOMATIO_WORKDIR`| Working directory for relative file paths | No |
 | `TESTOMATIO_PREPEND_DIR` | Directory to prepend to paths | No |
 
@@ -115,13 +121,17 @@ For complete CLI options, environment variables, and advanced examples, see **re
 
 **Basic Command:**
 ```bash
-npx -y check-tests@latest pull -d <directory>
+npx check-tests pull -d <directory>
+# or if installed locally
+./node_modules/.bin/check-tests pull -d <directory>
 ```
 
 **Examples:**
 ```bash
 # Pull tests to default manual-tests folder
-npx -y check-tests@latest pull -d manual-tests
+npx check-tests pull -d manual-tests
+# or if installed locally
+./node_modules/.bin/check-tests pull -d manual-tests
 ```
 
 **More examples**: See "Pull Basic Usage" section from references.
@@ -163,13 +173,17 @@ labels: ...
 
 **Basic Command:**
 ```bash
-npx -y check-tests@latest push -d <directory>
+npx check-tests push -d <directory>
+# or if installed locally
+./node_modules/.bin/check-tests push -d <directory>
 ```
 
 **Examples:**
 ```bash
 # Push tests from manual-tests folder
-npx -y check-tests@latest push -d manual-tests
+npx check-tests push -d manual-tests
+# or if installed locally
+./node_modules/.bin/check-tests push -d manual-tests
 ```
 
 **More examples**: See "Push Basic Usage" section from references.
@@ -180,28 +194,23 @@ npx -y check-tests@latest push -d manual-tests
 
 **Pull tests:**
 ```
-Use testomatio-sync-cases skill to pull tests from Testomat.io
+Use sync-cases skill to pull tests from Testomat.io
 ```
 
 **Pull with custom folder:**
 ```
-Use testomatio-sync-cases to pull tests in folder "manual-tests"
+Use sync-cases to pull tests in folder "manual-tests"
 ```
 
 **Push tests:**
 ```
-Use testomatio-sync-cases to push tests to Testomat.io
-```
-
-**With custom token:**
-```
-Use testomatio-sync-cases to push tests with TESTOMATIO=tstmt_xxx
+Use sync-cases to push tests to Testomat.io
 ```
 
 **Bulk test case edit workflow:**
-- "Use testomatio-sync-cases skill to pull tests from Testomat.io, I need to bulk edit them in IDE"
+- "Use sync-cases skill to pull tests from Testomat.io, I need to bulk edit them in IDE"
 - (Save some user updates)
-- "Use testomatio-sync-cases skill to push the updated tests back to Testomat.io"
+- "Use sync-cases skill to push the updated tests back to Testomat.io"
 
 **Result:**
 
