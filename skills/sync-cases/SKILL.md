@@ -122,6 +122,14 @@ labels: ...
 
 ```
 
+#### Labels Handling (Intent-Based)
+
+- Use `TESTOMATIO_LABELS` **only if the user explicitly requests to set or override labels** in their query.
+- Example triggers:
+  - "push tests with labels smoke"
+  - "upload tests and set labels to regression,api"
+- Format: comma-separated values (supports `label:value` - `TESTOMATIO_LABELS="smoke,updated" npx check-tests push`).
+
 **Command:**
 ```bash
 npx check-tests push -d <directory>
