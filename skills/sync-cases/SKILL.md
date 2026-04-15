@@ -1,6 +1,6 @@
 ---
 name: sync-cases
-description: Synchronize Markdown test scenarios between local project and Test Management Tool (Testomat.io). Supports custom directories, labels, and advanced import/export options.
+description: Synchronize Markdown test scenarios between a local project and Testomat.io. Use this skill whenever the user wants to pull/export/download tests from Testomat.io; or push/import/sync updated test cases back to the TMS. Supports custom directories and advanced import/export workflows.
 license: MIT
 metadata:
   author: Testomat.io
@@ -19,10 +19,12 @@ Test Cases Sync Jornay:
 ## When to Use
 
 Trigger this skill when user wants to:
-- **Pull/Export/Download** tests from Testomat.io to local Markdown files
-- **Push/Upload/Import** local Markdown tests to Testomat.io
-- Bulk edit manual tests in IDE or refactor test cases in local files
-- Sync refactored test cases back to Testomat.io
+- **Pull/Export/Download** tests from Testomat.io to local Markdown files.
+- **Push/Upload/Import** local Markdown tests to Testomat.io.
+- Bulk edit manual tests in IDE or refactor test cases in local files and upload to TMS.
+- Sync refactored test cases back to Testomat.io.
+- Synchronize test cases between local `.md` files and Testomat.io TMS.
+- Cover user bulk edit workflow: pull cases -> edit test cases -> push cases to TMS.
 
 ---
 
@@ -53,7 +55,7 @@ _( Project path example by "project-id": `https://app.testomat.io/projects/<proj
 
 ### Step 2: Install check-tests Package
 
-Prefer installing "check-tests" package locally from the **official npm registry** to ensure consistent and secure execution:
+Install the `check-tests` package from the official npm registry:
 
 ```bash
 npm install check-tests --save-dev
