@@ -53,7 +53,7 @@ _( Project path example by "project-id": `https://app.testomat.io/projects/<proj
 
 ### Step 2: Install check-tests Package
 
-Prefer installing "check-tests" package locally to ensure consistent and secure execution:
+Prefer installing "check-tests" package locally from the **official npm registry** to ensure consistent and secure execution:
 
 ```bash
 npm install check-tests --save-dev
