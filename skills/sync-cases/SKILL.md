@@ -13,15 +13,15 @@ This skill enables synchronization of Markdown test scenarios between your local
 
 Test Cases Sync Jornay: 
 - Export test cases from Testomat.io.
-- Bulk editing manual tests in IDE or refactoring test cases.
-- Further push back to the Testomat.io.
+- Bulk editing manual tests or refactoring test cases.
+- Further push back test cases to the Testomat.io.
 
 ## When to Use
 
 Trigger this skill when user wants to:
 - **Pull/Export/Download** tests from Testomat.io to local Markdown files.
 - **Push/Upload/Import** local Markdown tests to Testomat.io.
-- Bulk edit manual tests in IDE or refactor test cases in local files and upload to TMS.
+- Bulk edit manual tests or refactor test cases in local files and upload to TMS.
 - Sync refactored test cases back to Testomat.io.
 - Synchronize test cases between local `.md` files and Testomat.io TMS.
 - Cover user bulk edit workflow: pull cases -> edit test cases -> push cases to TMS.
