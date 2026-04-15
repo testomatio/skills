@@ -11,7 +11,7 @@ This document provides comprehensive information about the `check-tests` CLI too
 Install `check-tests` as a local dependency to avoid security warnings from `npx`:
 
 ```bash
-npm install check-tests@stable --save-dev
+npm install check-tests --save-dev
 ```
 
 Then use the local binary:
@@ -45,7 +45,7 @@ The tool supports loading environment variables from `.env` files using dotenv.
 Save credentials to `.env` file:
 
 ```env
-TESTOMATIO=your-api-key
+TESTOMATIO=tstmt_xxxxx
 TESTOMATIO_URL=https://app.testomat.io
 ...
 ```

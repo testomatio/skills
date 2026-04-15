@@ -56,7 +56,7 @@ _( Project path example by "project-id": `https://app.testomat.io/projects/<proj
 Prefer installing "check-tests" package locally to ensure consistent and secure execution:
 
 ```bash
-npm install check-tests@stable --save-dev
+npm install check-tests --save-dev
 ```
 
 Then run `pull` or `push` commands using the local version.
