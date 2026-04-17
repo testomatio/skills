@@ -53,17 +53,17 @@ Ask the user to obtain it from Testomat.io project:
 - Navigate to **Settings → Project → Project Reporting API key**
 _( Project path example by "project-id": `https://app.testomat.io/projects/<project-id>/settings/project` )_
 
-### Step 2: Install check-tests Package
+### Step 2: Pull or Push Operations
 
-Install the `check-tests` package from the official npm registry:
+#### Ensure check-tests Package Installed
+
+Ensure the `check-tests` package is available in the project before running `pull`, `push` or `sync` commands.
+- If `check-tests` is already installed, **reuse the existing version**.
+- If `check-tests` is **not installed**, install it:
 
 ```bash
-npm install check-tests --save-dev
+npm install check-tests --save-dev --no-audit --no-fund
 ```
-
-Then run `pull` or `push` commands using the local version.
-
-### Step 3: Pull or Push Operations
 
 #### Pull Changes
 
