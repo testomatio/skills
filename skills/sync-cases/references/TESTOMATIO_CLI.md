@@ -1,26 +1,34 @@
 # Testomat.io CLI Documentation
 
-This document provides comprehensive information about all CLI options and environment variables available in the check-tests sync command.
+This document provides comprehensive information about the `check-tests` CLI tool for synchronizing test scenarios between your local project and Testomat.io.
 
-## Usage
+---
 
-The sync process supports two operations:
-- **Pull** - Retrieve the latest test scenarios from Testomat.io and update the local project.
+## Prerequisites
 
-```bash
-# if we have preset of Testomatio env in `.env`
-npx -y check-tests@latest pull [options]
-```
+### Install check-tests Package
 
-- **Push** - Send local Markdown test updates to Testomat.io.
+Install `check-tests` as a local dependency to avoid security warnings from `npx`:
 
 ```bash
-# if we have preset of Testomatio env in `.env`
-npx -y check-tests@latest push [options]
-
+npm install check-tests --save-dev
 ```
+
+Then use the local binary:
+```bash
+./node_modules/.bin/check-tests <command>
+```
+
+Or use npx with the local installation:
+```bash
+npx check-tests <command>
+```
+
+---
 
 ## Environment Variables
+
+The tool supports loading environment variables from `.env` files using dotenv.
 
 ### Testomat.io Configuration
 
@@ -30,29 +38,30 @@ npx -y check-tests@latest push [options]
 | `TESTOMATIO_URL`         | Testomat.io server URL                                 | No (default: https://app.testomat.io) |
 | `TESTOMATIO_WORKDIR`     | Working directory for relative file paths              | No                                    |
 | `TESTOMATIO_PREPEND_DIR` | Directory to prepend to test paths                     | No                                    |
-| `TESTOMATIO_LABELS`      | Comma-separated labels. Supports `label:value` format  | No                                    |
+| `TESTOMATIO_LABELS`      | Comma-separated labels. Supports `label:value`         | No                                    |
 
-### Configuration Files
+### Configuration File
 
-The tool supports loading environment variables from `.env` files using dotenv (best practices to save provided `TESTOMATIO` or `TESTOMATIO_URL` to env file).
+Save credentials to `.env` file:
 
 ```env
-TESTOMATIO=your-api-key
+TESTOMATIO=tstmt_xxxxx
 TESTOMATIO_URL=https://app.testomat.io
 ...
 ```
 
+---
+
 ## CLI Options
 
-### Basic Options
+### Basic "check-tests" Options
 
 | Option                | Description                                 | Default           |
 | --------------------- | ------------------------------------------- | ----------------- |
-| `--help`              | Get all need extra cli information/options  | Current directory |
+| `-h, --help`          | Display help information                    | -                 |
 | `-d, --dir <dir>`     | Test directory to scan                      | Current directory |
-| `--exclude <pattern>` | Glob pattern to exclude files from analysis | -                 |
 
-### Testomat.io Integration
+### Testomat.io Integration Specific Project Options
 
 | Option                        | Description                                                   | Default |
 | ----------------------------- | ------------------------------------------------------------- | ------- |
@@ -60,47 +69,70 @@ TESTOMATIO_URL=https://app.testomat.io
 | `--keep-structure`            | Prefer structure of source code over structure in Testomat.io | false   |
 | `--no-empty`                  | Remove empty suites after import                              | false   |
 | `--clean-ids`                 | Remove Testomat.io IDs from test and suite                    | false   |
-| `--purge, --unsafe-clean-ids` | Remove Testomat.io IDs without server verification            | false   |
 
-## Quick Reference
-...
+---
 
-## Examples
+## Commands
 
-### Pull Basic Usage
+### Pull
+
+Retrieve the latest test scenarios from Testomat.io and save them as Markdown files locally.
 
 ```bash
-# Export the latest test scenarios from Testomat.io to root project dir
-npx -y check-tests@latest pull
-
-# Export the latest test scenarios from Testomat.io to local project, folder manual-tests
-npx -y check-tests@latest pull -d manual-tests 
-
-# Analyze Playwright tests with TypeScript
-npx -y check-tests@latest pull -d manual-tests --keep-structure
-
-# if we can't use variables from the `.env` file, set it to command line
-TESTOMATIO=tstmt_xxxxx npx -y check-tests@latest pull
+npx check-tests pull [options]
+# or if installed locally
+./node_modules/.bin/check-tests pull [options]
 ```
 
-### Push Basic Usage
+**Examples:**
 
 ```bash
-# Import current local test in Markdown format to Testomat.io
-npx -y check-tests@latest push
+# Export tests to current directory
+npx check-tests pull
 
-# Import current local test in Markdown format to Testomat.io by specific folder
-npx -y check-tests@latest push -d manual-tests
+# Export tests to manual-tests folder
+npx check-tests pull -d manual-tests
 
-# Import current local test in Markdown format to Testomat.io, with prepend dir option
-TESTOMATIO_PREPEND_DIR="backend-tests" npx -y check-tests@latest push --no-empty
+# Keep source structure
+npx check-tests pull -d manual-tests --keep-structure
+```
+
+### Push
+
+Send local Markdown test updates to Testomat.io.
+
+```bash
+npx check-tests push [options]
+# or if installed locally
+./node_modules/.bin/check-tests push [options]
+```
+
+**Examples:**
+
+```bash
+# Import tests from current directory
+npx check-tests push
+
+# Import tests from specific folder
+npx check-tests push -d manual-tests
+
+# Remove empty suites after import
+npx check-tests push --no-empty
+
+# With prepend directory
+TESTOMATIO_PREPEND_DIR=backend-tests npx check-tests push
 
 # Apply labels to all imported tests
-TESTOMATIO_LABELS="smoke,regression" npx -y check-tests@latest push
-
-# Apply labels with values using label:value format
-TESTOMATIO_LABELS="severity:high,feature:auth,team:frontend" npx -y check-tests@latest push
-
-# if we can't use variables from the `.env` file, set it to command line
-TESTOMATIO=tstmt_xxxxx npx -y check-tests@latest push
+TESTOMATIO_LABELS=smoke,updated npx check-tests push
 ```
+
+---
+
+## Quick Reference
+
+| Action | Command |
+|--------|---------|
+| Pull tests | `npx check-tests pull -d <dir>` |
+| Push tests | `npx check-tests push -d <dir>` |
+| With labels | `TESTOMATIO_LABELS=smoke npx check-tests push` |
+| Keep structure | `npx check-tests pull --keep-structure` |
