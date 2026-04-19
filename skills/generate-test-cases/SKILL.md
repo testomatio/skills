@@ -86,6 +86,8 @@ Ask clarifying questions if needed:
 
 Detect if this is a Testomat.io project:
 
+**Option 1: Using MCP:**
+
 Check if `testomatio` MCP available
 If available, gather Testomat.io context:
 
@@ -93,6 +95,15 @@ If available, gather Testomat.io context:
 - `tests_search`, `tests_list` to find existing tests and avoid duplicates
 - `steps_list`, `steps_search` to find reusable shared steps
 - `tags_list`, `labels_list` to understand project conventions
+
+**Option 2: Using `sync-cases` skill (with `check-tests` lib):**
+
+1. Use `sync-cases` skill with `pull` action to download existing tests from Testomat.io:
+
+2. Analyze the downloaded test files to understand:
+   - Existing structure and suites
+   - Current test cases (to avoid duplicates)
+   - Project conventions (tags, labels, priority levels)
 
 Notify user about existing cases which intersect with the feature/functionality being tested.
 
