@@ -26,6 +26,8 @@ Trigger this skill when user wants to:
 - Synchronize test cases between local `.md` files and Testomat.io TMS.
 - Cover user bulk edit workflow: pull cases -> edit test cases -> push cases to TMS.
 
+Keywords: sync, synchronize cases, pull, push, export, import, download, import.
+
 ---
 
 ## Workflow: Sync Test Cases
@@ -37,6 +39,19 @@ Trigger this skill when user wants to:
 Check if "TESTOMATIO" token was provided as input:
 - If not provided, check for `.env` file in project root.
   - If still not found => ❓ ask user for token.
+
+### Check Required Tools
+
+| Tool      | Purpose                              |
+|-----------|--------------------------------------|
+| `bash`    | Execute npx check-tests pull/push   |
+| `write`   | Create markdown files locally        |
+| `glob`    | Find existing test files             |
+| `read`    | Parse test file content              |
+
+> If any tools issue are disabled => **inform user about issue and stop**
+  - Ask user to check agent available tool list.
+  - **Do not attempt workarounds.**
 
 #### Save Credentials to .env File
 
@@ -124,14 +139,6 @@ labels: ...
 
 ```
 
-#### Labels Handling (Intent-Based)
-
-- Use `TESTOMATIO_LABELS` **only if the user explicitly requests to set or override labels** in their query.
-- Example triggers:
-  - "push tests with labels smoke"
-  - "upload tests and set labels to regression,api"
-- Format: comma-separated values (supports `label:value` - `TESTOMATIO_LABELS="smoke,updated" npx check-tests push`).
-
 **Command:**
 ```bash
 npx check-tests push -d <directory>
@@ -146,6 +153,21 @@ npx check-tests push -d manual-tests
 ```
 
 **More examples** you can find in "Push" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
+
+### Verify Changes (if Testomat MCP tools enabled)
+
+Use MCP tools for checking and **updating existing test attributes** if no sync:
+
+| MCP Tool        | Use Case                                    |
+|----------------|---------------------------------------------|
+| `tests_update`   | Change priority, creator, labels on existing test by ID |
+| `suites_update` | Change suite attributes by ID |
+| `labels_create` | Create new label in TMS |
+| `labels_update` | Update existing label in test case |
+
+**Example workflow:**
+1. Analyze a new/updated suite and tests only by local `.test.md` changes metadata (update `priority:`, `labels:` in md metadata).
+2. **use MCP** `tests_update` per test (not CLI push, which would rewrite everything).
 
 ---
 
@@ -181,6 +203,7 @@ Stop execution if:
 - Cannot create `.env` file by system.
 - Directory creation fails.
 - CLI sync command fails (network/auth/401/403).
+- MCP tools issue.
 
 ---
 
