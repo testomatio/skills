@@ -13,9 +13,8 @@ Follow this guide along with [Test Case Format](./test-case-format.md).
 
 ```
 Folder (top-level)
-└── Suite (@S{id})
-    └── Test (@T{id}) → has tags (e.g. @smoke), labels, priority (e.g. high)
-    └── Shared Steps (reusable components)
+└── Suite {title} (@S{id})
+    └── Test {title} (@T{id}) → has tags (e.g. @smoke), labels, priority (e.g. high)
 ```
 
 ## Priority values: critical, high, normal, low
