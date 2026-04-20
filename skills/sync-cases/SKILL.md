@@ -26,6 +26,45 @@ Trigger this skill when user wants to:
 - Synchronize test cases between local `.md` files and Testomat.io TMS.
 - Cover user bulk edit workflow: pull cases -> edit test cases -> push cases to TMS.
 
+Keywords: sync, synchronize cases, pull, push, export, import, download, import.
+
+---
+
+## Testomat MCP Tool Policy
+
+This skill uses Testomat MCP only when MCP tools provide better precision than the `check-tests` CLI.
+
+### Allowed MCP Tools
+
+| Tool            | When to Use            |
+|-----------------|------------------------|
+| `tags_get`      | Get tests by tag title |
+| `tests_get`     | Get single test by ID (to verify or inspect) |
+| `tests_update`  | Update specific test attributes (priority, tags, labels) by ID |
+| `suites_get`    | Get suite info by ID |
+| `suites_update` | Update specific suite attributes (priority, tags, labels) by ID |
+| `labels_list`   | List available labels |
+| `labels_create` | Create a new label |
+| `labels_update` | Update existing label |
+
+### Use `check-tests` CLI (Default)
+
+- Bulk pull/push operations.
+- From-scratch sync.
+- Any operation without specific test IDs.
+- Directory-based import/export.
+
+### Use MCP Tools (Restricted)
+
+Only when user explicitly requests:
+- Update a **specific test** by ID (`tests_update`).
+- Change test **attributes** on existing tests (priority, tags, labels).
+- Search/get single test or suite by ID.
+
+### Blocking Rule
+
+If request involves "all tests", "bulk", "pull everything", "push all" => **prefer to use `check-tests` CLI** options, instead of MCP.
+
 ---
 
 ## Workflow: Sync Test Cases
@@ -123,14 +162,6 @@ labels: ...
 ... (test case description)
 
 ```
-
-#### Labels Handling (Intent-Based)
-
-- Use `TESTOMATIO_LABELS` **only if the user explicitly requests to set or override labels** in their query.
-- Example triggers:
-  - "push tests with labels smoke"
-  - "upload tests and set labels to regression,api"
-- Format: comma-separated values (supports `label:value` - `TESTOMATIO_LABELS="smoke,updated" npx check-tests push`).
 
 **Command:**
 ```bash

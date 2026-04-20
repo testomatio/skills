@@ -38,7 +38,6 @@ The tool supports loading environment variables from `.env` files using dotenv.
 | `TESTOMATIO_URL`         | Testomat.io server URL                                 | No (default: https://app.testomat.io) |
 | `TESTOMATIO_WORKDIR`     | Working directory for relative file paths              | No                                    |
 | `TESTOMATIO_PREPEND_DIR` | Directory to prepend to test paths                     | No                                    |
-| `TESTOMATIO_LABELS`      | Comma-separated labels. Supports `label:value`         | No                                    |
 
 ### Configuration File
 
@@ -121,9 +120,6 @@ npx check-tests push --no-empty
 
 # With prepend directory
 TESTOMATIO_PREPEND_DIR=backend-tests npx check-tests push
-
-# Apply labels to all imported tests
-TESTOMATIO_LABELS=smoke,updated npx check-tests push
 ```
 
 ---
@@ -134,5 +130,4 @@ TESTOMATIO_LABELS=smoke,updated npx check-tests push
 |--------|---------|
 | Pull tests | `npx check-tests pull -d <dir>` |
 | Push tests | `npx check-tests push -d <dir>` |
-| With labels | `TESTOMATIO_LABELS=smoke npx check-tests push` |
 | Keep structure | `npx check-tests pull --keep-structure` |
