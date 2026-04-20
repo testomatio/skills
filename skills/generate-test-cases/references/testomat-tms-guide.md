@@ -22,11 +22,10 @@ Folder (top-level)
 
 ## Key MCP Tools
 
-| Purpose         | Tools                                                        |
-| --------------- | ------------------------------------------------------------ |
-| **Structure**   | `suites_list`, `suites_search`, `tests_list`, `tests_search` |
-| **Reuse**       | `steps_list`, `steps_search` (shared steps)                  |
-| **Conventions** | `tags_list`, `labels_list`                                   |
+| Purpose         | Entities / tools                                                                           |
+| --------------- | ------------------------------------------------------------------------------------------ |
+| **Structure**   | `suites_list`, `suites_search`, `tests_list`, `tests_search`, `steps_list`, `steps_search` |
+| **Conventions** | `tags_list`, `labels_list`                                                                 |
 
 **Key actions:**
 
@@ -37,25 +36,19 @@ Folder (top-level)
 
 Add them based on context, user prompt, existing tags and labels.
 
+Split tests by module, testing type, scope and other criteria which helps to organize and filter tests.
+
 ### When to use Tags vs Labels
 
 | Aspect          | Tags                                   | Labels                                |
 | --------------- | -------------------------------------- | ------------------------------------- |
-| **Best for**    | Automated tests, broad categorization  | Manual tests, specific metadata       |
+| **Best for**    | Broad categorization                   | Specific metadata                     |
 | **Use for**     | Test type (@smoke, @regression, @e2e)  | Priority, severity, status, ownership |
 | **Flexibility** | Constant, embedded in code             | Flexible, easy to change via UI       |
 | **Values**      | Single tag per category                | Multiple values per label allowed     |
 | **Examples**    | `@smoke`, `@api`, `@auth`, `@checkout` |                                       |
 
 **Rule of thumb:** Use tags for test categorization and automation; use labels for test metadata, workflow tracking, and manual test management.
-
-### Common Tags
-
-| Tag            | Usage                              |
-| -------------- | ---------------------------------- |
-| `@smoke`       | Critical path, quick health checks |
-| `@regression`  | Full coverage, prevent regressions |
-| `@api` / `@ui` | API or UI-focused tests            |
 
 ## Deduplication Workflow
 
@@ -65,14 +58,6 @@ Add them based on context, user prompt, existing tags and labels.
 3. Partial overlap? → Ask user
 4. No match? → Create new test cases
 ```
-
-## Branch Management (Optional)
-
-When creating tests on a branch:
-
-- **Naming:** `tc/{feature-name}` (lowercase, hyphens)
-- **API v1** for branch operations (MCP v2 doesn't support branches)
-- **Tags/labels:** Apply via UI multi-select after creation
 
 ## Quality Checklist
 
