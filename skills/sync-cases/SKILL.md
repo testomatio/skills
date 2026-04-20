@@ -30,43 +30,6 @@ Keywords: sync, synchronize cases, pull, push, export, import, download, import.
 
 ---
 
-## Testomat MCP Tool Policy
-
-This skill uses Testomat MCP only when MCP tools provide better precision than the `check-tests` CLI.
-
-### Allowed MCP Tools
-
-| Tool            | When to Use            |
-|-----------------|------------------------|
-| `tags_get`      | Get tests by tag title |
-| `tests_get`     | Get single test by ID (to verify or inspect) |
-| `tests_update`  | Update specific test attributes (priority, tags, labels) by ID |
-| `suites_get`    | Get suite info by ID |
-| `suites_update` | Update specific suite attributes (priority, tags, labels) by ID |
-| `labels_list`   | List available labels |
-| `labels_create` | Create a new label |
-| `labels_update` | Update existing label |
-
-### Use `check-tests` CLI (Default)
-
-- Bulk pull/push operations.
-- From-scratch sync.
-- Any operation without specific test IDs.
-- Directory-based import/export.
-
-### Use MCP Tools (Restricted)
-
-Only when user explicitly requests:
-- Update a **specific test** by ID (`tests_update`).
-- Change test **attributes** on existing tests (priority, tags, labels).
-- Search/get single test or suite by ID.
-
-### Blocking Rule
-
-If request involves "all tests", "bulk", "pull everything", "push all" => **prefer to use `check-tests` CLI** options, instead of MCP.
-
----
-
 ## Workflow: Sync Test Cases
 
 ### Step 1: Environment Setup
@@ -76,6 +39,19 @@ If request involves "all tests", "bulk", "pull everything", "push all" => **pref
 Check if "TESTOMATIO" token was provided as input:
 - If not provided, check for `.env` file in project root.
   - If still not found => ❓ ask user for token.
+
+### Check Required Tools
+
+| Tool      | Purpose                              |
+|-----------|--------------------------------------|
+| `bash`    | Execute npx check-tests pull/push   |
+| `write`   | Create markdown files locally        |
+| `glob`    | Find existing test files             |
+| `read`    | Parse test file content              |
+
+> If any tools issue are disabled => **inform user about issue and stop**
+  - Ask user to check agent available tool list.
+  - **Do not attempt workarounds.**
 
 #### Save Credentials to .env File
 
@@ -178,6 +154,24 @@ npx check-tests push -d manual-tests
 
 **More examples** you can find in "Push" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
 
+#### Verify Changes by Testomat MCP Tool (if enabled)
+
+Use MCP tools for checking and **updating existing test attributes**:
+
+| MCP Tool        | Use Case                                    |
+|----------------|---------------------------------------------|
+| `tests_update`   | Change priority, creator, labels on existing test by ID |
+| `suites_update` | Change suite attributes by ID |
+| `labels_create` | Create new label in TMS |
+| `labels_update` | Update existing label in test case |
+
+**Example workflow:**
+1. Pull tests: `npx check-tests pull -d folder`.
+2. Edit local `.test.md` files (update `priority:`, `labels:` in md metadata).
+3. Push updates => **use MCP** `tests_update` per test (not CLI push, which would rewrite everything).
+
+> If some suite/test metadata not synced - use Testomat MCP tool to save changes.
+
 ---
 
 ## Final Summary Example
@@ -212,6 +206,7 @@ Stop execution if:
 - Cannot create `.env` file by system.
 - Directory creation fails.
 - CLI sync command fails (network/auth/401/403).
+- MCP tools issue.
 
 ---
 
