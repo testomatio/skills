@@ -7,6 +7,11 @@ description: Generate test cases and checklists for software testing. Use this s
 
 This skill helps you to generate comprehensive test cases and checklists for software testing. It adapts to the context provided by the user and generates appropriate testing artifacts.
 
+**References:**
+
+- [Testomat.io TMS Guide](./references/testomat-tms-guide.md) - Complete guide for Testomat.io compatibility
+- [Test Case Format](./references/test-case-format.md) - Test cases markdown format reference (testomatio-friendly)
+
 ## When to Use
 
 Trigger this skill when the user:
@@ -37,12 +42,14 @@ Trigger this skill when the user:
 
 ## Workflow (IMPORTANT: how AI tool (Claude, Cursor etc) should work with user)
 
-This skill follows an **iterative approach**.  
+This skill follows an **iterative approach**.
 **Don't omit steps and strictly ask for user approval/feedback before proceeding to the next step**.
 Generate **checklist** prior to **test cases** generation even if user request sounds like "generate test cases".
 
+### Workflow Steps
+
 1. **Gather context and goals**
-   Understand what you're testing, what artifacts are provided, what the user wants to achieve.  
+   Understand what you're testing, what artifacts are provided, what the user wants to achieve.
    Then **show sources** (briefly, no details) from which you gathered the information. **Ask user** if he wants to add or change anything. Go to step 2 only after approval.
 
 2. **Ask for type of testing**.
@@ -75,14 +82,43 @@ Ask clarifying questions if needed:
 - What are the key user flows?
 - Are there any specific areas of concern?
 
+#### Testomat.io TMS Detection
+
+Detect if this is a Testomat.io project:
+
+**Option 1: Using MCP:**
+
+Check if `testomatio` MCP available
+If available, gather Testomat.io context:
+
+- `suites_list`, `suites_search` to understand existing structure
+- `tests_search`, `tests_list` to find existing tests and avoid duplicates
+- `steps_list`, `steps_search` to find reusable shared steps
+- `tags_list`, `labels_list` to understand project conventions
+
+**Option 2: Using `sync-cases` skill (with `check-tests` lib):**
+
+1. Use `sync-cases` skill with `pull` action to download existing tests from Testomat.io:
+
+2. Analyze the downloaded test files to understand:
+   - Existing structure and suites
+   - Current test cases (to avoid duplicates)
+   - Project conventions (tags, labels, priority levels)
+
+Notify user about existing cases which intersect with the feature/functionality being tested.
+
+#### Information Sources
+
 Gather all information about the feature/functionality being tested from:
 
-- User prompt.
+- User prompt
 - Task Tracking systems (Jira, etc.)
 - Requirements documents (Confluence, etc.)
 - Design mockups (Figma, Miro, etc.)
-- Existing test cases (Test Management tools like TestRail, **Testomat**, etc.)
-- Source code
+- Existing test cases (Test Management tools like TestRail, Testomat, etc.)
+- Testomat.io TMS (if available via MCP)
+
+- **Source code**
   - Existing manual test files in the project.
   - Automated test files (spec, test, cy files, etc).
   - Project structure.
@@ -149,7 +185,7 @@ Example:
 | Role               | Description                              |
 | ------------------ | ---------------------------------------- |
 | **⚙️ default**     | **balanced** approach                    |
-| **🌈 optimist**    | **positive** flows, happy path  |
+| **🌈 optimist**    | **positive** flows, happy path           |
 | **🤓 nerd**        | **details**, dependencies, perfectionist |
 | **🔪 psycho**      | **edge cases**                           |
 | **🔐 pentest**     | **security**                             |
@@ -255,6 +291,8 @@ Rules:
 - **Consider the user**. Focus on user-facing functionality first.
 - **Be adaptable**. Adjust depth, detail, testing type and other parameters based on user feedback.
 - **Keep scope**. Test only the functionality under test but not the related entities. If feature linked to other features, don't test them if user didn't ask for it explicitly.
+- Do not include **preconditions** like "service is running" if it's not explicitly mentioned by user or is not actually what the test is about.
+- Put preparations into **preconditions**/**description** section, not as steps.
 
 **Don't change the user's source code. Only generate .md files with test cases.**
 
@@ -275,11 +313,14 @@ Checklist should have hierarchical and categorized structure.
 ### Test cases format (saved to .md file(s))
 
 - Strictly follow the `./references/test-case-format.md` format. Exception: user specify format in the prompt. In this case, follow the user's format.
+
+- Follow [Testomat.io TMS Guide](./references/testomat-tms-guide.md) for format and conventions (priority levels, tags, labels, etc.) (especially when using testomatio mcp)
+
 - Files naming: `test-cases-feature-name.md`.
 - **IMPORTANT:** **Strictly follow the `./references/test-case-format.md` format** for **suites**, **tests** and **steps**.
 - Always use suite block. (e.g. `<!-- suite ... -->`).
 - If required, put `tags:` and `labels:` inside **each** `<!-- test ... -->` metadata block (see [test metadata](./references/test-case-format.md#test-metadata)). Not only on the suite block.
-- If reasonable, add test metadata like priority, preconditions, test data, labels, tags based on analyzed information and context. For **priority** use values from the [reference metadata](./references/test-case-format.md#test-metadata)
+- If reasonable, add test metadata like priority, preconditions, test data, labels, tags based on analyzed information and context.
 - **IMPORTANT: NEVER generate Testomat.io test or suite IDs** - Do NOT include `id: @T...` or `id: @S...` fields in your output. These IDs are server-generated and should NOT be created by this skill. The format reference file shows IDs in examples, but you must NOT generate them.
 
 ### Matching Existing Test Case Formats
