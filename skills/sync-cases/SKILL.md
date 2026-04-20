@@ -154,9 +154,9 @@ npx check-tests push -d manual-tests
 
 **More examples** you can find in "Push" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
 
-#### Verify Changes by Testomat MCP Tool (if enabled)
+### Verify Changes (if Testomat MCP tools enabled)
 
-Use MCP tools for checking and **updating existing test attributes**:
+Use MCP tools for checking and **updating existing test attributes** if no sync:
 
 | MCP Tool        | Use Case                                    |
 |----------------|---------------------------------------------|
@@ -166,11 +166,8 @@ Use MCP tools for checking and **updating existing test attributes**:
 | `labels_update` | Update existing label in test case |
 
 **Example workflow:**
-1. Pull tests: `npx check-tests pull -d folder`.
-2. Edit local `.test.md` files (update `priority:`, `labels:` in md metadata).
-3. Push updates => **use MCP** `tests_update` per test (not CLI push, which would rewrite everything).
-
-> If some suite/test metadata not synced - use Testomat MCP tool to save changes.
+1. Analyze a new/updated suite and tests only by local `.test.md` changes metadata (update `priority:`, `labels:` in md metadata).
+2. **use MCP** `tests_update` per test (not CLI push, which would rewrite everything).
 
 ---
 
