@@ -250,7 +250,7 @@ A coherent slice of the sub-feature that a tester would search for as one unit. 
 
 ### Why a directory of MD files (not one MD with multiple `<!-- suite -->` blocks)
 
-The `check-tests` parser uses a single `currentSuite` variable — multiple `<!-- suite -->` blocks in one file overwrite each other (real bug, see `.claude/skills/create-test-cases/CLAUDE.md` § Nested Suites). A directory becomes a parent suite in Testomat; each file inside becomes a child suite nested under it. This is the **only** working approach for nesting.
+The `check-tests` parser uses a single `currentSuite` variable — multiple `<!-- suite -->` blocks in one file overwrite each other (real parser bug). A directory becomes a parent suite in Testomat; each file inside becomes a child suite nested under it. This is the **only** working approach for nesting.
 
 ### What to flag
 

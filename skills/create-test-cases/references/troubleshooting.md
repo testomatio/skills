@@ -60,7 +60,6 @@ The `ui-explorer` and `ui-validator` subagents enforce the user-configured explo
 
 ## Nested Suite Parser Gotchas
 
-Covered in [.claude/skills/create-test-cases/CLAUDE.md § Nested Suites](../CLAUDE.md). Summary:
 - Multiple `<!-- suite -->` blocks in ONE file **do not nest** — parser overwrites `currentSuite`, creates duplicates
 - `## Steps` heading can be misread as a test title if preceded by another heading
 - Directory structure is the only working approach — tested 2026-04-15

@@ -255,7 +255,7 @@ automation: candidate
 
 **When to nest** (decision matrix, auto-merge, anti-patterns, "what counts as a natural section"): [self-review-checks.md § 8](self-review-checks.md#8-sub-suite-distribution) — single source of truth. This section only covers **how to lay the files out** once the decision is "nested".
 
-**Only working approach:** directory structure. Multiple `<!-- suite -->` blocks in one file do not nest (parser bug — see `.claude/skills/create-test-cases/CLAUDE.md` § Nested Suites).
+**Only working approach:** directory structure. Multiple `<!-- suite -->` blocks in one file do not nest (parser bug).
 
 ### File structure
 
