@@ -12,8 +12,6 @@ effort: max
 
 Creates manual test cases as local MD files. **Does not publish** — publishing is a separate skill (`/publish-test-cases-batch` — local for now, not yet part of this repo; alternatively use [`sync-cases`](../sync-cases/SKILL.md)) invoked after MD is approved.
 
-> Visual overview of the full flow: [`examples/flow-diagram.md`](examples/flow-diagram.md).
-
 **Argument:** $ARGUMENTS — Testomat suite URL or feature name
 
 **References:** [intake-questionnaire.md](intake-questionnaire.md) | [artifacts.md](references/artifacts.md) | [testing-strategy.md](references/testing-strategy.md) | [test-case-format.md](references/test-case-format.md) | [self-review-checks.md](references/self-review-checks.md) | [product-context.md](references/product-context.md) | [destructuring.md](references/destructuring.md) (feature-phase procedure) | [troubleshooting.md](references/troubleshooting.md)
