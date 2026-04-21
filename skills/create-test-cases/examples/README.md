@@ -2,6 +2,13 @@
 
 This folder contains a real end-to-end run of the `create-test-cases` skill against the **Manual Tests Execution** feature of [Testomat.io](https://testomat.io).
 
+> ⚠️ **Everything under `examples/` is optional reference material — NOT part of the skill itself.**
+>
+> - [`generatedTests/`](./generatedTests/) is a sample of what this skill **produces** (the feature folder with baselines + per-suite deltas + test cases).
+> - [`generatedDocs/`](./generatedDocs/) is a sample of **what else you can generate afterwards** using the test-cases data as input (BA-style product documentation). It is **not** output of this skill — it illustrates the downstream value of a high-quality test-case baseline.
+>
+> You can delete, ignore, or fork the `examples/` folder without affecting how the skill runs.
+
 ## What's inside
 
 | Folder / file | What it is | Produced by |
