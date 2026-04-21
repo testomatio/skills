@@ -22,8 +22,8 @@ Trigger this skill when user wants to:
 - **Pull/Export/Download** tests from Testomat.io to local Markdown files.
 - **Push/Upload/Import** local Markdown tests to Testomat.io.
 - Bulk edit manual tests or refactor test cases in local files and upload to TMS.
-- **Sync** refactored cases: push back to Testomat.io with 
-- Synchronize test cases between local `.md` files and Testomat.io TMS.
+- Synchronize test cases between local `.md` files and TMS (Testomat.io).
+- **Sync** test cases with the remote version in TMS (Testomat.io).
 - Cover user bulk edit workflow: pull cases -> edit test cases -> push cases to TMS.
 
 ---
@@ -126,36 +126,37 @@ labels: ...
 
 #### Smart Sync Rules
 
-When using `push` command, choose the appropriate mode based on the changes in your `.test.md` files.
-
 First of all - **analyze user changes/updates** and select needed command for `push` strategy:
 - Only content updates.
-- New test cases added (no system IDs).
+- New test cases added (without IDs in metadata).
 - Mixed changes (updates + new tests).
 
 **Only content updates:**
 - Test description, title, or metadata changed.
-- No new tests added
-- No changes to existing test IDs
-✅ Use standard push: `npx check-tests push -d <directory>`
+- No new tests added.
+- No changes to existing test.
+> Use standard push: `npx check-tests push`
 
-**New test cases added (no system IDs):**
-- New tests exist in `.test.md`.
-- These tests do **not** contain system IDs.
-✅ Use push with ID update: `npx check-tests push -d <directory> --update-ids`
+**New test cases added (without suite/test IDs in metadata):**
+- New tests exist/added to `.md` file.
+- These tests do **not** contain suite/test IDs.
+> Use push with ID update: `npx check-tests push --update-ids`
 
-**Mixed changes (updates + new tests):**
+**Mixed changes (updates + new test cases):**
 - Existing tests updated.
 - AND new tests without IDs added.
-✅ Use: `npx check-tests push -d <directory> --update-ids`
+> Use: `npx check-tests push --update-ids`
 (`--update-ids` safely handles both updating existing tests and assigning IDs to new ones)
 
 **Examples:**
 ```bash
+# Push tests to root folder
+npx check-tests push
+
 # Push tests from manual-tests folder
 npx check-tests push -d manual-tests
 
-# Push with new test creation (assign IDs)
+# Push newly created test cases and update (assign) their IDs to TMS
 npx check-tests push -d manual-tests --update-ids
 ```
 
@@ -163,11 +164,18 @@ npx check-tests push -d manual-tests --update-ids
 
 #### Labels Handling (Intent-Based)
 
-- Use `TESTOMATIO_LABELS` in sync/push **only if the user explicitly requests to set or override labels** in their query.
-- Example triggers:
-  - "push tests with labels smoke"
-  - "upload tests and set labels to regression,api"
-- Format: comma-separated values (supports `label:value` - `TESTOMATIO_LABELS="smoke,updated" npx check-tests push`).
+Use `TESTOMATIO_LABELS` in sync/push **only if the user explicitly requests to set or override labels** in their query.
+
+**Triggers:**
+* "push tests with labels smoke".
+* "upload tests and set labels to regression,api".
+* etc.
+
+**Supported formats:**
+* Simple labels: `smoke,regression`. 
+  - Example: `TESTOMATIO_LABELS="smoke,regression" npx check-tests push`
+* Key-value labels: `severity:high,feature:auth`. 
+  - Example: `TESTOMATIO_LABELS="severity:high,feature:auth" npx check-tests push`
 
 ---
 
