@@ -1,6 +1,6 @@
 ---
 name: sync-cases
-description: Synchronize Markdown test scenarios between a local project and Testomat.io. Use this skill whenever the user wants to pull/export/download tests from Testomat.io; or push/import/sync updated test cases back to the TMS. Supports custom directories and advanced import/export workflows.
+description: Synchronize test scenarios and cases between a local project and Testomat.io. Use this skill whenever the user wants to pull/export/download tests from Testomat.io; or push/import/sync updated test cases back to the TMS. Supports custom directories, markdown test format and advanced import/export workflows.
 license: MIT
 metadata:
   author: Testomat.io
@@ -22,8 +22,8 @@ Trigger this skill when user wants to:
 - **Pull/Export/Download** tests from Testomat.io to local Markdown files.
 - **Push/Upload/Import** local Markdown tests to Testomat.io.
 - Bulk edit manual tests or refactor test cases in local files and upload to TMS.
-- Sync refactored test cases back to Testomat.io.
-- Synchronize test cases between local `.md` files and Testomat.io TMS.
+- Synchronize test cases between local `.md` files and TMS (Testomat.io).
+- **Sync** test cases with the remote version in TMS (Testomat.io).
 - Cover user bulk edit workflow: pull cases -> edit test cases -> push cases to TMS.
 
 ---
@@ -67,15 +67,15 @@ npm install check-tests --save-dev --no-audit --no-fund
 
 #### Pull Changes
 
-Retrieves test scenarios from Testomat.io and saves them as Markdown files locally.
+Download/Retrieves test scenarios from Testomat.io and saves them as Markdown files locally.
 
 **Use Cases:**
-- Export tests from TMS to markdown for bulk editing in IDE
-- Backup test cases locally
-- Refactor test cases offline
+- Export tests from TMS to markdown for bulk editing in IDE.
+- Backup test cases locally.
+- Refactor test cases offline.
 
 **Pre-Pull:**
-- Ensure `testDir` exists; otherwise create `manual-tests` folder
+- Ensure `testDir` exists; otherwise create `manual-tests` folder.
 
 **Command:**
 ```bash
@@ -92,15 +92,9 @@ npx check-tests pull -d manual-tests
 
 **More examples** you can find in "Pull" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
 
-#### Warning Before Push
-
-Before push, warn user about potential risks:
-- Save and commit local changes.
-- Pull latest changes from Testomat.io first to avoid overwriting.
-
 #### Push Changes
 
-Uploads local Markdown tests into Testomat.io.
+Uploads/Imports local Markdown tests into Testomat.io.
 
 **Use Cases:**
 - Mass create test cases in Testomat.io from markdown files.
@@ -108,8 +102,9 @@ Uploads local Markdown tests into Testomat.io.
 - Sync refactored test cases to Testomat.io.
 
 **Pre-Push Validation:**
-1. Ensure at least one test `.test.md` file exists
-2. Ensure file contains valid test blocks:
+1. Ensure a new test cases was created by user.
+2. Ensure at least one test `.test.md` file exists
+3. Ensure file contains valid test blocks:
 
 ```md
 <!-- test
@@ -124,28 +119,34 @@ labels: ...
 
 ```
 
-#### Labels Handling (Intent-Based)
+#### Sync Changes
 
-- Use `TESTOMATIO_LABELS` **only if the user explicitly requests to set or override labels** in their query.
-- Example triggers:
-  - "push tests with labels smoke"
-  - "upload tests and set labels to regression,api"
-- Format: comma-separated values (supports `label:value` - `TESTOMATIO_LABELS="smoke,updated" npx check-tests push`).
+Analyze local changes in test cases and determine what has changed:
+- Only content updates.
+- New test cases added.
+- Mixed changes (updates + new tests).
 
-**Command:**
-```bash
-npx check-tests push -d <directory>
-# or if installed locally
-./node_modules/.bin/check-tests push -d <directory>
-```
+> Use: `npx check-tests push` to **synchronize** local tests with the TMS (including automatic test ID assignment when needed).
 
 **Examples:**
 ```bash
+# Push updated/newly created test cases to TMS
+npx check-tests push
+
 # Push tests from manual-tests folder
 npx check-tests push -d manual-tests
 ```
 
 **More examples** you can find in "Push" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
+
+#### Labels Handling (Intent-Based)
+
+Use `TESTOMATIO_LABELS` in sync/push **only if the user explicitly requests to set or override labels** in their query.
+
+**Triggers:**
+* "push tests with labels smoke".
+* "import tests to TMS and set label=regression":
+  - labels like `smoke,regression` example: `TESTOMATIO_LABELS="smoke,regression" npx check-tests push`
 
 ---
 
