@@ -92,7 +92,7 @@ Ask user about next steps:
 ❓ Next actions?
 
 1. 💾 Save to `docs/test-planner.md`
-2. ➡️ Proceed to `generate-test-cases` skill
+2. ➡️ Proceed to cover planner cases by `generate-test-cases` skill
 3. ✏️ Modify plan
 ```
 
