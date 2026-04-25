@@ -19,7 +19,7 @@ Trigger when user wants to:
 - Suggest test scenarios for E2E automation.
 - Provides requirements, user stories, or acceptance criteria.
 - Mentions QA activities or testing documentation needs.
-- User asks to: "discovery project", "analyze codebase for testing", "plan test coverage", "analyze code for testing approaches", "plan test activities", etc.
+- User asks: "discovery project", "analyze codebase for testing", "plan test coverage", "analyze code for testing approaches", "plan test activities".
 
 ---
 
@@ -27,30 +27,35 @@ Trigger when user wants to:
 
 ### Step 1: Project Discovery
 
-#### Auto-detect from source code
+#### Gather Project Information
+
+**A. From Source Code (Auto-detect)**
 
 1. **Tech Stack** - Frontend, backend, DB, integrations.
 2. **Test Framework**:
-- Trust user prompt and get framework from the request ("use CodeceptJS" or "Playwright project") 
-- Inspect the project to determine the test framework, by config files like `playwright.config.js`, `codecept.conf.js`, `cypress.json`, etc.
+- Trust user prompt and get framework from the request ("use CodeceptJS" or "Playwright project")
+- Inspect project for test framework by checking: `playwright.config.js`, `codecept.conf.js`, `cypress.json`, etc.
 3. **Existing Test Assets:**
-- Manual tests in `.md` format (`manual-cases`, `manual-tests`, etc.).
-- Automation tests (`tests`, `specs`, `e2e`, etc.).
+- Manual tests: `.md` files in `manual-cases`, `manual-tests`, etc.
+- Automation tests: `tests`, `specs`, `e2e` directories.
 - Test data and fixtures.
-- Documentation and Requirements (`README.md`, `docs/`, `requirements/`, etc).
+- Documentation: `README.md`, `docs/`, `requirements/` folders.
 4. **Key Areas** - API routes, pages, user flows.
 
-#### Project information
+**B. From User/External Sources**
 
-Gather information about the feature/functionality being tested from:
-- User prompt
-- Task Tracking systems (Jira, etc.)
-- Requirements documents (Confluence, etc.)
-- Design mockups (Figma, Miro, etc.)
-- Existing test cases (Test Management tools like TestRail, Testomat, etc.)
-(This information could be available as text files (copy-pasted), via links or via available tools and **MCP tools**. Use MCP when required and reasonable.)
+Gather feature/functionality details from:
+- User prompt (primary source)
+- Task Tracking: Jira, Linear, etc.
+- Requirements: Confluence, Google Docs, etc.
+- Design: Figma, Miro exports.
+- Test Cases: TestRail, Testomat, copy-pasted text.
 
-> **Important**: This skill focuses on **system/E2E and UAT testing** scenarios. Do not analyze unit tests unless explicitly requested by user user ask about it.
+> **Note**: Information may come as text, links, or via MCP tools. Use MCP when required and reasonable.
+
+> **Important**: This skill focuses on **system/E2E and UAT testing** scenarios. Do not analyze unit tests unless explicitly requested.
+
+**Validation**: If insufficient project info =>  **Ask user for more details** before proceeding to Step 2.
 
 #### Discovery Summary
 
@@ -100,40 +105,56 @@ Create a short "Scope & Prioritization" planning overview based on the user's ty
 - Identify high-risk areas.
 - Define possible scope for future testing.
 
-Create a **hierarchical, categorized, well-structured planner** based on the gathered information, user choices and suggested scenarios.
+Create a **hierarchical, categorized, well-structured planner** in checklist format. Each scenario should be actionable — ready for test case generation.
 
-**Example if smoke tests selected:**
+**Example output (smoke tests):**
 
 ```markdown
-# Test Planner: ...[Project Name]
+# Test Planner: [Project Name]
 
-**Generated:** ...(Current Date)
-**Resources:** ...(e.g: source code, requirements)
-**Test Type:** smoke.
-**Scenarios Count:** 15.
-**Focus:** System/E2E Testing.
+**Generated:** [Date]
+**Resources:** [source code, requirements]
+**Test Type:** SMOKE
+**Scenarios Count:** 12
+**Focus:** System/E2E Testing
 
-# Project Summary
+---
+
+## Project Summary
 [2-3 sentences about what this project does]
 
-# Testing Scope & Prioritization
+---
 
-## Priority 1 - Smoke Tests
-- Applicton Signup
-  - Signup with valid email
-  - Signup with valid phone number
-  - ...
-[Key smoke scenarios to cover high-level functionality(in bullet list of scenarios)]
+## Testing Scope & Prioritization
+
+### P0 — Critical
+- [ ] **User Registration**
+  - [x] Signup with valid email
+  - [ ] Signup with valid phone number
+  - [ ] Signup with invalid email (error)
+- [x] **User Login**
+  - [x] Login with correct credentials
+  - [x] Login with wrong password (error)
+
+### P1 — Important
+- [ ] **Password Reset**
+  - [ ] Request reset link
+  - [ ] Reset with valid token
+- [ ] **User Profile**
+  - [ ] Update profile name
+  - [ ] Upload profile avatar
+
 ...
+
 ```
 
-Ask user about next steps:
+**Ask user about next steps:**
 
 ```
 ❓ Next actions?
 
 1. 💾 Save to `docs/test-planner.md`
-2. ➡️ Proceed to cover planner cases by `generate-test-cases` skill
+2. ➡️ Proceed to generate test cases by uncover scenarios
 3. ✏️ Modify plan
 ```
 
