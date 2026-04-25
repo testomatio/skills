@@ -175,7 +175,7 @@ Show the question with your computed estimates. Put each option on its own block
 Critical-path only
 
 **2. ⚖️ Balanced** ~<N> tests
-Happy path, key negative and edge cases
+Happy path, key negative and common edge cases
 
 **3. 🧨 Exhaustive** ~<N> tests
 Full coverage incl. error states, boundaries, and security/perf/i18n where relevant
@@ -259,7 +259,7 @@ Choose **default** in case user does not specify role.
 
 Create a **hierarchical, categorized, well-structured checklist** based on the gathered information and user choices.
 
-**Size the checklist to match the scope tier chosen in Step 2** (🚀 smoke → only critical paths; ⚖️ balanced → happy + key negative/edge; 🧨 exhaustive → full coverage). For ✏️ other, follow what the user described.
+**Size the checklist to match the scope tier chosen in Step 2** (🚀 smoke → only critical paths; ⚖️ balanced → happy + key negative + common edge cases; 🧨 exhaustive → full coverage). For ✏️ other, follow what the user described.
 
 Example:
 
