@@ -13,6 +13,7 @@ AI skills for test management workflows with [Testomat.io](https://testomat.io).
 | Skill                  | Description                                                                                  |
 | ---------------------- | -------------------------------------------------------------------------------------------- |
 | `generate-test-cases`  | Generate test cases and checklists from requirements, tickets, or feature descriptions       |
+| `create-test-cases`    | Deep, feature-first manual test-case authoring with UI exploration, AC baselines, self-review gates, and worked examples |
 | `improve-test-cases`   | Analyze and improve existing markdown test cases for clarity                                 |
 | `find-duplicate-cases` | Find duplicate, near-duplicate, and overlapping test cases                                   |
 | `sync-cases`           | Synchronize Markdown test scenarios between local project and Testomat.io                    |
