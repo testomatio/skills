@@ -12,7 +12,7 @@ AI skills for test management workflows with [Testomat.io](https://testomat.io).
 
 | Skill                  | Description                                                                                  |
 | ---------------------- | -------------------------------------------------------------------------------------------- |
-| `generate-test-cases`  | Generate test cases and checklists from requirements, tickets, or feature descriptions       |
+| `generate-cases`  | Generate test cases and checklists from requirements, tickets, or feature descriptions       |
 | `improve-test-cases`   | Analyze and improve existing markdown test cases for clarity                                 |
 | `find-duplicate-cases` | Find duplicate, near-duplicate, and overlapping test cases                                   |
 | `sync-cases`           | Synchronize Markdown test scenarios between local project and Testomat.io                    |
@@ -64,7 +64,7 @@ For other ways of installation see [installation details](./docs/install-details
 testomatio/skills
 ├── skills/                    # Agent-agnostic skills (canonical source)
 │   ├── find-duplicate-cases/
-│   ├── generate-test-cases/
+│   ├── generate-cases/
 │   ├── improve-test-cases/
 │   ├── reporter-setup/
 │   ├── sync-cases/
