@@ -52,11 +52,11 @@ Generate **checklist** prior to **test cases** generation even if user request s
    Understand what you're testing, what artifacts are provided, what the user wants to achieve.
    Then **show sources** (briefly, no details) from which you gathered the information. **Ask user** if he wants to add or change anything. Go to step 2 only after approval.
 
-2. **Ask for type of testing**.
-   **Ask user about type of tests required** (smoke, regression, acceptance, etc.). Go to step 3 only after approval.
+2. **Ask for coverage scope**.
+   **Ask the user how much coverage they want** (🚀 smoke, ⚖️ balanced, 🧨 exhaustive, or ✏️ other). Go to step 3 only after approval.
 
 3. **Ask user to choose role**.
-   **Ask if user wants to enable specific role** (refer to [roles](#roles)) or just proceed with default one.  
+   Skipped if user picked "Smoke" in Step 2 (auto-applies ⚙️ default). Otherwise, **ask if user wants to enable a specific role** (refer to [roles](#roles)) or just proceed with the default one.  
    Show each role name and short description thus user can make proper decision. Go to step 4 only after approval.
 
 4. **Generate checklist**.
@@ -157,28 +157,42 @@ I've gathered information from the following sources:
 
 [Wait for user approval before proceeding to Step 2.]
 
-### Step 2: Ask for type of testing
+### Step 2: Ask for coverage size
 
-**Ask user about type of tests required: smoke, regression, feature acceptance, etc.**
+**Ask the user how much coverage they want.** This sets the _initial_ size of the checklist generated in Step 4 — the user can still fine-tune up/down in Step 4.1 after seeing the result.
+Use exact values: 🚀 **Smoke**, ⚖️ **Balanced**, 🧨 **Exhaustive**, ✏️ **Other**.
 
-Suggest more types based on gathered context.
+**Compute approximate test counts per tier from your Step 1 analysis**. **Do not use generic or hardcoded ranges** — the numbers shown to the user must reflect the specific feature(s) under test and the context.
 
-Example:
+Show the question with your computed estimates inline. Example (replace `<N>` with your actual estimates for this feature):
 
 ```markdown
-❓ What type of tests do you want to generate?
+❓ How much coverage do you want?
 
-1. smoke
-2. regression
-3. acceptance
-4. ✏️ other
+1. 🚀 Smoke — ~<N> tests — critical-path only
+2. ⚖️ Balanced — ~<N> tests — happy path, key negative and edge cases
+3. 🧨 Exhaustive — ~<N> tests — full coverage incl. error states,
+   boundaries, and security/perf/i18n where relevant
+4. ✏️ Other — proceed to specific role selection, type a number of tests or describe scope in your own words
 ```
+
+If you can't reasonably estimate (e.g. feature is too vague or context too thin), say so and either omit the numbers or go back to Step 1 for more info.
+
+If the user picks **✏️ Other**, accept either a number (e.g. "around 10") or a free-form description (e.g. "just the API contract, no UI"), and use it to size the checklist.
 
 [Wait for user approval before proceeding to Step 3.]
 
 ### Step 3: Ask for specific role
 
-**Show the roles names and short description (as markdown table) and let user choose** the default one or the specific one.
+Check condition and select next step accordingly:
+
+**If the user picked "smoke" scope in Step 2:**
+
+- **skip this step**, auto-apply the "⚙️ default" role and **go straight to Step 4** without asking for role. A smoke suite is too small to benefit from a specialized role.
+
+**If the user picked "balanced", "exhaustive" or "other" scope in Step 2:**
+
+- **show the roles names and short description (as markdown table) and let user choose** the default one or the specific one. And ask user if he wants to select any specific role.
 
 ##### Roles
 
@@ -234,6 +248,8 @@ Choose **default** in case user does not specify role.
 ### Step 4: Generate Checklist
 
 Create a **hierarchical, categorized, well-structured checklist** based on the gathered information and user choices.
+
+**Size the checklist to match the scope tier chosen in Step 2** (🚀 smoke → only critical paths; ⚖️ balanced → happy + key negative/edge; 🧨 exhaustive → full coverage). For ✏️ other, follow what the user described.
 
 Example:
 
@@ -352,7 +368,7 @@ When the user provides an existing test cases example and/or asks for "similar" 
    - interact with user
 2. Show gathered information to user and ask for approval or changes
    - ask if user wants to add/remove/modify anything
-3. Ask for test type (smoke, regression, feature acceptance, etc.)
+3. Ask for coverage scope (🚀 smoke, ⚖️ balanced, 🧨 exhaustive, or ✏️ other)
 4. Ask for role (default, optimist, drama-queen, etc.)
 5. Generate hierarchical structured checklist for feature X
 6. Display checklist in terminal and ask for user approval
@@ -370,7 +386,7 @@ When the user provides an existing test cases example and/or asks for "similar" 
    - interact with user
 2. Show gathered information to user and ask for approval or changes
    - ask if user wants to add/remove/modify anything
-3. Ask for test type (smoke, regression, feature acceptance, etc.)
+3. Ask for coverage scope (🚀 smoke, ⚖️ balanced, 🧨 exhaustive, or ✏️ other)
 4. Ask for generation role (default, optimist, drama-queen, etc.)
 5. Generate hierarchical structured checklist for feature X
 6. Display checklist in terminal and ask for user approval
