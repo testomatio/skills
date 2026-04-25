@@ -35,7 +35,7 @@ The skill orchestrates these specialized capabilities:
 
 | Skill                   | Purpose                                             |
 | ----------------------- | --------------------------------------------------- |
-| **generate-test-cases** | Generate new test cases from requirements           |
+| **generate-cases** | Generate new test cases from requirements           |
 | **improve-test-cases**  | Improve existing test cases quality                 |
 | **sync-cases**          | Upload test cases to Testomat.io TMS                |
 | **reporter-setup**      | Add Testomat.io reporter to your automation project |
@@ -67,12 +67,12 @@ Route to appropriate skill to execute.
 ```
 User: asks to generate/create test cases/check list
 =>
-Use `generate-test-cases` skill to proceed with test case, check list generation
+Use `generate-cases` skill to proceed with test case, check list generation
 =>
 After generation fully completed, suggest next actions:
 1. ⬆️ Upload generated test cases to Testomat.io (with `sync-cases` skill)
 2. 🔧 Add Testomat.io reporter to your automation project (with `reporter-setup` skill)
-3. 🎭 Generate specific test cases using `generate-test-cases` skill and role name (e.g. "pessimist")
+3. 🎭 Generate specific test cases using `generate-cases` skill and role name (e.g. "pessimist")
 ```
 
 ### **Test cases Improvement Flow**
@@ -95,7 +95,7 @@ Use `sync-cases` skill to proceed with test case sync
 =>
 After sync/upload step fully completed, suggest next actions:
 1. 🔧 Add Testomat.io reporter to your automation project (with `reporter-setup` skill)
-2. 📝 Generate test cases from requirements (with `generate-test-cases` skill)
+2. 📝 Generate test cases from requirements (with `generate-cases` skill)
 ```
 
 ### **Add test reporter (or Testomat.io reporter) to your automation project Flow**
@@ -108,7 +108,7 @@ User: asks to add test reporter to your automation project (or Testomat.io repor
 Use `reporter-setup` skill to proceed with test reporter setup
 =>
 After previous step fully completed, suggest next actions:
-1. 📝 Generate test cases from requirements (with `generate-test-cases` skill)
+1. 📝 Generate test cases from requirements (with `generate-cases` skill)
 ```
 
 ### Example Request Flows
@@ -124,7 +124,7 @@ Context Analysis:
 - Requirements: Jira story USR-123
 - Testomat.io: Configured
 
-Action: Uses `generate-test-cases` skill
+Action: Uses `generate-cases` skill
 Output: 8 test cases created
 
 Smart Suggestion:

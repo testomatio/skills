@@ -1,5 +1,5 @@
 ---
-name: generate-test-cases
+name: generate-cases
 description: Generate test cases and checklists for software testing. Use this skill whenever the user asks to create test cases, test scenarios, test plans, checklists, QA documentation, or mentions testing activities like "write tests for feature", "create a test checklist", "generate test scenarios from requirements", or similar. This skill works better if user provides documentation, requirements etc or it can create test cases based on the user prompt without any additional context.
 ---
 
@@ -39,6 +39,8 @@ Trigger this skill when the user:
 - Use non-formal language to attract user attention. Try to be liked by the user.
 
 - Fill input fields with suggestions when asking user to provide input.
+
+- Questions and outputs should be structured, formated to be easy to read and understand.
 
 ## Workflow (IMPORTANT: how AI tool (Claude, Cursor etc) should work with user)
 
@@ -164,17 +166,25 @@ Use exact values: 🚀 **Smoke**, ⚖️ **Balanced**, 🧨 **Exhaustive**, ✏�
 
 **Compute approximate test counts per tier from your Step 1 analysis**. **Do not use generic or hardcoded ranges** — the numbers shown to the user must reflect the specific feature(s) under test and the context.
 
-Show the question with your computed estimates inline. Example (replace `<N>` with your actual estimates for this feature):
+Show the question with your computed estimates. Put each option on its own block: the **bold label with the test count on the first line**, and the description indented on the next line. Example (replace `<N>` with your actual estimates for this feature):
 
 ```markdown
-❓ How much coverage do you want?
+❓ **How much coverage do you want?**
 
-1. 🚀 Smoke — ~<N> tests — critical-path only
-2. ⚖️ Balanced — ~<N> tests — happy path, key negative and edge cases
-3. 🧨 Exhaustive — ~<N> tests — full coverage incl. error states,
-   boundaries, and security/perf/i18n where relevant
-4. ✏️ Other — proceed to specific role selection, type a number of tests or describe scope in your own words
+**1. 🚀 Smoke** ~<N> tests
+Critical-path only
+
+**2. ⚖️ Balanced** ~<N> tests
+Happy path, key negative and edge cases
+
+**3. 🧨 Exhaustive** ~<N> tests
+Full coverage incl. error states, boundaries, and security/perf/i18n where relevant
+
+**4. ✏️ Other**
+Proceed to specific role selection, type a number of tests, or describe scope in your own words
 ```
+
+Keep each description easy to read and understand.
 
 If you can't reasonably estimate (e.g. feature is too vague or context too thin), say so and either omit the numbers or go back to Step 1 for more info.
 
