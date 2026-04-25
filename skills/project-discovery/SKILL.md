@@ -91,8 +91,8 @@ Show the question with your computed estimates inline. Example (replace `<N>` wi
 ❓ What type of tests do you want to generate?
 
 1. 🚀 Smoke — ~<N> tests — critical-path only.
-2. ⚖️ Balanced — ~<N> tests — happy path, key negative and edge cases.
-3. 🧨 Exhaustive — ~<N> tests — full coverage incl. error states, boundaries, and security/perf/i18n where relevant.
+2. ⚖️ Balanced — ~<N> tests — happy path, key negative.
+3. 🧨 Exhaustive — ~<N> tests — full coverage incl. edge cases, error states, boundaries, and security/perf/i18n where relevant.
 4. ✏️ Other — proceed to specific role selection, type a number of tests or describe scope in your own words.
 ```
 
