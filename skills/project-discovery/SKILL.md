@@ -153,7 +153,7 @@ Create a **hierarchical, categorized, well-structured planner** in checklist for
 ```
 ❓ Next actions?
 
-1. 💾 Save to `docs/test-planner.md`
+1. 💾 Save plan
 2. ➡️ Proceed to generate test cases by uncover scenarios
 3. ✏️ Modify plan
 ```
