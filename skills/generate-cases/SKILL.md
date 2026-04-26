@@ -125,7 +125,7 @@ Gather all information about the feature/functionality being tested from:
   - Automated test files (spec, test, cy files, etc).
   - Project structure.
   - Search for test-related directories such as: `tests`, `manual-tests`, `manual`, `qa`, `spec` or similarly named folders.
-  - Within those directories, look specifically for Markdown-based test files, especially files ending with `.test.md`
+  - Within those directories, look specifically for Markdown-based test files, especially files ending with `.test.md` or `.md`
 
 This information could be available as text files (copy-pasted), via links or via MCP tools. Use MCP when required and reasonable. Ask user for mcp configuration if needed.
 
@@ -320,7 +320,7 @@ Rules:
 - Do not include **preconditions** like "service is running" if it's not explicitly mentioned by user or is not actually what the test is about.
 - Put preparations into **preconditions**/**description** section, not as steps.
 
-**Don't change the user's source code. Only generate .md files with test cases.**
+**Don't change the user's source code. Only generate `*.test.md` files with test cases.**
 
 ### Step 6: Show summary results
 
@@ -342,12 +342,12 @@ Checklist should have hierarchical and categorized structure.
 
 - Follow [Testomat.io TMS Guide](./references/testomat-tms-guide.md) for format and conventions (priority levels, tags, labels, etc.) (especially when using testomatio mcp)
 
-- Files naming: `test-cases-feature-name.md`.
+- Files naming: `feature-name.test.md` (always use the `.test.md` extension).
 - **IMPORTANT:** **Strictly follow the `./references/test-case-format.md` format** for **suites**, **tests** and **steps**.
-- Always use suite block. (e.g. `<!-- suite ... -->`).
+- Use `<!-- suite ... -->` and `<!-- test ... -->` blocks to wrap test cases.
 - If required, put `tags:` and `labels:` inside **each** `<!-- test ... -->` metadata block (see [test metadata](./references/test-case-format.md#test-metadata)). Not only on the suite block.
 - If reasonable, add test metadata like priority, preconditions, test data, labels, tags based on analyzed information and context.
-- **IMPORTANT: NEVER generate Testomat.io test or suite IDs** - Do NOT include `id: @T...` or `id: @S...` fields in your output. These IDs are server-generated and should NOT be created by this skill. The format reference file shows IDs in examples, but you must NOT generate them.
+- **IMPORTANT: NEVER GENERATE Testomat.io test or suite IDs**: do NOT include `id: @T...` or `id: @S...` fields in your output. These IDs are server-generated and should NOT be created by this skill. The format reference file shows IDs in examples, but you must NOT generate them. They will be obtained from Testomat.io via `sync-cases` skill, no need to add them on this step.
 
 ### Matching Existing Test Case Formats
 
@@ -383,7 +383,7 @@ When the user provides an existing test cases example and/or asks for "similar" 
 5. Generate hierarchical structured checklist for feature X
 6. Display checklist in terminal and ask for user approval
    - ask about amount of cases / level of details (more, less, keep as is)
-7. On approval, generate detailed test cases for feature X and save to `test-cases-feature-x.md`
+7. On approval, generate detailed test cases for feature X and save to `feature-x.test.md`
 
 ### Example 2
 
