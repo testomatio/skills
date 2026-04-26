@@ -1,9 +1,10 @@
 # Testomatio skills installation details
 
-[Most agentic tools](#most-agentic-tools)
-[Claude Code](#claude-code)
-[Codex](#codex)
-[Cursor](#cursor)
+- [Most agentic tools](#most-agentic-tools-claude-code-cursor-cline-vs-code-and-others)
+- [Claude Code](#claude-code-plugin-with-marketplace)
+- [Codex](#codex)
+- [Cursor](#cursor)
+- [VS Code / Copilot](#vs-code--copilot)
 
 ### Most agentic tools (Claude Code, Cursor, Cline, VS Code and others)
 
@@ -11,7 +12,7 @@
 npx skills add testomatio/skills
 ```
 
-To update your installed skills later:
+To update your installed skills:
 
 ```bash
 npx skills update
@@ -20,6 +21,8 @@ npx skills update
 ### Claude Code (plugin with marketplace)
 
 For Claude Code skills are grouped into plugins which could be installed from the marketplace.
+
+> All commands below should be executed in Claude Code terminal.
 
 1. Add marketplace
 
@@ -42,14 +45,22 @@ For Claude Code skills are grouped into plugins which could be installed from th
 /test-management
 
 # or call skill directly
-/test-management:generate-cases
+/test-management:generate-test-cases
 
 # or just use skill name
-generate-cases
+generate-test-cases
 
 # or skill will be loaded automatically on a relevant prompt
 "create test cases for login feature"
 ```
+
+### Codex
+
+Easiest way to install skills for Codex is to chat with Codex and ask something like:
+
+`install skills from https://github.com/testomatio/skills/tree/master/skills`
+
+or trigger `Skill Installer` in Codex chat and provide the same link `https://github.com/testomatio/skills/tree/master/skills`.
 
 ### Cursor
 
@@ -57,13 +68,4 @@ generate-cases
 2. Go to **Rules/Skills/Subagents** → **New** → **Add from GitHub/GitLab**
 3. Paste: `https://github.com/testomatio/skills.git`
 
-<img height="300" alt="Cursor install skills" src="./docs/resources/skill-install-Cursor.png">
-
-### VS Code / Copilot IN PROGRESS
-
-```bash
-# Install to your configured skills directory
-cp -r skills/* ~/.vscode/skills/
-# or
-cp -r skills/* .vscode/skills/
-```
+<img height="300" alt="Cursor install skills" src="./resources/skill-install-Cursor.png">
