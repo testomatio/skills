@@ -40,7 +40,7 @@ Trigger this skill when user wants to:
 
 ### Step 1: Locate Test Files
 
-Find existing manual "test.md" markdown test files in the project:
+Find existing markdown test files (`.test.md` or `.md`) in the project:
 - Common locations: `./manual-tests`, `./tests/manual`, `./docs/tests`, etc.
 - Look for `.md` files with test case content.
 
