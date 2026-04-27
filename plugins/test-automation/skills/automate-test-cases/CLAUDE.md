@@ -35,14 +35,24 @@ Converts manual test cases into automation test scripts following POM pattern.
 
 ## PostHook
 
-After skill completes successfully, run:
+After skill completes, run the generated `$TEST_FILE` using the project's test framework:
+
+**Example:**
+
 ```bash
-./scripts/post-hook.sh
+# Playwright case
+npx playwright test "$TEST_FILE"
+# or
+./node_modules/.bin/playwright test "$TEST_FILE"
+
+# CodeceptJS case
+npx codeceptjs run "$TEST_FILE"
+
+# Cypress case
+npx cypress run --spec "$TEST_FILE"
 ```
-Or manually verify:
-1. Test file exists at expected path
-2. Run test once more to confirm stability
-3. Check for artifacts (screenshots, reports)
+
+Confirm test passes before finishing.
 
 ## Files
 
@@ -50,4 +60,3 @@ Or manually verify:
 |------|---------|
 | SKILL.md | Main skill instructions with step tracking |
 | references/*.md | Best practices (POM, framework-specific) |
-| scripts/post-hook.sh | Verification after skill completes |
