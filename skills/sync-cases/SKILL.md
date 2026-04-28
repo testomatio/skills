@@ -154,6 +154,10 @@ npx check-tests push
 npx check-tests push -d manual-cases
 ```
 
+**Important constraints:**
+- Only use options that are explicitly documented in this skill or in the "Testomat.io CLI Documentation" ref file.
+- Do **not** assume support for undocumented options, like: `--pattern`, `--forces`, etc.
+
 **More examples** you can find in "Push" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
 
 #### Labels Handling (Intent-Based)
@@ -206,7 +210,7 @@ Stop execution if:
 
 | Description                  | File                                |
 | ---------------------------- | ----------------------------------- |
-| Testomat.io CLI Commands     | ./references/TESTOMATIO_CLI.md     |
+| Testomat.io CLI Commands     | ./references/TESTOMATIO_CLI.md      |
 
 ---
 
