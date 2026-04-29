@@ -47,30 +47,7 @@ mkdir -p .testclaw-context/code
 
 ---
 
-### Step 2: Source Code Discovery
-
-**Check if current directory has source files** — detect via:
-- File extensions: `.ts`, `.js`, `.py`, `.go`, `.rs`, `.java`, `.cs`, etc.
-- Directories: `app/`, `src/`, `backend/`, `frontend/`, `lib/`, `packages/`, etc.
-
-**If test frameworks detected BUT no source folders found:**
-
-If `testFrameworks` is detected (Playwright, Vitest, etc.) but no source folders (`app/`, `src/`, `frontend/`) exist — ask user:
-
-```
-❓ This project has test automation (${testFramework}) but no application source detected.
-How should I proceed?
-
-- **1.** Use local app source from another folder (create symlink).
-- **2.** Clone app source from Git repo.  
-- **3.** Continue with test-only project.
-- **4.** Skip source code detecting.
-```
-[Wait for user input before proceeding].
-
----
-
-### Step 3: Project Analysis (Simplified)
+### Step 2: Project Analysis (Simplified)
 
 Scan user's project and collect:
 
@@ -83,17 +60,19 @@ Scan user's project and collect:
 - **Build and generated artifacts:** like `dist/`, `build/`, `out/`, `target/`, `.next/`, `.cache/`, `.turbo/`.
 - **Coverage and reports:** `coverage/`, `reports/`.
 - **Lock and generated files:** like `*.lock`.
+- **Docker and Makefile files:** like `Dockerfile`.
 - **Ignored files:** Respect `.gitignore` if available.
 - **Configuration and env files:** like `.git/`, `.env`, `tsconfig.json`.
+- **TestClaw agent source files and prompts**: like `session-factory.ts`, `system-prompt.ts`
 
 **Skip these entirely during scanning.**
 [**If in doubt**, prefer excluding over including non-source files.]
 
-3. **Detect frameworks** — separate application and test frameworks:
+3. **Detect frameworks** — separate project and test frameworks:
 
-**PRIORITY: Application frameworks first, then test frameworks.**
+**PRIORITY: Project source code FIRST (mandatory), test frameworks SECOND (optional)**
 
-**A) Application Frameworks** (from source code/configs):
+**A) Project Frameworks** (from source folders like app/, src/, backend/):
 
 | Config/Source | Framework |
 |----------------|------------|
@@ -101,13 +80,37 @@ Scan user's project and collect:
 | `Cargo.toml` | Rust (actix, axum, rocket) |
 | `go.mod` | Go (gin, echo, fiber) |
 | `pyproject.toml` | Django, Flask, FastAPI |
-| `app/` folder | As initial application folder |
+| `app/` folder | App code present |
 | `src/` folder | Source code present |
 | `backend/` folder | Backend structure |
 | `frontend/` folder | Frontend structure |
-[This table contains only basic examples and actual names may vary.]
 
-**B) Test Frameworks** (from test configs):
+**CRITICAL: Project source code MUST be accessible.**
+
+Detect source via:
+- Directories: `app/`, `src/`, `backend/`, `frontend/`, `lib/`, `packages/`
+- MUST contain actual code files: `.ts`, `.js`, `.py`, `.go`, `.rs`, `.java`, `.html`, `.css`
+
+**IMPORTANT:** 
+> `projectFrameworks` = application frameworks (MANDATORY if source exists AND has code files)
+- **`app/`, `src/`, `frontend/` with HTML/CSS only** (no framework deps) - `projectFrameworks: HTML/CSS (simple project)`
+- **If source folder exists BUT is empty OR has no code files** - STOP and ask user:
+- **If source folder like `app/`, `src/`, `frontend/` empty** - STOP and ask user:
+- **If source directories NOT found** - STOP and ask user:
+
+```
+❓ No application source code detected (folder may be empty or missing).
+Where is the source code?
+
+- **1.** Use local project from another folder (I will create symlink)
+- **2.** Clone from Git repo
+- **3.** I don't know yet (STOP here)
+```
+[STOP and wait for user response].
+
+**Note:** Test files (playwright, vitest) are optional — project source comes FIRST.
+
+**B) Test Frameworks** (optional):
 
 | Config File | Test Framework |
 |-------------|-----------------|
@@ -116,11 +119,8 @@ Scan user's project and collect:
 | `vitest.config.ts` | Vitest |
 | `jest.config.js` | Jest |
 | `pytest.ini`, `pyproject.toml` | pytest |
-| `*_test.go` | Go tests |
 
-**IMPORTANT:** 
-- List **application** frameworks in `frameworks` field.
-- List **test** frameworks in `testFrameworks` field.
+> `testFrameworks` = testing tools (OPTIONAL)
 
 4. **Extract project name** from `package.json`, `Cargo.toml`, or directory name
 
@@ -138,18 +138,18 @@ Output to `.testclaw-context/scan-result.json`:
 ```json
 {
   "name": "project-name",
-  "description": "...",
+  "description": "...",   // Based on the {projectFrameworks} info
   "languages": ["typescript", "javascript"],
-  "projectFrameworks": ["Vanilla JS"],        // Application frameworks or source folders
-  "testFrameworks": ["Playwright"],    // Test frameworks
+  "projectFrameworks": ["..."],  // Application frameworks (source folders) - (mandatory)
+  "testFrameworks": ["Playwright"],     // Test frameworks (optional)
   "estimatedComplexity": "small",
   "totalFiles": 12
 }
 ```
 
 **Important:** 
-- `frameworks` = app frameworks or source folders (Vanilla JS if app/ exists)
-- `testFrameworks` = testing tools (Playwright, Vitest, Jest, etc.)
+- `projectFrameworks` = app frameworks (MANDATORY)
+- `testFrameworks` = testing tools (OPTIONAL)
 
 **Show a summary** based on scan results.
 
@@ -200,9 +200,9 @@ Merge all results into `.testclaw-context/scan-result.json`:
 ```json
 {
   "name": "project-name",
-  "description": "...",
+  "description": "...",   // Based on the {projectFrameworks} info
   "languages": ["typescript", "javascript"],
-  "frameworks": ["React", "Vite"],        // Application frameworks
+  "projectFrameworks": ["React", "Vite"],        // Application frameworks (mandatory)
   "testFrameworks": ["Playwright"],     // Test frameworks (optional)
   "estimatedComplexity": "moderate",
   "totalFiles": 42,
@@ -220,7 +220,7 @@ Merge all results into `.testclaw-context/scan-result.json`:
 **(This `scan-result.json` file must includes full list of available tests)**
 
 **Important:** 
-- `frameworks` = application frameworks (React, Vue, Express, Django, etc.)
+- `projectFrameworks` = application frameworks (React, Vue, Express, Django, etc.)
 - `testFrameworks` = test tools (Playwright, Vitest, Jest, CodeceptJS, pytest, etc.)
 
 **Report a summary to the user:**
@@ -241,8 +241,8 @@ If manual/automated tests are included in output:
 Scan Complete:
 - Project: ...
 - Languages: TypeScript
-- Frameworks: Vanilla JS (from `app/` folder)
-- Test Frameworks: Playwright
+- Project Frameworks: ... (mandatory)
+- Test Frameworks: Playwright (optional)
 - Complexity: small (12 files)
 - Automated Tests: 2 files
 - Manual Tests: 9 cases
