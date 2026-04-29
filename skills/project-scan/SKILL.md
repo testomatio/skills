@@ -53,12 +53,18 @@ mkdir -p .testclaw-context/code
 - File extensions: `.ts`, `.js`, `.py`, `.go`, `.rs`, `.java`, `.cs`, etc.
 - Directories: `app/`, `src/`, `backend/`, `frontend/`, `lib/`, `packages/`, etc.
 
-**If no source in root, ask user:**
+**If test frameworks detected BUT no source folders found:**
+
+If `testFrameworks` is detected (Playwright, Vitest, etc.) but no source folders (`app/`, `src/`, `frontend/`) exist — ask user:
 
 ```
-❓ What source code to use?
-- **1.** Local project from another folder (create symlink to `.testclaw-context/code/`)
-- **2.** Git repo (clone code to `.testclaw-context/code/`)
+❓ This project has test automation (${testFramework}) but no application source detected.
+How should I proceed?
+
+- **1.** Use local app source from another folder (create symlink).
+- **2.** Clone app source from Git repo.  
+- **3.** Continue with test-only project.
+- **4.** Skip source code detecting.
 ```
 [Wait for user input before proceeding].
 
@@ -90,15 +96,16 @@ Scan user's project and collect:
 **A) Application Frameworks** (from source code/configs):
 
 | Config/Source | Framework |
-|--------------|----------|
+|----------------|------------|
 | `package.json` deps | React, Vue, Angular, Svelte, Next.js, Nuxt, Express, NestJS, Fastify, Koa |
 | `Cargo.toml` | Rust (actix, axum, rocket) |
 | `go.mod` | Go (gin, echo, fiber) |
 | `pyproject.toml` | Django, Flask, FastAPI |
-| `app/` folder | Frontend app structure |
+| `app/` folder | As initial application folder |
 | `src/` folder | Source code present |
 | `backend/` folder | Backend structure |
 | `frontend/` folder | Frontend structure |
+[This table contains only basic examples and actual names may vary.]
 
 **B) Test Frameworks** (from test configs):
 
@@ -114,7 +121,6 @@ Scan user's project and collect:
 **IMPORTANT:** 
 - List **application** frameworks in `frameworks` field.
 - List **test** frameworks in `testFrameworks` field.
-- These are separate — a project can have both.
 
 4. **Extract project name** from `package.json`, `Cargo.toml`, or directory name
 
@@ -134,15 +140,15 @@ Output to `.testclaw-context/scan-result.json`:
   "name": "project-name",
   "description": "...",
   "languages": ["typescript", "javascript"],
-  "frameworks": ["React", "Vite"],        // Application frameworks FIRST
-  "testFrameworks": ["Playwright"],        // Test frameworks SECOND
-  "estimatedComplexity": "moderate",
-  "totalFiles": 42
+  "projectFrameworks": ["Vanilla JS"],        // Application frameworks or source folders
+  "testFrameworks": ["Playwright"],    // Test frameworks
+  "estimatedComplexity": "small",
+  "totalFiles": 12
 }
 ```
 
 **Important:** 
-- `frameworks` = application/frontend/backend frameworks
+- `frameworks` = app frameworks or source folders (Vanilla JS if app/ exists)
 - `testFrameworks` = testing tools (Playwright, Vitest, Jest, etc.)
 
 **Show a summary** based on scan results.
@@ -197,7 +203,7 @@ Merge all results into `.testclaw-context/scan-result.json`:
   "description": "...",
   "languages": ["typescript", "javascript"],
   "frameworks": ["React", "Vite"],        // Application frameworks
-  "testFrameworks": ["Playwright"],     // Test frameworks (separate)
+  "testFrameworks": ["Playwright"],     // Test frameworks (optional)
   "estimatedComplexity": "moderate",
   "totalFiles": 42,
   "testCounts": {
@@ -234,12 +240,12 @@ If manual/automated tests are included in output:
 ```
 Scan Complete:
 - Project: ...
-- Languages: TypeScript, JavaScript
-- Frameworks: (application structure from root, `app/`, etc)
+- Languages: TypeScript
+- Frameworks: Vanilla JS (from `app/` folder)
 - Test Frameworks: Playwright
-- Complexity: small (7 files)
-- Automated Tests: 3 files
-- Manual Tests: 0 cases
+- Complexity: small (12 files)
+- Automated Tests: 2 files
+- Manual Tests: 9 cases
 ```
 
 ---
