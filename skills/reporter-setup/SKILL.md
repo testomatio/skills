@@ -23,15 +23,45 @@ Trigger this skill when user wants to:
 
 # Workflow: Setup testomatio/reporter
 
-## Step 1: Detect Project Framework
+## Step 1: Detect Project Language & Framework
 
-Identify which testing framework is used in the project: `Playwright`, `CodeceptJS`, `Jest`, `Mocha`, `WebdriverIO`, JUnit, Pytest, XML, etc.
+### Phase 1: Detect Program Language
 
-> If the framework is unclear, inspect the repository structure, dependencies, configuration files, and `package.json` scripts to determine which framework is used or ask the user which framework the project uses.
+First, identify the primary programming language of the project by inspecting:
+- `package.json` => JavaScript/TypeScript.
+- `requirements.txt`, `pyproject.toml`, `setup.py` => Python.
+- `pom.xml`, `build.gradle` => Java.
+- `*.csproj` => C#/.NET.
+- `composer.json` => PHP.
+- `Gemfile` => Ruby.
 
-**If framework and Config detected:**
+### Phase 2: Detect Test Framework
+
+Based on the detected language, identify the specific test framework:
+
+#### JavaScript / TypeScript
+- **Playwright** => `playwright.config.ts`, `playwright.config.js`.
+- **CodeceptJS** => `codecept.conf.js`, `codecept.config.js`.
+- **Jest** => `jest.config.js`, `jest.config.ts`.
+- **Mocha** => `mocha.opts`, `.mocharc.*`.
+- **WebdriverIO** => `wdio.conf.js`, `wdio.conf.ts`.
+
+#### Python
+- **pytest** => `pytest.ini`, `pyproject.toml`, `conftest.py`
+- **unittest** => standard Python unittest
+
+#### Java
+- **JUnit** => `pom.xml` with junit dependency, `junit.jupiter`
+- **TestNG** => `testng.xml`
+
+#### Other
+- **XML/JUnit** => XML report files for C#, PHP, Ruby, etc.
+
+> If the framework is unclear, inspect the repository structure, dependencies, configuration files to determine which framework is used or ask the user which framework the project uses.
+
+**If language and framework detected:**
 - Proceed to Step 2 (Install reporter).
-- Configure based on detected framework.
+- Configure based on detected language and framework.
 
 **If no framework and Config detected:**
 Ask user in "Interactive Setup" mode:
@@ -39,49 +69,48 @@ Ask user in "Interactive Setup" mode:
 ```
 ❓ No test framework was detected in your project.
 
+Detected Program Language: ...
+
 To continue, please choose how to proceed:
 
-**Specify a framework manually**. Available frameworks:  
-  - Playwright
-  - CodeceptJS
-  - WebdriverIO
-  - Jest
-  - Mocha
-  - JUnit
-  - Pytest
-  - XML
-  - ...
+**Specify a framework manually**. Available frameworks for [LANGUAGE]:  
+  - JavaScript/TypeScript: Playwright, CodeceptJS, WebdriverIO, Jest, Mocha
+  - Python: pytest, unittest
+  - Java: JUnit, TestNG
+  - Other: XML/JUnit format
 ```
 
 > Move to Step 2 (Install reporter) after filling all gaps.
 
 ### Step 1 Summary (Log)
 
-After completing framework detection and/or interactive setup, output a short log-style summary:
+After completing language and framework detection and/or interactive setup, output a short log-style summary:
 ```
-- Test framework: ...
 - Program Language: ...
-- Config file found (if any).
+- Test Framework: ...
+- Config file found: ...
 - Testomatio API key source (`.env` / user input / missing).
 ```
 
+---
+
 ## Step 2: Testomat.io Reporter Setup
+
+Based on the detected Program Language and Test framework, install and configure the appropriate reporter.
 
 ### JavaScript / TypeScript
 
 Use `@testomatio/reporter` for NodeJS test frameworks.
 
-#### NPM Packages install
-
-Install `@testomatio/reporter` package:
+#### Install Package
 
 ```bash
 npm install @testomatio/reporter --save-dev
 ```
 
-#### Configure Framework Config File
+#### Configure by Framework
 
-**Playwright:**
+**Playwright** — Update `playwright.config.ts` or `playwright.config.js`:
 
 ```js
 reporter: [
@@ -90,7 +119,7 @@ reporter: [
 ],
 ```
 
-**CodeceptJS:**
+**CodeceptJS** — Update `codecept.conf.js` or `codecept.config.js`:
 
 ```js
 plugins: {
@@ -101,7 +130,7 @@ plugins: {
 }
 ```
 
-**WebdriverIO:**
+**WebdriverIO** — Update `wdio.conf.js`:
 
 ```js
 const testomatio = require('@testomatio/reporter/webdriver');
@@ -114,77 +143,83 @@ exports.config = {
 };
 ```
 
-**Jest:**
-
-Add the following line to jest.config.js:
+**Jest** — Update `jest.config.js` or `jest.config.ts`:
 
 ```js
-// jest.config.js
 module.exports = {
   reporters: ['default', ['@testomatio/reporter/jest', { apiKey: process.env.TESTOMATIO }]],
 };
 ```
 
-**Mocha:**
+**Mocha** — Run with CLI flags:
 
 ```bash
 mocha --reporter @testomatio/reporter/mocha --reporter-options apiKey=tstmt_xxx
 ```
 
-> **More examples or extra framework configuration** you can find in [Testomat.io Reporters NodeJS Test Frameworks Configuration](https://docs.testomat.io/test-reporting/frameworks/)
+> More configuration examples: [Testomat.io NodeJS Frameworks](https://docs.testomat.io/test-reporting/frameworks/)
+
+---
+
+### Python
+
+Use `pytestomatio` plugin for pytest-based Python projects.
+
+#### Install
+
+```bash
+pip install pytestomatio
+```
+
+#### Configure & Run
+
+```bash
+# Sync tests with Testomat.io
+TESTOMATIO={API_KEY} pytest --testomatio sync
+
+# Run and report tests
+TESTOMATIO={API_KEY} pytest --testomatio report
+```
+
+> Full documentation: [Testomat.io Python Reporting](https://docs.testomat.io/test-reporting/python/)
+
+---
 
 ### Java
 
-Use JUnit XML reports with `@testomatio/reporter` for Java test frameworks (JUnit, TestNG):
+Use JUnit XML reports with `@testomatio/reporter` for Java test frameworks (JUnit, TestNG).
 
-1. **Generate JUnit XML report** with your test runner (e.g., Maven/Surefire):
+#### Generate XML Report
 
 ```bash
 mvn clean test
 ```
 
-2. **Import report** into Testomat.io:
+#### Import to Testomat.io
 
 ```bash
 TESTOMATIO={API_KEY} npx report-xml "target/surefire-reports/*.xml" --java-tests
 ```
 
 - Use `--java-tests` flag when tests are in a non-standard location
-- Test IDs can be assigned in test names: `test name @T8acca9eb`
+- Test IDs in test names: `test name @T8acca9eb`
 - File attachments: print `file://{path}` to stdout, Test ID: `tid://@T8acca9eb`
 
-> **More examples or extra framework configuration** you can find in [Testomat.io Reporters Java Test Frameworks Configuration](https://docs.testomat.io/test-reporting/junit/)
+> Full documentation: [Testomat.io Java/JUnit Reporting](https://docs.testomat.io/test-reporting/junit/)
 
-### Python
+---
 
-Use `pytestomatio` plugin for pytest-based Python projects:
+### Other Languages (C#, PHP, Ruby)
 
-1. **Install**:
+XML/JUnit format reporters can use `report-xml` CLI tool:
 
-```bash
-pip install pytestomatio
-```
+| Language | Framework | Output Format |
+|----------|-----------|---------------|
+| C#/.NET | NUnit, xUnit | JUnit XML |
+| PHP | PHPUnit | JUnit XML |
+| Ruby | Minitest | JUnit reporter |
 
-2. **Sync tests** with Testomat.io:
-
-```bash
-TESTOMATIO={API_KEY} pytest --testomatio sync
-```
-
-3. **Run and report** tests:
-
-```bash
-TESTOMATIO={API_KEY} pytest --testomatio report
-```
-
-> **Full documentation** see [Testomat.io Python Test Reporting](https://docs.testomat.io/test-reporting/python/)
-
-### Others
-
-XML/JUnit format reporters (C#, PHP, Ruby, etc.) can use `report-xml` CLI tool. See [Testomat.io Reporters Configuration](https://docs.testomat.io/test-reporting/frameworks/) for details.
-- **C#/.NET**: NUnit, xUnit with JUnit XML output
-- **PHP**: PHPUnit XML reports
-- **Ruby**: Minitest with JUnit reporter
+> Configuration details: [Testomat.io Reporters](https://docs.testomat.io/test-reporting/frameworks/)
 
 ## Step 3: Configure Credentials
 
@@ -344,5 +379,3 @@ Agent: Run tests with: npx playwright test and push results to TMS
 | Import to TMS (Mocha) | `npx check-tests@latest Mocha "test/**/*_test.js"` |
 | Import to TMS (CodeceptJS) | `npx check-tests@latest CodeceptJS "tests/**_test.js"` |
 | Import to TMS (Python) | `pytest --testomatio sync` |
-| Import to TMS (Java) | `npx report-xml "target/surefire-reports/*.xml" --java-tests` |
-| Import to TMS (XML) | `npx report-xml "report.xml" --lang java` |
