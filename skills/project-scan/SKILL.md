@@ -93,10 +93,9 @@ Detect source via:
 
 **IMPORTANT:** 
 > `projectFrameworks` = application frameworks (MANDATORY if source exists AND has code files)
-- **`app/`, `src/`, `frontend/` with HTML/CSS only** (no framework deps) - `projectFrameworks: HTML/CSS (simple project)`
-- **If source folder exists BUT is empty OR has no code files** - STOP and ask user:
-- **If source folder like `app/`, `src/`, `frontend/` empty** - STOP and ask user:
-- **If source directories NOT found** - STOP and ask user:
+- **`app/`, `src/`, `frontend/` with HTML/CSS only** (no framework deps) - `projectFrameworks: ["HTML", "CSS"]`
+- **If NO valid source files are found** in any of: `app/`, `src/`, `backend/`, `frontend/`, `lib/`, `packages/`
+=> STOP and Ask the user:
 
 ```
 ❓ No application source code detected (folder may be empty or missing).
@@ -137,19 +136,30 @@ Output to `.testclaw-context/scan-result.json`:
 
 ```json
 {
-  "name": "project-name",
-  "description": "...",   // Based on the {projectFrameworks} info
+  "name": "...",
+  "description": "...",
   "languages": ["typescript", "javascript"],
-  "projectFrameworks": ["..."],  // Application frameworks (source folders) - (mandatory)
-  "testFrameworks": ["Playwright"],     // Test frameworks (optional)
+  "projectFrameworks": ["..."],
+  "testFrameworks": ["Playwright"],
   "estimatedComplexity": "small",
   "totalFiles": 12
 }
 ```
 
+[Field notes:
+* "name" - Project root folder name or repo name.
+* "description" - 1-2 sentence summary based ONLY on: detected source code and folder structure.
+* "projectFrameworks" - Application frameworks (mandatory, must be explicitly detected).
+* "testFrameworks" - Testing tools (optional, include only if present).
+* "estimatedComplexity" - One of: "small" | "moderate" | "large" | "very-large", based on file count + structure.
+* "totalFiles" - Total number of relevant source files]
+
 **Important:** 
-- `projectFrameworks` = app frameworks (MANDATORY)
-- `testFrameworks` = testing tools (OPTIONAL)
+- `projectFrameworks` = app frameworks (MANDATORY).
+- `testFrameworks` = testing tools (OPTIONAL).
+- Do NOT guess or infer missing data.
+- Do NOT add fields not defined in the schema.
+- All values must come from observable files.
 
 **Show a summary** based on scan results.
 
@@ -199,11 +209,11 @@ Merge all results into `.testclaw-context/scan-result.json`:
 
 ```json
 {
-  "name": "project-name",
-  "description": "...",   // Based on the {projectFrameworks} info
+  "name": "...",
+  "description": "...",
   "languages": ["typescript", "javascript"],
-  "projectFrameworks": ["React", "Vite"],        // Application frameworks (mandatory)
-  "testFrameworks": ["Playwright"],     // Test frameworks (optional)
+  "projectFrameworks": ["React", "Vite"],
+  "testFrameworks": ["Playwright"],
   "estimatedComplexity": "moderate",
   "totalFiles": 42,
   "testCounts": {
@@ -217,7 +227,11 @@ Merge all results into `.testclaw-context/scan-result.json`:
   ]
 }
 ```
-**(This `scan-result.json` file must includes full list of available tests)**
+[Extra Field nNtes:
+* "testCounts" - Count only clearly identified tests (no guessing).
+* "manualTests" - Preserve hierarchy as plain strings (no restructuring)]
+
+**(This `scan-result.json` file must includes full list of available tests, if detect it)**
 
 **Important:** 
 - `projectFrameworks` = application frameworks (React, Vue, Express, Django, etc.)
