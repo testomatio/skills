@@ -99,30 +99,32 @@ npx check-tests pull -d manual-tests --keep-structure
 
 ### Push
 
-Send local Markdown test updates to Testomat.io.
+Send local Markdown test updates to Testomat.io. (Equivalent to `check-tests manual <files> --update-ids`.)
 
 ```bash
 npx check-tests push [options]
-# or if installed locally
-./node_modules/.bin/check-tests push [options]
 ```
+
+`--files` (alias `-f`) accepts file paths, glob patterns, or a mix; defaults to `**/*.test.md`. Paths resolve relative to `--dir`. Quote globs.
+
+**Best practice:** when the files to push are known, list them explicitly via `--files` rather than relying on the default glob.
 
 **Examples:**
 
 ```bash
-# Import tests from current directory
+# Default glob (**/*.test.md)
 npx check-tests push
 
-# Import tests from specific folder
-npx check-tests push -d manual-tests
+# Specific files
+npx check-tests push -f docs/login.test.md docs/checkout.test.md
 
-# Remove empty suites after import
-npx check-tests push --no-empty
+# Glob (quoted)
+npx check-tests push --files "manual-tests/**/*.test.md"
 
-# With prepend directory
-TESTOMATIO_PREPEND_DIR=backend-tests npx check-tests push
+# Multiple globs
+npx check-tests push -f "smoke/**/*.test.md" "regression/**/*.test.md"
 
-# Apply labels to all imported tests
+# With labels
 TESTOMATIO_LABELS=smoke,updated npx check-tests push
 ```
 
@@ -130,9 +132,11 @@ TESTOMATIO_LABELS=smoke,updated npx check-tests push
 
 ## Quick Reference
 
-| Action | Command |
-|--------|---------|
-| Pull tests | `npx check-tests pull -d <dir>` |
-| Push tests | `npx check-tests push -d <dir>` |
-| With labels | `TESTOMATIO_LABELS=smoke npx check-tests push` |
-| Keep structure | `npx check-tests pull --keep-structure` |
+| Action          | Command                                                        |
+| --------------- | -------------------------------------------------------------- |
+| Pull tests      | `npx check-tests pull -d <dir>`                                |
+| Push files      | `npx check-tests push --files <file1.test.md> <file2.test.md>` |
+| Push glob       | `npx check-tests push --files "<dir>/**/*.test.md"`            |
+| Push directory  | `npx check-tests push -d <dir>` (glob: `**/*.test.md`)         |
+| With labels     | `TESTOMATIO_LABELS=smoke npx check-tests push`                 |
+| Keep structure  | `npx check-tests pull --keep-structure`                        |

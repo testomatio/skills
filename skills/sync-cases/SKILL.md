@@ -119,21 +119,22 @@ labels: ...
 
 ```
 
-#### Sync Changes
+**Command:**
+```bash
+npx check-tests push [-d <directory>] [--files <files...>]
+```
 
-Analyze local changes in test cases and determine what has changed:
-- Only content updates.
-- New test cases added.
-- Mixed changes (updates + new tests).
-
-> Use: `npx check-tests push` to **synchronize** local tests with the TMS (including automatic test ID assignment when needed).
+**IMPORTANT:** When the files to push are known (e.g. just produced by `generate-cases` / `improve-test-cases`), pass them explicitly via `--files` (alias `-f`). Without `--files` the CLI falls back to the default glob `**/*.test.md`, which may pick up unrelated files. Quote glob patterns. Paths resolve relative to `--dir`.
 
 **Examples:**
 ```bash
-# Push updated/newly created test cases to TMS
-npx check-tests push
+# Specific files (preferred when known)
+npx check-tests push --files manual-tests/login.test.md manual-tests/checkout.test.md
 
-# Push tests from manual-tests folder
+# Custom glob
+npx check-tests push --files "manual-tests/**/*.test.md"
+
+# Default glob (**/*.test.md) under -d
 npx check-tests push -d manual-tests
 ```
 
@@ -214,8 +215,10 @@ Use sync-cases to push tests to Testomat.io
 
 ## Quick Commands
 
-| Action | Command |
-|--------|---------|
-| Install | `npm install check-tests --save-dev` |
-| Pull | `npx check-tests pull -d <directory>` |
-| Push | `npx check-tests push -d <directory>` |
+| Action          | Command                                                        |
+| --------------- | -------------------------------------------------------------- |
+| Install         | `npm install check-tests --save-dev`                           |
+| Pull            | `npx check-tests pull -d <directory>`                          |
+| Push (files)    | `npx check-tests push --files <file1.test.md> <file2.test.md>` |
+| Push (glob)     | `npx check-tests push --files "<dir>/**/*.test.md"`            |
+| Push (default)  | `npx check-tests push -d <directory>` (glob: `**/*.test.md`)   |
