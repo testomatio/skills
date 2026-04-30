@@ -118,7 +118,7 @@ Gather all information about the feature/functionality being tested from:
 - Requirements documents (Confluence, etc.)
 - Design mockups (Figma, Miro, etc.)
 - Existing test cases (Test Management tools like TestRail, Testomat, etc.)
-- Testomat.io TMS (if available via MCP)
+- Testomat.io TMS (if available via MCP or `sync-cases` skill)
 
 - **Source code**
   - Existing manual test files in the project.
@@ -330,6 +330,8 @@ Show the generated files list and destination folder.
 
 Ask user to review generated files and ask if he want to change something to achieve the satisfactory result.
 
+Suggest user to upload generated test cases to Testomat.io via `sync-cases` skill.
+
 ## Output formats
 
 ### Checklist format (displayed in terminal)
@@ -384,6 +386,7 @@ When the user provides an existing test cases example and/or asks for "similar" 
 6. Display checklist in terminal and ask for user approval
    - ask about amount of cases / level of details (more, less, keep as is)
 7. On approval, generate detailed test cases for feature X and save to `feature-x.test.md`
+8. Suggest user to upload generated test cases to Testomat.io via `sync-cases` skill
 
 ### Example 2
 
@@ -402,3 +405,4 @@ When the user provides an existing test cases example and/or asks for "similar" 
 6. Display checklist in terminal and ask for user approval
    - ask if user wants to proceed
    - ask about amount of cases / level of details (more, less, keep as is)
+7. Suggest user to upload generated checklist to Testomat.io via `sync-cases` skill
