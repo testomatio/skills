@@ -1,6 +1,10 @@
 ---
 name: sync-cases
-description: Synchronize test scenarios and cases between a local project and Testomat.io. Use this skill whenever the user wants to pull/export/download tests from Testomat.io; or push/import/sync updated test cases back to the TMS. Supports custom directories, markdown test format and advanced import/export workflows.
+description: Synchronize test scenarios and cases between a local project and Testomat.io. Use this skill whenever the user wants to pull/export/download tests from Testomat.io; or push/import/sync new or updated test cases back to the TMS in corresponding `*.test.md` format. Supports custom directories, markdown test format and advanced import/export workflows.
+inputs:
+  testDir:
+    description: "Target directory for pulled tests (default: `manual-cases`)"
+    required: false
 license: MIT
 metadata:
   author: Testomat.io
@@ -22,7 +26,7 @@ Trigger this skill when user wants to:
 - **Pull/Export/Download** tests from Testomat.io to local Markdown files.
 - **Push/Upload/Import** local Markdown tests to Testomat.io.
 - Bulk edit manual tests or refactor test cases in local files and upload to TMS.
-- Synchronize test cases between local `.md` files and TMS (Testomat.io).
+- Synchronize test cases between local `*.test.md` files and TMS (Testomat.io).
 - **Sync** test cases with the remote version in TMS (Testomat.io).
 - Cover user bulk edit workflow: pull cases -> edit test cases -> push cases to TMS.
 
@@ -75,7 +79,7 @@ Download/Retrieves test scenarios from Testomat.io and saves them as Markdown fi
 - Refactor test cases offline.
 
 **Pre-Pull:**
-- Ensure `testDir` exists; otherwise create `manual-tests` folder.
+- Ensure `testDir` exists; otherwise create `manual-cases` folder in root.
 
 **Command:**
 ```bash
@@ -86,25 +90,38 @@ npx check-tests pull -d <directory>
 
 **Examples:**
 ```bash
-# Pull tests to default manual-tests folder
-npx check-tests pull -d manual-tests
+# Pull tests to default manual-cases folder
+npx check-tests pull -d manual-cases
 ```
 
 **More examples** you can find in "Pull" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
 
 #### Push Changes
 
-Uploads/Imports local Markdown tests into Testomat.io.
+Uploads/Imports local Markdown tests into Testomat.io:
+- Upload only test case files.
+- Avoid uploading any project documentation/requirements files in `.md` format.
 
 **Use Cases:**
 - Mass create test cases in Testomat.io from markdown files.
 - Import bulk-edited tests back to TMS.
 - Sync refactored test cases to Testomat.io.
 
+**Pre-Push File Filtering**
+
+Before uploading, scan the project/target folder and **include only**:
+- Files matching `*.test.md` pattern.
+- Files containing valid test blocks: `<!-- test ... -->` markers.
+
+**Exclude** all other `.md` files — especially:
+- `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`.
+- Project documentation (`docs/requirements.md`, `architecture.md`, etc.).
+
+> If a directory contains mixed content, skip documentation files and upload only test case files.
+
 **Pre-Push Validation:**
-1. Ensure a new test cases was created by user.
-2. Ensure at least one test `.test.md` file exists
-3. Ensure file contains valid test blocks:
+1. Ensure at least one test `*.test.md` file exists.
+2. Ensure file contains valid test blocks:
 
 ```md
 <!-- test
@@ -121,7 +138,7 @@ labels: ...
 
 #### Sync Changes
 
-Analyze local changes in test cases and determine what has changed:
+Analyze local changes in test cases files (`*.test.md`) and determine what has changed:
 - Only content updates.
 - New test cases added.
 - Mixed changes (updates + new tests).
@@ -133,8 +150,8 @@ Analyze local changes in test cases and determine what has changed:
 # Push updated/newly created test cases to TMS
 npx check-tests push
 
-# Push tests from manual-tests folder
-npx check-tests push -d manual-tests
+# Push tests from manual-cases folder
+npx check-tests push -d manual-cases
 ```
 
 **More examples** you can find in "Push" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
@@ -157,7 +174,7 @@ After completing sync operations, output a short log-style summary:
 ```
 Sync Complete:
 - Action: pull/push
-- Directory: manual-tests
+- Directory: manual-cases
 - Tests synced: 15
 - Status: Success
 ```
@@ -197,7 +214,7 @@ Stop execution if:
 
 **Pull tests:**
 ```
-Use sync-cases skill to pull tests from Testomat.io in folder manual-tests
+Use sync-cases skill to pull tests from Testomat.io in folder "beta-tests/"
 ```
 
 **Push tests:**
