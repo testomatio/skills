@@ -59,15 +59,12 @@ _( Project path example by "project-id": `https://app.testomat.io/projects/<proj
 
 ### Step 2: Pull or Push Operations
 
-#### Ensure check-tests Package Installed
+#### Always use latest version of check-tests
 
-Ensure the `check-tests` package is available in the project before running `pull`, `push` or `sync` commands.
-- If `check-tests` is already installed, **reuse the existing version**.
-- If `check-tests` is **not installed**, install it:
-
-```bash
-npm install check-tests --save-dev --no-audit --no-fund
-```
+Use `npx` to invoke `check-tests` so users automatically pick up the newest version from npm.
+- Do **not** install `check-tests` as a project dependency.
+- **The very first `check-tests` call in the current agent session must be invoked as `npx check-tests@latest …`** to force npx to resolve and install the latest version from the registry.
+- **All subsequent calls** in the same session use the plain form (`npx check-tests …`) shown in the examples below — npx reuses the just-cached version, so no extra registry round-trip.
 
 #### Pull Changes
 
@@ -84,8 +81,6 @@ Download/Retrieves test scenarios from Testomat.io and saves them as Markdown fi
 **Command:**
 ```bash
 npx check-tests pull -d <directory>
-# or if installed locally
-./node_modules/.bin/check-tests pull -d <directory>
 ```
 
 **Examples:**
@@ -238,6 +233,5 @@ Use sync-cases to push tests to Testomat.io
 
 | Action | Command |
 |--------|---------|
-| Install | `npm install check-tests --save-dev` |
 | Pull | `npx check-tests pull -d <directory>` |
 | Push | `npx check-tests push -d <directory>` |
