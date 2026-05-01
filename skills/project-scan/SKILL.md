@@ -68,6 +68,7 @@ Scan user's project and collect:
 **Skip these entirely during scanning.**
 [**If in doubt**, prefer excluding over including non-source files.]
 
+// TODO: 3. **Detect Stack Technologies** — combine all code tech: source code, test frameworks, services, etc ????
 3. **Detect frameworks** — separate project and test frameworks:
 
 **PRIORITY: Project source code FIRST (mandatory), test frameworks SECOND (optional)**
@@ -96,6 +97,8 @@ Detect source via:
 - **`app/`, `src/`, `frontend/` with HTML/CSS only** (no framework deps) - `projectFrameworks: ["HTML", "CSS"]`
 - **If NO valid source files are found** in any of: `app/`, `src/`, `backend/`, `frontend/`, `lib/`, `packages/`
 => STOP and Ask the user:
+
+// TODO: IF no source code / frameworks or empty folders detected -> ask user???
 
 ```
 ❓ No application source code detected (folder may be empty or missing).
@@ -139,12 +142,14 @@ Output to `.testclaw-context/scan-result.json`:
   "name": "...",
   "description": "...",
   "languages": ["typescript", "javascript"],
-  "projectFrameworks": ["..."],
+  "projectFrameworks": ["..."], 
   "testFrameworks": ["Playwright"],
   "estimatedComplexity": "small",
   "totalFiles": 12
 }
 ```
+TODO: don't split by projectFrameworks & testFrameworks - list as one array of all available frameworks in pne place
+- this should fix mandatory/optional confusing???
 
 [Field notes:
 * "name" - Project root folder name or repo name.
