@@ -1,6 +1,10 @@
 ---
 name: sync-cases
-description: Synchronize test scenarios and cases between a local project and Testomat.io. Use this skill whenever the user wants to pull/export/download tests from Testomat.io; or push/import/sync updated test cases back to the TMS. Supports custom directories, markdown test format and advanced import/export workflows.
+description: Synchronize test scenarios and cases between a local project and Testomat.io. Use this skill whenever the user wants to pull/export/download tests from Testomat.io; or push/import/sync new or updated test cases back to the TMS in corresponding `*.test.md` format. Supports custom directories, markdown test format and advanced import/export workflows.
+inputs:
+  testDir:
+    description: "Target directory for pulled tests (default: `manual-cases`)"
+    required: false
 license: MIT
 metadata:
   author: Testomat.io
@@ -22,7 +26,7 @@ Trigger this skill when user wants to:
 - **Pull/Export/Download** tests from Testomat.io to local Markdown files.
 - **Push/Upload/Import** local Markdown tests to Testomat.io.
 - Bulk edit manual tests or refactor test cases in local files and upload to TMS.
-- Synchronize test cases between local `.md` files and TMS (Testomat.io).
+- Synchronize test cases between local `*.test.md` files and TMS (Testomat.io).
 - **Sync** test cases with the remote version in TMS (Testomat.io).
 - Cover user bulk edit workflow: pull cases -> edit test cases -> push cases to TMS.
 
@@ -55,15 +59,12 @@ _( Project path example by "project-id": `https://app.testomat.io/projects/<proj
 
 ### Step 2: Pull or Push Operations
 
-#### Ensure check-tests Package Installed
+#### Always use latest version of check-tests
 
-Ensure the `check-tests` package is available in the project before running `pull`, `push` or `sync` commands.
-- If `check-tests` is already installed, **reuse the existing version**.
-- If `check-tests` is **not installed**, install it:
-
-```bash
-npm install check-tests --save-dev --no-audit --no-fund
-```
+Use `npx` to invoke `check-tests` so users automatically pick up the newest version from npm.
+- Do **not** install `check-tests` as a project dependency.
+- **The very first `check-tests` call in the current agent session must be invoked as `npx check-tests@latest …`** to force npx to resolve and install the latest version from the registry.
+- **All subsequent calls** in the same session use the plain form (`npx check-tests …`) shown in the examples below — npx reuses the just-cached version, so no extra registry round-trip.
 
 #### Pull Changes
 
@@ -75,36 +76,47 @@ Download/Retrieves test scenarios from Testomat.io and saves them as Markdown fi
 - Refactor test cases offline.
 
 **Pre-Pull:**
-- Ensure `testDir` exists; otherwise create `manual-tests` folder.
+- Ensure `testDir` exists; otherwise create `manual-cases` folder in root.
 
 **Command:**
 ```bash
 npx check-tests pull -d <directory>
-# or if installed locally
-./node_modules/.bin/check-tests pull -d <directory>
 ```
 
 **Examples:**
 ```bash
-# Pull tests to default manual-tests folder
-npx check-tests pull -d manual-tests
+# Pull tests to default manual-cases folder
+npx check-tests pull -d manual-cases
 ```
 
 **More examples** you can find in "Pull" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
 
 #### Push Changes
 
-Uploads/Imports local Markdown tests into Testomat.io.
+Uploads/Imports local Markdown tests into Testomat.io:
+- Upload only test case files.
+- Avoid uploading any project documentation/requirements files in `.md` format.
 
 **Use Cases:**
 - Mass create test cases in Testomat.io from markdown files.
 - Import bulk-edited tests back to TMS.
 - Sync refactored test cases to Testomat.io.
 
+**Pre-Push File Filtering**
+
+Before uploading, scan the project/target folder and **include only**:
+- Files matching `*.test.md` pattern.
+- Files containing valid test blocks: `<!-- test ... -->` markers.
+
+**Exclude** all other `.md` files — especially:
+- `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`.
+- Project documentation (`docs/requirements.md`, `architecture.md`, etc.).
+
+> If a directory contains mixed content, skip documentation files and upload only test case files.
+
 **Pre-Push Validation:**
-1. Ensure a new test cases was created by user.
-2. Ensure at least one test `.test.md` file exists
-3. Ensure file contains valid test blocks:
+1. Ensure at least one test `*.test.md` file exists.
+2. Ensure file contains valid test blocks:
 
 ```md
 <!-- test
@@ -138,6 +150,11 @@ npx check-tests push --files "manual-tests/**/*.test.md"
 npx check-tests push -d manual-tests
 ```
 
+**Important constraints:**
+- Only use options explicitly documented in this skill or in the "Testomat.io CLI Documentation" ref file.
+- If you are unsure about available CLI options, run `npx check-tests --help` and use only options listed there.
+- Do **not** use an option unless it is mentioned in the documentation or in the `--help` option (e.g., `--pattern`, `--forces`).
+
 **More examples** you can find in "Push" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
 
 #### Labels Handling (Intent-Based)
@@ -158,7 +175,7 @@ After completing sync operations, output a short log-style summary:
 ```
 Sync Complete:
 - Action: pull/push
-- Directory: manual-tests
+- Directory: manual-cases
 - Tests synced: 15
 - Status: Success
 ```
@@ -190,7 +207,7 @@ Stop execution if:
 
 | Description                  | File                                |
 | ---------------------------- | ----------------------------------- |
-| Testomat.io CLI Commands     | ./references/TESTOMATIO_CLI.md     |
+| Testomat.io CLI Commands     | ./references/TESTOMATIO_CLI.md      |
 
 ---
 
@@ -198,7 +215,7 @@ Stop execution if:
 
 **Pull tests:**
 ```
-Use sync-cases skill to pull tests from Testomat.io in folder manual-tests
+Use sync-cases skill to pull tests from Testomat.io in folder "beta-tests/"
 ```
 
 **Push tests:**
