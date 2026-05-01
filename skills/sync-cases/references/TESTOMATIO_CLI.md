@@ -6,23 +6,19 @@ This document provides comprehensive information about the `check-tests` CLI too
 
 ## Prerequisites
 
-### Install check-tests Package
+### Run check-tests via npx (always latest)
 
-Install `check-tests` as a local dependency to avoid security warnings from `npx`:
+Invoke `check-tests` through `npx` so users automatically pick up the newest published version:
 
 ```bash
-npm install check-tests --save-dev
-```
+# First invocation in the agent session — forces resolve of latest
+npx check-tests@latest <command>
 
-Then use the local binary:
-```bash
-./node_modules/.bin/check-tests <command>
-```
-
-Or use npx with the local installation:
-```bash
+# Subsequent invocations in the same session could be used without @latest
 npx check-tests <command>
 ```
+
+Do not install `check-tests` as a project dependency. The first call (with `@latest` version specified) refreshes the npx cache; next calls in the same session reuse it without an extra registry round-trip. A new agent session re-triggers the `@latest` check so users use the latest version over time.
 
 ---
 
@@ -80,8 +76,6 @@ Retrieve the latest test scenarios from Testomat.io and save them as Markdown fi
 
 ```bash
 npx check-tests pull [options]
-# or if installed locally
-./node_modules/.bin/check-tests pull [options]
 ```
 
 **Examples:**
@@ -103,8 +97,6 @@ Send local Markdown test updates to Testomat.io.
 
 ```bash
 npx check-tests push [options]
-# or if installed locally
-./node_modules/.bin/check-tests push [options]
 ```
 
 **Examples:**
