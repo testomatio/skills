@@ -47,7 +47,7 @@ Based on the detected language, identify the specific test framework:
 
 #### Python
 - **pytest** => `pytest.ini`, `conftest.py`.
-- **Robot Framework** => `.robot`, `robot.toml/yaml`.
+- **Robot Framework** => `.robot`, `robot.toml` (TOML or YAML config).
 
 #### Java
 - **JUnit or TestNG** => `pom.xml` with testng dependency, `junit.jupiter`, `testng.xml`.
