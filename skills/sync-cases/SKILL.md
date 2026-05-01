@@ -155,8 +155,9 @@ npx check-tests push -d manual-cases
 ```
 
 **Important constraints:**
-- Only use options that are explicitly documented in this skill or in the "Testomat.io CLI Documentation" ref file.
-- Do **not** assume support for undocumented options, like: `--pattern`, `--forces`, etc.
+- Only use options explicitly documented in this skill or in the "Testomat.io CLI Documentation" ref file.
+- If you are unsure about available CLI options, run `npx check-tests --help` and use only options listed there.
+- Do **not** use an option unless it is mentioned in the documentation or in the `--help` option (e.g., `--pattern`, `--forces`).
 
 **More examples** you can find in "Push" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
 
