@@ -42,26 +42,22 @@ Based on the detected language, identify the specific test framework:
 #### JavaScript / TypeScript
 - **Playwright** => `playwright.config.ts`, `playwright.config.js`.
 - **CodeceptJS** => `codecept.conf.js`, `codecept.config.js`.
-- **Jest** => `jest.config.js`, `jest.config.ts`.
-- **Mocha** => `mocha.opts`, `.mocharc.*`.
 - **WebdriverIO** => `wdio.conf.js`, `wdio.conf.ts`.
+- **Jest or Mocha** => `jest.config.js`, `jest.config.ts`, `mocha.opts`, `.mocharc.*`.
 
 #### Python
-- **pytest** => `pytest.ini`, `pyproject.toml`, `conftest.py`
-- **unittest** => standard Python unittest
+- **pytest** => `pytest.ini`, `conftest.py`.
+- **Robot Framework** => `.robot`, `robot.toml/yaml`.
 
 #### Java
-- **JUnit** => `pom.xml` with junit dependency, `junit.jupiter`
-- **TestNG** => `testng.xml`
+- **JUnit or TestNG** => `pom.xml` with testng dependency, `junit.jupiter`, `testng.xml`.
 
 #### Other
-- **XML/JUnit** => XML report files for C#, PHP, Ruby, etc.
-
-> If the framework is unclear, inspect the repository structure, dependencies, configuration files to determine which framework is used or ask the user which framework the project uses.
+- **XML** => XML report files for C#, PHP, Ruby, etc.
 
 **If language and framework detected:**
 - Proceed to Step 2 (Install reporter).
-- Configure based on detected language and framework.
+- Auto-configure based on detected language and framework.
 
 **If no framework and Config detected:**
 Ask user in "Interactive Setup" mode:
@@ -69,15 +65,13 @@ Ask user in "Interactive Setup" mode:
 ```
 ❓ No test framework was detected in your project.
 
-Detected Program Language: ...
+To continue, please choose how to proceed.
 
-To continue, please choose how to proceed:
-
-**Specify a framework manually**. Available frameworks for [LANGUAGE]:  
-  - JavaScript/TypeScript: Playwright, CodeceptJS, WebdriverIO, Jest, Mocha
-  - Python: pytest, unittest
-  - Java: JUnit, TestNG
-  - Other: XML/JUnit format
+**Specify a framework manually:**  
+- JavaScript/TypeScript: Playwright, CodeceptJS, WebdriverIO, Jest.
+- Python: Pytest, Robot Framework.
+- Java: JUnit, TestNG, Cucumber, Karate.
+- ✏️ Specify a framework name manually: Playwright, XML format, etc.
 ```
 
 > Move to Step 2 (Install reporter) after filling all gaps.
@@ -89,7 +83,7 @@ After completing language and framework detection and/or interactive setup, outp
 - Program Language: ...
 - Test Framework: ...
 - Config file found: ...
-- Testomatio API key source (`.env` / user input / missing).
+- Testomatio API key source: ... (`.env` / user input / missing).
 ```
 
 ---
@@ -161,7 +155,7 @@ mocha --reporter @testomatio/reporter/mocha --reporter-options apiKey=tstmt_xxx
 
 ---
 
-### Python
+### Python by pytestomatio
 
 Use `pytestomatio` plugin for pytest-based Python projects.
 
@@ -175,35 +169,94 @@ pip install pytestomatio
 
 ```bash
 # Sync tests with Testomat.io
-TESTOMATIO={API_KEY} pytest --testomatio sync
+pytest --testomatio sync
 
 # Run and report tests
-TESTOMATIO={API_KEY} pytest --testomatio report
+pytest --testomatio report
 ```
 
 > Full documentation: [Testomat.io Python Reporting](https://docs.testomat.io/test-reporting/python/)
 
 ---
 
+### Python by Robot Framework
+
+Use specific Robot Framework instruction to configure.
+
+#### Install
+
+```bash
+pip install robot-framework-reporter
+```
+
+#### Configure & Run
+
+```bash
+# Sync tests with Testomat.io
+robot --listener Testomatio.Import path/to/tests
+
+# Run and report tests
+robot --listener Testomatio.Report path/to/tests
+```
+
+**IMPORTANT:** Use `pip3` if Python `2.x` and `3.x` coexist.
+
+---
+
 ### Java
 
-Use JUnit XML reports with `@testomatio/reporter` for Java test frameworks (JUnit, TestNG).
+Use the appropriate `@testomatio/reporter` for Java test frameworks (JUnit, TestNG).
 
-#### Generate XML Report
+#### Install
+
+Check JDK version and **Install** if not already installed:
+
+```bash
+# macOS
+brew install openjdk
+
+# Ubuntu
+sudo apt install openjdk
+```
+
+(On Windows: download and install JDK, then set environment variables.)
+
+#### Configure
+
+Add the dependency for your framework:
+
+* **TestNG:**
+
+```xml
+<dependency>
+  <groupId>io.testomat</groupId>
+  <artifactId>java-reporter-testng</artifactId>
+</dependency>
+```
+
+* **JUnit:**
+
+```xml
+<dependency>
+  <groupId>io.testomat</groupId>
+  <artifactId>java-reporter-junit</artifactId>
+</dependency>
+```
+
+* **Karate:**
+
+```xml
+<dependency>
+  <groupId>io.testomat</groupId>
+  <artifactId>java-reporter-karate</artifactId>
+</dependency>
+```
+
+#### Run
 
 ```bash
 mvn clean test
 ```
-
-#### Import to Testomat.io
-
-```bash
-TESTOMATIO={API_KEY} npx report-xml "target/surefire-reports/*.xml" --java-tests
-```
-
-- Use `--java-tests` flag when tests are in a non-standard location
-- Test IDs in test names: `test name @T8acca9eb`
-- File attachments: print `file://{path}` to stdout, Test ID: `tid://@T8acca9eb`
 
 > Full documentation: [Testomat.io Java/JUnit Reporting](https://docs.testomat.io/test-reporting/junit/)
 
@@ -323,6 +376,7 @@ TESTOMATIO=tstmt_xxxxx npx playwright test --grep "@smoke"
 | ---------------------- | ------------------------------------------- |
 | Reporter Configuration | https://docs.testomat.io/test-reporting/frameworks/ |
 | Python Test Reporting  | https://docs.testomat.io/test-reporting/python/ |
+| Python Robot Framework | https://github.com/testomatio/robot-framework-reporter/blob/master/README.md |
 | Java/JUnit Reporting   | https://docs.testomat.io/test-reporting/junit/ |
 | HTML Pipe              | ./references/TESTOMATIO_HTML_REPORT.md |
 | Debug Pipe | `TESTOMATIO_DEBUG=1 <test-command>` |
