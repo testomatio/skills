@@ -6,7 +6,7 @@ AI skills for test management workflows with [Testomat.io](https://testomat.io).
 
 `npx skills add testomatio/skills`
 
-## Installation
+## Install
 
 The easiest way to install these skills across supported AI agent (Cursor, Claude Code, VS Code / GitHub Copilot, Cline etc.) is using the [`skills`](https://skills.sh) CLI. It provides an interactive menu to select the skills you need and choose whether to install them globally or for your current project.
 
@@ -20,7 +20,7 @@ To update your installed skills:
 npx skills update
 ```
 
-For other ways of installation see [installation details](./docs/install-details.md).
+For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [install details](./docs/install-details.md).
 
 ## Available Skills
 
