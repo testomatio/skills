@@ -124,7 +124,7 @@ Gather all information about the feature/functionality being tested from:
   - Existing manual test files in the project.
   - Automated test files (spec, test, cy files, etc).
   - Project structure.
-  - Search for test-related directories such as: `tests`, `manual-tests`, `manual`, `qa`, `spec` or similarly named folders.
+  - Search for test-related directories such as: `manual-tests`, `tests`, `manual`, `qa`, `spec` or similarly named folders.
   - Within those directories, look specifically for Markdown-based test files, especially files ending with `.test.md` or `.md`
 
 This information could be available as text files (copy-pasted), via links or via MCP tools. Use MCP when required and reasonable. Ask user for mcp configuration if needed.
