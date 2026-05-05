@@ -15,15 +15,14 @@ Test Scanner Journey:
 - Analyze source code structure in project root.
 - Detect programming languages used.
 - Identify test frameworks (automated tests).
+  * Avoid deep parsing unit test and integration system files.
 - Inventory manual test cases from `.test.md` files.
 - Generate project scan JSON for test planning.
 
 **CONSTRAINT (large projects):**
-For large codebases, do not perform deep analysis:
-- Do not resolve full imports/dependencies.
-- Do not analyze code line-by-line.
-- Do not infer complex code relationships.
-Focus only on high-level structure.
+- Do not perform deep analysis: no full import resolution, no line‑by‑line parsing, no inference of complex code relationships. 
+
+**Focus only on high‑level structure**.
 
 ## When to Use
 
@@ -37,96 +36,67 @@ Trigger this skill when user wants to:
 
 ## Workflow: Scan Project (QA-Focused)
 
-### Step 1: Setup Context
+### Step 1: Understand Project Context
 
-Scan root dir and create `.testclaw-context/code/` **only if missing**:
+Scan root dir to understand which files we will analyze in the future:
 
-```bash
-mkdir -p .testclaw-context/code
+**Option-1** 
+- If folder includes NON empty source code folders, files => Go to "Step 2".
+
+**Option-2** 
+- If **no source** files are found in any of the listed directories, halt scanning and ask the user:
+
 ```
+❓ No application source code detected (folder may be empty or missing).
+Where is the source code?
+1. Use local project from another folder (I will create a symlink)
+2. Clone from Git repo
+3. I don't know yet (stop here)
+```
+[Waits for the user’s reply.]
+
+- If user provides `Git repo` or `another folder` variant => Check if cache directory `.testclaw-context/code` already exists. If not, create it and save files or symlink to this `code/` folder.
+*The command is a no‑op when the directory already exists.*
 
 ---
 
 ### Step 2: Project Analysis (Simplified)
 
-Scan user's project and collect:
+Scan the project and collect a list of **source code files only**.
 
-1. **Discover files** - Use the most appropriate method based on project context:
-- Prefer `git ls-files` if the project is a Git repository (respects `.gitignore`).
-- Otherwise, perform recursive file listing from project root.
+#### 1. Discover Files
 
-2. **Exclude non-source files and directories** - Apply the following exclusion rules:
-- **Dependency directories:** like `node_modules/`, `vendor/`, `.venv/`, `__pycache__/`.
-- **Build and generated artifacts:** like `dist/`, `build/`, `out/`, `target/`, `.next/`, `.cache/`, `.turbo/`.
-- **Coverage and reports:** `coverage/`, `reports/`.
-- **Lock and generated files:** like `*.lock`.
-- **Docker and Makefile files:** like `Dockerfile`.
-- **Ignored files:** Respect `.gitignore` if available.
-- **Configuration and env files:** like `.git/`, `.env`, `tsconfig.json`.
-- **TestClaw agent source files and prompts**: like `session-factory.ts`, `system-prompt.ts`
+- Traverse the project directory.
+- Collect file paths only (**Do NOT read file contents at this point**).
 
-**Skip these entirely during scanning.**
+#### 2. Filter to Source Code
+
+Include:
+- Application source files (e.g. `.js`, `.ts`, `.py`, `.java`, `.go`, etc.).
+
+Exclude:
+- Dependencies (e.g. `node_modules/`, `vendor/`, `.venv/`).
+- Build/generated output (e.g. `dist/`, `build/`, `.next/`, `target/`).
+- Coverage, reports, caches, config, lock, and environment files.
+- Ignored paths from `.gitignore`.
+- TestClaw internal files (e.g. `session-factory.ts`, `system-prompt.ts`).
 [**If in doubt**, prefer excluding over including non-source files.]
 
-// TODO: 3. **Detect Stack Technologies** — combine all code tech: source code, test frameworks, services, etc ????
-3. **Detect frameworks** — separate project and test frameworks:
+#### 3. Detect Tech Stack
 
-**PRIORITY: Project source code FIRST (mandatory), test frameworks SECOND (optional)**
+Infer program languages and frameworks from file extensions, structure, and config files. The result is a **single array** `frameworks` containing ALL observed application and testing frameworks.
 
-**A) Project Frameworks** (from source folders like app/, src/, backend/):
+#### 4. Extract Project Name
 
-| Config/Source | Framework |
-|----------------|------------|
-| `package.json` deps | React, Vue, Angular, Svelte, Next.js, Nuxt, Express, NestJS, Fastify, Koa |
-| `Cargo.toml` | Rust (actix, axum, rocket) |
-| `go.mod` | Go (gin, echo, fiber) |
-| `pyproject.toml` | Django, Flask, FastAPI |
-| `app/` folder | App code present |
-| `src/` folder | Source code present |
-| `backend/` folder | Backend structure |
-| `frontend/` folder | Frontend structure |
+- Use, in priority order:
+  1. Project config files (e.g. `package.json`, `Cargo.toml`).
+  2. Root directory name.
 
-**CRITICAL: Project source code MUST be accessible.**
+#### 5. Estimate Project Complexity
 
-Detect source via:
-- Directories: `app/`, `src/`, `backend/`, `frontend/`, `lib/`, `packages/`
-- MUST contain actual code files: `.ts`, `.js`, `.py`, `.go`, `.rs`, `.java`, `.html`, `.css`
+Based on total number of source files, choose one variant.
 
-**IMPORTANT:** 
-> `projectFrameworks` = application frameworks (MANDATORY if source exists AND has code files)
-- **`app/`, `src/`, `frontend/` with HTML/CSS only** (no framework deps) - `projectFrameworks: ["HTML", "CSS"]`
-- **If NO valid source files are found** in any of: `app/`, `src/`, `backend/`, `frontend/`, `lib/`, `packages/`
-=> STOP and Ask the user:
-
-// TODO: IF no source code / frameworks or empty folders detected -> ask user???
-
-```
-❓ No application source code detected (folder may be empty or missing).
-Where is the source code?
-
-- **1.** Use local project from another folder (I will create symlink)
-- **2.** Clone from Git repo
-- **3.** I don't know yet (STOP here)
-```
-[STOP and wait for user response].
-
-**Note:** Test files (playwright, vitest) are optional — project source comes FIRST.
-
-**B) Test Frameworks** (optional):
-
-| Config File | Test Framework |
-|-------------|-----------------|
-| `codecept.conf.js/ts` | CodeceptJS |
-| `playwright.config.ts` | Playwright |
-| `vitest.config.ts` | Vitest |
-| `jest.config.js` | Jest |
-| `pytest.ini`, `pyproject.toml` | pytest |
-
-> `testFrameworks` = testing tools (OPTIONAL)
-
-4. **Extract project name** from `package.json`, `Cargo.toml`, or directory name
-
-5. **Calculate complexity:**
+**Calculate complexity table:**
 
 | File Count | Complexity   |
 |------------|--------------|
@@ -135,33 +105,33 @@ Where is the source code?
 | 151-500    | `large`      |
 | 500+       | `very-large` |
 
-Output to `.testclaw-context/scan-result.json`:
+#### Output
+
+Save results to:
+- `scan-result.json` in the root directory if `.testclaw-context/` does NOT exist.
+- `.testclaw-context/scan-result.json`  if the cache folder already exists.
+
+**Example:**
 
 ```json
 {
   "name": "...",
   "description": "...",
-  "languages": ["typescript", "javascript"],
-  "projectFrameworks": ["..."], 
-  "testFrameworks": ["Playwright"],
+  "languages": ["javascript"],
+  "frameworks": ["..."],
   "estimatedComplexity": "small",
   "totalFiles": 12
 }
 ```
-TODO: don't split by projectFrameworks & testFrameworks - list as one array of all available frameworks in pne place
-- this should fix mandatory/optional confusing???
 
 [Field notes:
 * "name" - Project root folder name or repo name.
 * "description" - 1-2 sentence summary based ONLY on: detected source code and folder structure.
-* "projectFrameworks" - Application frameworks (mandatory, must be explicitly detected).
-* "testFrameworks" - Testing tools (optional, include only if present).
+* "frameworks" - Application frameworks, Testing tools, etc.
 * "estimatedComplexity" - One of: "small" | "moderate" | "large" | "very-large", based on file count + structure.
 * "totalFiles" - Total number of relevant source files]
 
 **Important:** 
-- `projectFrameworks` = app frameworks (MANDATORY).
-- `testFrameworks` = testing tools (OPTIONAL).
 - Do NOT guess or infer missing data.
 - Do NOT add fields not defined in the schema.
 - All values must come from observable files.
@@ -170,25 +140,23 @@ TODO: don't split by projectFrameworks & testFrameworks - list as one array of a
 
 ---
 
-### Step 4: Existing Tests Inventory
+### Step 3: Tests Inventory (optional)
 
-**A) Automated tests:**
+Detect existing tests (automated and manual).  
+This step is **shallow** - **Do NOT read full test implementations**.
 
-Detect test configs and count:
+### Automated Tests
 
-| Test Framework | Config File | Test Pattern |
-|---------------|------------|-------------|
-| CodeceptJS | `codecept.conf.js/ts` | `**/*.test.ts` |
-| Playwright | `playwright.config.ts` | `**/*.spec.ts` |
-| Vitest | `vitest.config.ts` | `**/*.test.ts` |
-| Jest | `jest.config.js` | `**/*.test.ts`, `**/*.spec.ts` |
-| pytest | `pytest.ini`, `pyproject.toml` | `**/*_test.py` |
-| Go | `*_test.go` files | `**/*_test.go` |
-| JUnit | `pom.xml`, `build.gradle` | `**/src/test/**` |
+Detect test automation frameworks using:
+- Config files (e.g. `jest.config.*`, `playwright.config.*`, `vitest.config.*`, `pytest.ini`, `pom.xml`, etc.).
+- Dependencies in project configs.
+- Common test file patterns (e.g. `*.test.*`, `*.spec.*`, `*_test.*`).
 
-Count files in each pattern.
+For each detected framework:
+- Identify test file patterns.
+- Count matching test files.
 
-**B) Manual tests:**
+### Manual Tests
 
 Find all `.test.md` files and parse test titles:
 
@@ -210,19 +178,18 @@ find . -name "*.test.md" -exec awk '
 
 ### Step 5: Final Output
 
-Merge all results into `.testclaw-context/scan-result.json`:
+Merge all results into previously created "scan-result" file (from "Step 2"):
 
 ```json
 {
   "name": "...",
   "description": "...",
-  "languages": ["typescript", "javascript"],
-  "projectFrameworks": ["React", "Vite"],
-  "testFrameworks": ["Playwright"],
-  "estimatedComplexity": "moderate",
-  "totalFiles": 42,
+  "languages": ["javascript"],
+  "frameworks": ["..."],
+  "estimatedComplexity": "small",
+  "totalFiles": 12,
   "testCounts": {
-    "automated": 25,
+    "automated": 20,
     "manual": 12
   },
   "manualTests": [
@@ -232,22 +199,17 @@ Merge all results into `.testclaw-context/scan-result.json`:
   ]
 }
 ```
-[Extra Field nNtes:
+
+[Extra Field Notes:
 * "testCounts" - Count only clearly identified tests (no guessing).
 * "manualTests" - Preserve hierarchy as plain strings (no restructuring)]
-
-**(This `scan-result.json` file must includes full list of available tests, if detect it)**
-
-**Important:** 
-- `projectFrameworks` = application frameworks (React, Vue, Express, Django, etc.)
-- `testFrameworks` = test tools (Playwright, Vitest, Jest, CodeceptJS, pytest, etc.)
 
 **Report a summary to the user:**
 * Provide a concise overview of the scan results (see example below).
 * Do not include full test listings.
 
 **Test listing constraint:**
-If manual/automated tests are included in output:
+If manual tests are included in output:
 - Limit displayed items to the first 25 entries.
 - Keep original file order.
 - Indicate truncation if more exist (e.g., `...and N more`).
@@ -259,12 +221,11 @@ If manual/automated tests are included in output:
 ```
 Scan Complete:
 - Project: ...
-- Languages: TypeScript
-- Project Frameworks: ... (mandatory)
-- Test Frameworks: Playwright (optional)
+- Languages: JavaScript
+- Frameworks: ...
 - Complexity: small (12 files)
-- Automated Tests: 2 files
-- Manual Tests: 9 cases
+- Automated Tests: 20 files
+- Manual Tests: 12 cases
 ```
 
 ---
@@ -304,15 +265,3 @@ What test frameworks exist in this project?
 ```
 List all automated and manual tests in this project
 ```
-
----
-
-## Quick Commands
-
-| Action            | Command                           |
-|-------------------|-----------------------------------|
-| Create context    | `mkdir -p .testclaw-context/code` |
-| Scan files        | `git ls-files` or `find . -type f -name "*.ts"` |
-| Find test configs | `find . -name "codecept.conf.*"` |
-| Find test files   | `find . -name "*.test.ts" -o -name "*.spec.ts"` |
-| Find manual tests | `find . -name "*.test.md"` |
