@@ -17,12 +17,11 @@ Test Scanner Journey:
 - Identify test frameworks (automated tests).
   * Avoid deep parsing unit test and integration system files.
 - Inventory manual test cases from `.test.md` files.
-- Generate project scan JSON for test planning.
 
 **CONSTRAINT (large projects):**
-- Do not perform deep analysis: no full import resolution, no line‑by‑line parsing, no inference of complex code relationships. 
+- Do not perform deep analysis: no full import resolution, no line-by-line parsing, no inference of complex code relationships.
 
-**Focus only on high‑level structure**.
+**Focus only on high-level structure**.
 
 ## When to Use
 
@@ -40,11 +39,11 @@ Trigger this skill when user wants to:
 
 Scan root dir to understand which files we will analyze in the future:
 
-**Option-1** 
-- If folder includes NON empty source code folders, files => Go to "Step 2".
+**Option-1**
+- If folder includes non-empty source code folders or files => Go to "Step 2".
 
-**Option-2** 
-- If **no source** files are found in any of the listed directories, halt scanning and ask the user:
+**Option-2**
+- If **no source** files are found in any of the listed directories, stop scanning and ask the user:
 
 ```
 ❓ No application source code detected (folder may be empty or missing).
@@ -53,10 +52,10 @@ Where is the source code?
 2. Clone from Git repo
 3. I don't know yet (stop here)
 ```
-[Waits for the user’s reply.]
+[Waits for the user's reply.]
 
 - If user provides `Git repo` or `another folder` variant => Check if cache directory `.testclaw-context/code` already exists. If not, create it and save files or symlink to this `code/` folder.
-*The command is a no‑op when the directory already exists.*
+*The command is a no-op when the directory already exists.*
 
 ---
 
@@ -89,7 +88,7 @@ Infer program languages and frameworks from file extensions, structure, and conf
 #### 4. Extract Project Name
 
 - Use, in priority order:
-  1. Project config files (e.g. `package.json`, `Cargo.toml`).
+  1. Project config files (e.g. `package.json`, `Cargo.toml`, `pom.xml`).
   2. Root directory name.
 
 #### 5. Estimate Project Complexity
@@ -105,33 +104,31 @@ Based on total number of source files, choose one variant.
 | 151-500    | `large`      |
 | 500+       | `very-large` |
 
-#### Output
+#### Output (Structured Result)
 
-Save results to:
-- `scan-result.json` in the root directory if `.testclaw-context/` does NOT exist.
-- `.testclaw-context/scan-result.json`  if the cache folder already exists.
+Produce and return a single structured markdown result directly. 
+**Do NOT save to a file.** 
 
-**Example:**
+Use the following markdown format:
 
-```json
-{
-  "name": "...",
-  "description": "...",
-  "languages": ["javascript"],
-  "frameworks": ["..."],
-  "estimatedComplexity": "small",
-  "totalFiles": 12
-}
+```markdown
+# Project Overview
+
+- **Project Name:** ...
+- **Description:** ...
+- **Languages:** TypeScript, SQL
+- **Frameworks:** React, Express, Jest, Playwright
+- **Complexity:** small (12 files)
 ```
 
 [Field notes:
-* "name" - Project root folder name or repo name.
-* "description" - 1-2 sentence summary based ONLY on: detected source code and folder structure.
-* "frameworks" - Application frameworks, Testing tools, etc.
-* "estimatedComplexity" - One of: "small" | "moderate" | "large" | "very-large", based on file count + structure.
-* "totalFiles" - Total number of relevant source files]
+* **Project Name** - Project root folder name or repo name.
+* **Description** - 1-2 sentence summary based ONLY on: detected source code and folder structure.
+* **Languages** - Detected programming languages.
+* **Frameworks** - Application frameworks, Testing tools, etc.
+* **Complexity** - One of: `small` | `moderate` | `large` | `very-large`, based on file count + structure.]
 
-**Important:** 
+**Important:**
 - Do NOT guess or infer missing data.
 - Do NOT add fields not defined in the schema.
 - All values must come from observable files.
@@ -142,7 +139,7 @@ Save results to:
 
 ### Step 3: Tests Inventory (optional)
 
-Detect existing tests (automated and manual).  
+Detect existing tests (automated and manual).
 This step is **shallow** - **Do NOT read full test implementations**.
 
 ### Automated Tests
@@ -178,55 +175,55 @@ find . -name "*.test.md" -exec awk '
 
 ### Step 5: Final Output
 
-Merge all results into previously created "scan-result" file (from "Step 2"):
+Merge all results into the structured markdown format.
 
-```json
-{
-  "name": "...",
-  "description": "...",
-  "languages": ["javascript"],
-  "frameworks": ["..."],
-  "estimatedComplexity": "small",
-  "totalFiles": 12,
-  "testCounts": {
-    "automated": 20,
-    "manual": 12
-  },
-  "manualTests": [
-    "SUITE: Authentication",
-    "|- User can login",
-    "|- User can reset password"
-  ]
-}
+- If **no tests are found**, return a note that the current version of the project does not contain any tests. The user may still use the `## Project Overview` section above for next steps.
+- If **tests were inventoried**, append a `## Test Inventory` section.
+
+**Full example:**
+
+```markdown
+# Project Overview
+
+- **Project Name:** ...
+- **Description:** ...
+- **Languages:** TypeScript, SQL
+- **Frameworks:** React, Express, Jest, Playwright
+- **Complexity:** small (12 files)
+
+## Test Inventory
+
+- **Automated Tests:** 10 files
+- **Manual Tests:** 37 cases
+
+### Manual Tests (25 of 37 shown)
+
+- SUITE: Authentication
+  |- User can login
+  |- User can reset password
+- SUITE: Billing
+  |- User can view invoice
+  ...and 9 more
+
+### Automated Tests (10 of 10 shown)
+
+- home.page.spec.ts
+...
 ```
 
 [Extra Field Notes:
-* "testCounts" - Count only clearly identified tests (no guessing).
-* "manualTests" - Preserve hierarchy as plain strings (no restructuring)]
+* **Manual Tests** — Preserve hierarchy as plain strings. Render SUITE items as parent bullets and test titles (`|-`) as nested children.]
+* **Automated Tests** — List of identified test files.
 
 **Report a summary to the user:**
 * Provide a concise overview of the scan results (see example below).
 * Do not include full test listings.
 
 **Test listing constraint:**
-If manual tests are included in output:
-- Limit displayed items to the first 25 entries.
+If manual / automated tests are included in output:
+- Limit displayed items to the first 20 entries.
 - Keep original file order.
 - Indicate truncation if more exist (e.g., `...and N more`).
-
----
-
-## Final Summary Example
-
-```
-Scan Complete:
-- Project: ...
-- Languages: JavaScript
-- Frameworks: ...
-- Complexity: small (12 files)
-- Automated Tests: 20 files
-- Manual Tests: 12 cases
-```
 
 ---
 
@@ -251,17 +248,61 @@ Stop if:
 
 ## Examples
 
-**Scan project:**
-```
-Use project-scan to analyze this codebase for test planning
+### Example: Scan Project
+
+User Prompt: `Use project-scan to analyze this project codebase`
+Skill Output:
+
+```markdown
+# Project Overview
+
+- **Project Name:** acme-web-app
+- **Description:** A React-based customer dashboard. Uses TypeScript for the frontend and Express for the API.
+- **Languages:** TypeScript, JavaScript
+- **Frameworks:** React, Express, Jest
+- **Complexity:** moderate (87 files)
+
+## Test Inventory
+
+- **Automated Tests:** 24 files
+- **Manual Tests:** 0 cases
+
+> No manual tests (`.test.md`) found in the project.
+
+### Automated Tests (20 of 24 shown)
+
+- home.page.spec.ts
+...
 ```
 
-**Find test frameworks:**
-```
-What test frameworks exist in this project?
+### Example: Get Test Inventory
+
+User Prompt: `List all automated and manual tests in this project`
+Skill Output:
+
+```markdown
+# Project Overview
+
+- **Project Name:** acme-web-app
+- **Description:** A React-based customer dashboard.
+- **Languages:** TypeScript
+- **Frameworks:** React, Playwright, Jest
+- **Complexity:** moderate (87 files)
+
+## Test Inventory
+
+- **Automated Tests:** 0 files
+- **Manual Tests:** 37 cases
+
+### Manual Tests (20 of 37 shown)
+
+- SUITE: Authentication
+  |- User can login
+  |- User can reset password
+- SUITE: Billing
+  |- User can view invoice
+  ...and 34 more
+
+> No automation tests found in the project.
 ```
 
-**Get test inventory:**
-```
-List all automated and manual tests in this project
-```
