@@ -127,7 +127,7 @@ plugins: {
 **WebdriverIO** — Update `wdio.conf.js`:
 
 ```js
-const testomatio = require('@testomatio/reporter/webdriver');
+import testomatio from '@testomatio/reporter/webdriver';
 
 exports.config = {
   // ...
@@ -207,20 +207,6 @@ robot --listener Testomatio.Report path/to/tests
 
 Use the appropriate `@testomatio/reporter` for Java test frameworks (JUnit, TestNG).
 
-#### Install
-
-Check JDK version and **Install** if not already installed:
-
-```bash
-# macOS
-brew install openjdk
-
-# Ubuntu
-sudo apt install openjdk
-```
-
-(On Windows: download and install JDK, then set environment variables.)
-
 #### Configure
 
 Add the dependency for your framework:
@@ -261,18 +247,6 @@ mvn clean test
 > Full documentation: [Testomat.io Java/JUnit Reporting](https://docs.testomat.io/test-reporting/junit/)
 
 ---
-
-### Other Languages (C#, PHP, Ruby)
-
-XML/JUnit format reporters can use `report-xml` CLI tool:
-
-| Language | Framework | Output Format |
-|----------|-----------|---------------|
-| C#/.NET | NUnit, xUnit | JUnit XML |
-| PHP | PHPUnit | JUnit XML |
-| Ruby | Minitest | JUnit reporter |
-
-> Configuration details: [Testomat.io Reporters](https://docs.testomat.io/test-reporting/frameworks/)
 
 ## Step 3: Configure Credentials
 
