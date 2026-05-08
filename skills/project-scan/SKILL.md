@@ -123,7 +123,7 @@ Use the following markdown format:
 
 [Field notes:
 * **Project Name** - Project root folder name or repo name.
-* **Description** - 1-2 sentence summary based ONLY on: detected source code and folder structure.
+* **Description** - 1-2 sentence summary based ONLY on: detected source code and folder structure (including domain area if that make sense for current project).
 * **Languages** - Detected programming languages.
 * **Frameworks** - Application frameworks, Testing tools, etc.
 * **Complexity** - One of: `small` | `moderate` | `large` | `very-large`, based on file count + structure.]
