@@ -39,8 +39,10 @@ The skill orchestrates these specialized capabilities:
 | **improve-test-cases**  | Improve existing test cases quality                 |
 | **sync-cases**          | Upload test cases to Testomat.io TMS                |
 | **reporter-setup**      | Add Testomat.io reporter to your automation project |
+| **manual-coverage**     | Map manual test cases to source files (`coverage.manual.yml`) |
+| **automation-coverage** | Map automated e2e tests to source files (`coverage.e2e.yml`) |
 
-<!-- TODO: coverage-analyzer, autotests-fixer, traceability-matrix -->
+<!-- TODO: autotests-fixer, traceability-matrix -->
 
 ## Smart Task Routing
 
@@ -109,7 +111,32 @@ Use `reporter-setup` skill to proceed with test reporter setup
 =>
 After previous step fully completed, suggest next actions:
 1. 📝 Generate test cases from requirements (with `generate-cases` skill)
+2. 🗺️ Map e2e tests to source files for affected-tests-only CI (with `automation-coverage` skill)
 ```
+
+### **Coverage Mapping Flow (run only affected tests)**
+
+The coverage flow maps test identifiers to source files so `@testomatio/reporter --filter "coverage:..."` can run only the tests touched by a code change.
+
+```
+User: asks to map tests to code, generate coverage.yml, run only affected tests
+=>
+Identify whether the user wants manual or e2e (automated) coverage:
+  - Manual cases (markdown) => use `manual-coverage` skill (output: `coverage.manual.yml`)
+  - Automated e2e tests     => use `automation-coverage` skill (output: `coverage.e2e.yml`)
+=>
+After coverage file is generated, suggest next actions:
+1. 💾 Commit `coverage.*.yml` so CI and teammates use the same mapping
+2. 🚦 Run only affected tests:
+   - Manual:  `npx @testomatio/reporter run --kind manual --filter "coverage:file=coverage.manual.yml,diff=main"`
+   - E2E:     `npx @testomatio/reporter run "<runner>" --filter "coverage:file=coverage.e2e.yml,diff=main"`
+3. 🧹 Scan for coverage gaps or dead tests
+```
+
+Suggest these as logical follow-ups in other flows:
+
+- After `sync-cases` pull → propose `manual-coverage` to map the freshly pulled cases.
+- After `reporter-setup` (and `check-tests --update-ids`) → propose `automation-coverage` to map the e2e tests.
 
 ### Example Request Flows
 
