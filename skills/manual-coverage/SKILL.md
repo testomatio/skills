@@ -57,7 +57,7 @@ Do not duplicate `sync-cases` pull logic here.
 
 ### Step 2: Extract test information
 
-Each manual test markdown file follows the format described in [Manual Test Format](./references/MANUAL_TEST_FORMAT.md). For every file extract:
+Each manual test markdown file follows the format described in [Classical Tests Markdown Format](../generate-cases/references/test-case-format.md) (canonical reference, owned by `generate-cases`). For every file extract:
 
 - **Suite ID** — `@S` + 8 chars, found in the `<!-- suite ... id: @S... -->` block.
 - **Test IDs** — `@T` + 8 chars, found in `<!-- test ... id: @T... -->` blocks.
@@ -153,10 +153,10 @@ Once the file is saved, propose any of:
 
 ## References
 
-| Description                | File                                          |
-| -------------------------- | --------------------------------------------- |
-| Coverage YAML format       | ./references/COVERAGE_FILE_FORMAT.md          |
-| Manual test markdown format | ./references/MANUAL_TEST_FORMAT.md           |
+| Description                  | File                                                       |
+| ---------------------------- | ---------------------------------------------------------- |
+| Coverage YAML format         | ./references/COVERAGE_FILE_FORMAT.md                       |
+| Manual test markdown format  | ../generate-cases/references/test-case-format.md           |
 
 ---
 
