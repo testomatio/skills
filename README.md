@@ -26,14 +26,15 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 
 ### Test Management
 
-| Skill                  | Description                                                                                  |
-| ---------------------- | -------------------------------------------------------------------------------------------- |
-| `generate-cases`       | Generate test cases and checklists from requirements, tickets, or feature descriptions       |
-| `improve-test-cases`   | Analyze and improve existing markdown test cases for clarity                                 |
-| `find-duplicate-cases` | Find duplicate, near-duplicate, and overlapping test cases                                   |
-| `sync-cases`           | Synchronize Markdown test scenarios between local project and Testomat.io                    |
-| `manual-coverage`      | Map manual test cases to source files; generate `coverage.manual.yml` for affected-only runs |
-| `testomatio-flow`      | Orchestrate complete test case lifecycle: generate, improve, analyze coverage, upload to TMS |
+| Skill                  | Description                                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| `generate-cases`       | Generate test cases and checklists from requirements, tickets, or feature descriptions               |
+| `improve-test-cases`   | Analyze and improve existing markdown test cases for clarity                                         |
+| `find-duplicate-cases` | Find duplicate, near-duplicate, and overlapping test cases                                           |
+| `sync-cases`           | Synchronize Markdown test scenarios between local project and Testomat.io                            |
+| `manual-coverage`      | Map manual test cases to source files; generate `coverage.manual.yml` for affected-only runs         |
+| `automation-coverage`  | Map e2e tests to source files; generate `coverage.e2e.yml` to run only the tests affected by a diff  |
+| `testomatio-flow`      | Orchestrate complete test case lifecycle: generate, improve, analyze coverage, upload to TMS         |
 
 ### Automation
 
