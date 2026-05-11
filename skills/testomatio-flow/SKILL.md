@@ -41,6 +41,7 @@ The skill orchestrates these specialized capabilities:
 | **reporter-setup**      | Add Testomat.io reporter to your automation project |
 | **manual-coverage**     | Map manual test cases to source files (`coverage.manual.yml`) |
 | **automation-coverage** | Map automated e2e tests to source files (`coverage.e2e.yml`) |
+| **project-scan** | Scan project source code to inventory languages, frameworks, and existing tests |
 
 <!-- TODO: autotests-fixer, traceability-matrix -->
 

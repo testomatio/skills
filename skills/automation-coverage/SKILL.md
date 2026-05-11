@@ -45,8 +45,6 @@ From the `project-scan` result, capture:
 - **Automated Tests** — the list of e2e test files (the input to Step 3).
 - **Project Overview** — languages, complexity (the framing for Step 5).
 
-Output file default: `coverage.e2e.yml` in the project root. If the user supplied a different path, use it.
-
 If `project-scan` reports **no automated tests**, or no e2e framework is among the detected frameworks:
 - ❓ Ask the user to either:
   1. Provide a path to the e2e tests directory (then re-run `project-scan` scoped to it).
@@ -135,7 +133,7 @@ See [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md) for the full YA
 
 ### Step 6: Save the coverage file
 
-Write the YAML to the resolved output path (default `coverage.e2e.yml`) and display it to the user.
+Write the YAML to the resolved output path (default `coverage.e2e.yml` in the project root) and display it to the user (If the user supplied a different path => use it).
 
 ### Step 7: Show next steps
 

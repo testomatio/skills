@@ -31,7 +31,7 @@ This skill works **only with manual tests in markdown format**.
 - **DO NOT** suggest creating new automated tests.
 - **DO NOT** edit any file other than the output coverage file (default `coverage.manual.yml`).
 
-If automated test files are encountered while exploring, ignore them and continue with the manual markdown set.
+If automated test files (e.g. e2e test, unit, api)  are encountered while exploring, ignore them and continue with the manual markdown set.
 
 ---
 
@@ -45,7 +45,6 @@ From the `project-scan` result, capture:
 - **Manual Tests** — the list of `.test.md` files and their suite/test titles (the input to Step 2).
 - **Project Overview** — languages, frameworks, complexity (the framing for Step 3).
 
-Output file default: `coverage.manual.yml` in the project root. If the user supplied a different path, use it.
 
 If `project-scan` reports **no manual tests**:
 - ❓ Ask the user how to proceed:
@@ -115,7 +114,8 @@ See [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md) for the full YA
 
 ### Step 5: Save the coverage file
 
-Write the YAML to the resolved output path (default `coverage.manual.yml`). Display the produced YAML to the user.
+Write the YAML to the resolved output path (default `coverage.manual.yml`). If the user supplied a different path => use it.
+Display the produced YAML to the user.
 
 Keep `#` comments next to each ID so future readers can audit the mapping without opening Testomat.io.
 
