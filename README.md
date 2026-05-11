@@ -38,10 +38,9 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 
 ### Automation
 
-| Skill                  | Description                                                                                          |
-| ---------------------- | ---------------------------------------------------------------------------------------------------- |
-| `reporter-setup`       | Set up Testomat.io test reporting for your automation framework (Playwright, CodeceptJS, Jest, etc.) |
-| `automation-coverage`  | Map e2e tests to source files; generate `coverage.e2e.yml` to run only the tests affected by a diff  |
+| Skill            | Description                                                                                          |
+| ---------------- | ---------------------------------------------------------------------------------------------------- |
+| `reporter-setup` | Set up Testomat.io test reporting for your automation framework (Playwright, CodeceptJS, Jest, etc.) |
 
 ---
 
