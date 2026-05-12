@@ -107,17 +107,18 @@ jobs:
             --filter "coverage:file=coverage.e2e.yml,diff=origin/main"
 ```
 
-## Validating the coverage file
+## Checking the coverage file
 
-Both `manual-coverage` and `automation-coverage` ship `scripts/validate-coverage.mjs` (the `automation-coverage` copy is a symlink to this one). Run it from the skill's directory:
+Two steps — no parser of your own:
 
 ```bash
-node scripts/validate-coverage.mjs coverage.manual.yml   # or coverage.e2e.yml
+npx js-yaml coverage.manual.yml > /dev/null && echo "valid YAML"   # parses? errors loudly if not
+node scripts/check-coverage.mjs coverage.manual.yml                 # keys exist? empties? list IDs
 ```
 
-It reports malformed lines, duplicate keys, file keys that don't exist (for a glob key it checks the directory prefix), and keys with no identifiers, then lists every `@S…` / `@T…` / tag it references. It exits non-zero if anything is wrong.
+`scripts/check-coverage.mjs` ships with both `manual-coverage` and `automation-coverage` (the `automation-coverage` copy is a symlink). It's ~30 lines: flags a key whose path is missing on disk, flags a key with no identifiers, lists every `@S…` / `@T…` / tag the file references, and exits non-zero if it finds a problem.
 
-The script can't tell which identifiers are real — check the listed ones against the set you extracted earlier in the workflow. Don't re-parse the test set for this. Don't write your own YAML parser, and never use `python`.
+The script can't tell which identifiers are real — check the listed ones against the set you extracted earlier in the workflow. Don't re-parse the test set, don't write your own YAML parser, and never use `python`.
 
 ## Authoring tips
 

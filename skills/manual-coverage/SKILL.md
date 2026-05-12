@@ -30,10 +30,7 @@ This skill works **only with manual tests in markdown format**.
 - **DO NOT** process unit, functional, or e2e test files.
 - **DO NOT** suggest creating new automated tests.
 - **Only touch two files in this repo.** This skill runs inside the user's source-code repo. It may write `coverage.manual.yml` (or the path the user gave) and add one `.testclaw-context/` line to `.gitignore` if it is missing. Nothing else — never a source file. Cases pulled from Testomat.io go into the gitignored `.testclaw-context/manual-tests/`, never into a tracked folder (see Step 1).
-- **Use the bundled scripts. Never use Python. Don't write your own parser.** This skill ships small Node helpers next to this `SKILL.md`:
-  - `scripts/parse-manual-tests.mjs [tests-dir]` — lists every `.test.md` file's suite ID, test IDs, and tags (Step 2).
-  - `scripts/validate-coverage.mjs <coverage.yml>` — checks the file's structure, that the file keys exist, that no entry is empty, and lists the IDs it references (Step 5).
-  Use these, or just read files with your file tool, or a `grep` one-liner. If none of that fits, a short `node -e '…'` line is the limit — never `python`, never a parser you write yourself.
+- **Don't write scripts. Never use Python.** Read `.test.md` files with your file tool; pull out IDs and tags with `grep` (Step 2). The skill ships one tiny helper, `scripts/check-coverage.mjs`, for the one fiddly bit — checking the finished coverage file (Step 5). That's the only script. If you ever need more than a `grep`, a one-line `node -e '…'` is the limit — never `python`, never a parser of your own.
 
 If automated test files (e.g. e2e test, unit, api)  are encountered while exploring, ignore them and continue with the manual markdown set.
 
@@ -67,17 +64,18 @@ Each manual test markdown file follows the format described in [Classical Tests 
 - **Tags** — `@tag` markers in suite/test titles and `tags:` lines inside the metadata blocks.
 - **Context** — suite title, test titles, steps, and expected results — used to reason about which source files implement each behavior.
 
-**How to extract.** Run the bundled helper. It walks the directory and prints, for each `.test.md` file, the suite ID and title, every test ID and title, and the tags. Point it at wherever the cases are — `manual-tests/`, or the cache `.testclaw-context/manual-tests/`:
+**How to extract.** Read the `.test.md` files — the metadata blocks are short. For a quick overview, `grep` instead of a parser. Run these in whichever directory holds the cases (`manual-tests/`, or the cache `.testclaw-context/manual-tests/`):
 
 ```bash
-node scripts/parse-manual-tests.mjs manual-tests
-# or, if the cases came from the cache:
-node scripts/parse-manual-tests.mjs .testclaw-context/manual-tests
+grep -rnE 'id:[[:space:]]*@S' <dir>      # suite IDs (+ which file)
+grep -rnE 'id:[[:space:]]*@T' <dir>      # test IDs
+grep -rnE '^tags:' <dir>                 # tags from metadata blocks
+grep -rhoE '@[A-Za-z0-9_-]+' <dir> | sort -u   # every @token (titles included)
 ```
 
-(A few files? Just read them — the metadata blocks are short. `grep -rnE 'id:[[:space:]]*@[ST][0-9a-f]{8}' <dir>/` works for a quick look too. Don't write a markdown parser. Never use `python`.)
+Don't write a markdown parser. Never use `python`.
 
-If a file has no `@S` / `@T` IDs, the user has not yet pushed it to Testomat.io (the helper flags these). Ask whether to push first via `sync-cases` or skip those files (mappings without IDs are useless to the reporter).
+If a file has no `@S` / `@T` IDs, the user hasn't pushed it to Testomat.io yet. Ask whether to push first via `sync-cases`, or skip those files — a mapping without IDs is useless to the reporter.
 
 ### Step 3: Explore the codebase
 
@@ -131,13 +129,14 @@ See [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md) for the full YA
 Write the YAML to the resolved output path (default `coverage.manual.yml`). If the user supplied a different path => use it.
 Keep `#` comments next to each ID so future readers can audit the mapping without opening Testomat.io.
 
-**Validate it with the bundled script** — don't write your own checker:
+**Check it** — two steps, no script of your own:
 
 ```bash
-node scripts/validate-coverage.mjs coverage.manual.yml
+npx js-yaml coverage.manual.yml > /dev/null && echo "valid YAML"   # parses?
+node scripts/check-coverage.mjs coverage.manual.yml                 # keys exist? empties? list IDs
 ```
 
-It reports malformed lines, file keys that don't exist (for a glob key it checks the directory prefix), keys with no identifiers, and lists every `@S…` / `@T…` / tag it references. Then check those IDs against the set you extracted in Step 2 — only you know which IDs are real. Don't re-parse the markdown; use the set you already built. Never use `python`.
+`check-coverage.mjs` flags any key whose path is missing on disk, any key with no identifiers, and prints every `@S…` / `@T…` / tag it references. Check that list against the IDs you extracted in Step 2 — only you know which are real. Don't re-parse the markdown; use the set you already have. Never use `python`.
 
 > The keys in the coverage file are paths to source files in this repo, never `.testclaw-context/...` paths. The cache holds the test cases; the coverage file points at the code they cover.
 
@@ -184,14 +183,9 @@ Once the file is saved, propose any of:
 | Coverage YAML format         | ./references/COVERAGE_FILE_FORMAT.md                       |
 | Manual test markdown format  | ../generate-cases/references/test-case-format.md           |
 
-## Bundled scripts
+## Bundled script
 
-| Script                                | Purpose                                                                                  |
-| ------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `scripts/parse-manual-tests.mjs [dir]` | List the suite ID, test IDs, and tags in every `.test.md` under `dir` (default `manual-tests`; use `.testclaw-context/manual-tests` for pulled cases). |
-| `scripts/validate-coverage.mjs <yml>`  | Validate a coverage file: structure, file keys exist, no empty entries; lists referenced IDs. |
-
-Run with `node scripts/<name>.mjs …` from this skill's directory. Don't rewrite them in `python` or as a one-off parser.
+`scripts/check-coverage.mjs <coverage.yml>` — flags keys whose path is missing on disk and keys with no identifiers, and lists every `@S`/`@T`/tag the file references. ~30 lines, zero deps. Run it with `node scripts/check-coverage.mjs <yml>` from this skill's directory. It's the only script — everything else is `grep`, your file tool, or `npx js-yaml`. Don't rewrite it in `python`.
 
 ---
 

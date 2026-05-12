@@ -31,10 +31,7 @@ This skill works **only with automated e2e tests** (Playwright, Cypress, Webdriv
 - **DO NOT** process manual markdown test cases (use `manual-coverage` instead).
 - **DO NOT** suggest creating new tests.
 - **Only touch two files in this repo.** It may write `coverage.e2e.yml` (or the path the user gave) and add one `.testclaw-context/` line to `.gitignore` if it is missing. Nothing else — never a source or test file. If the e2e tests live in another repo, clone it into the gitignored `.testclaw-context/e2e-tests/`, never into a tracked folder (see Step 1).
-- **Use the bundled scripts. Never use Python. Don't write your own parser.** This skill ships small Node helpers next to this `SKILL.md`:
-  - `scripts/parse-tests.mjs <tests-dir>` — lists the `@S`/`@T` IDs and `@tag` markers in test and suite names, per file (Step 3).
-  - `scripts/validate-coverage.mjs <coverage.yml>` — checks the file's structure, that the file keys exist, that no entry is empty, and lists the IDs it references (Step 6). Same validator as `manual-coverage`, symlinked.
-  Use these, or just read files with your file tool, or a `grep` one-liner. If none of that fits, a short `node -e '…'` line is the limit — never `python`, never a parser you write yourself.
+- **Don't write scripts. Never use Python.** Read test files with your file tool; pull out IDs and tags with `grep` (Step 3). The skill ships one tiny helper, `scripts/check-coverage.mjs` (symlinked from `manual-coverage`), for the one fiddly bit — checking the finished coverage file (Step 6). That's the only script. If you ever need more than a `grep`, a one-line `node -e '…'` is the limit — never `python`, never a parser of your own.
 
 ---
 
@@ -90,15 +87,14 @@ For each test file extract:
 - **Tags** — other `@word` markers (`@smoke`, `@jira-123`, `@regression`).
 - **What is exercised** — page objects imported, routes hit, fixtures used — used to reason about which source files each test covers.
 
-**How to extract.** Run the bundled helper. It walks the tests directory and prints, for each file, the `@S`/`@T` IDs and `@tag` markers in the test and suite names. Point it at wherever the tests are — `tests/e2e`, or the cache `.testclaw-context/e2e-tests`:
+**How to extract.** Read the test files, or `grep` for the IDs and tags in test/suite names. Run these in whichever directory holds the tests (`tests/e2e`, or the cache `.testclaw-context/e2e-tests`):
 
 ```bash
-node scripts/parse-tests.mjs tests/e2e
-# or, if the tests came from the cache:
-node scripts/parse-tests.mjs .testclaw-context/e2e-tests
+grep -rnoE '@[ST][0-9a-f]{8}' <dir>             # suite/test IDs (+ which file/line)
+grep -rnoE '@[A-Za-z0-9_-]+' <dir> | sort -u    # every @token, tags included
 ```
 
-(A few files? Just read them. `grep -rnE '@[ST][0-9a-f]{8}' <tests-dir>` works for a quick look. Don't write a parser. Never use `python`.) If the helper finds no IDs, add them first with `npx check-tests@latest <Framework> "<glob>" --update-ids` (see Step 2).
+Don't write a parser. Never use `python`. If there are no `@S`/`@T` IDs, add them first with `npx check-tests@latest <Framework> "<glob>" --update-ids` (see Step 2).
 
 ### Step 4: Explore the source codebase
 
@@ -151,13 +147,14 @@ See [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md) for the full YA
 
 Write the YAML to the resolved output path (default `coverage.e2e.yml` in the project root). If the user supplied a different path => use it.
 
-**Validate it with the bundled script** — don't write your own checker:
+**Check it** — two steps, no script of your own:
 
 ```bash
-node scripts/validate-coverage.mjs coverage.e2e.yml
+npx js-yaml coverage.e2e.yml > /dev/null && echo "valid YAML"   # parses?
+node scripts/check-coverage.mjs coverage.e2e.yml                 # keys exist? empties? list IDs
 ```
 
-It reports malformed lines, file keys that don't exist (for a glob key it checks the directory prefix), keys with no identifiers, and lists every `@S…` / `@T…` / tag it references. Then check those IDs against the set you extracted in Step 3 — only you know which IDs are real. Don't re-parse the test files; use the set you already built. Never use `python`.
+`check-coverage.mjs` flags any key whose path is missing on disk, any key with no identifiers, and prints every `@S…` / `@T…` / tag it references. Check that list against the IDs you extracted in Step 3 — only you know which are real. Don't re-parse the test files; use the set you already have. Never use `python`.
 
 > The keys in the coverage file are paths to source files in this repo, never `.testclaw-context/...` paths. The cache holds the cloned tests; the coverage file points at the code they exercise.
 
@@ -205,14 +202,9 @@ Report:
 | Coverage YAML format         | ./references/COVERAGE_FILE_FORMAT.md          |
 | E2E framework detection      | ./references/E2E_FRAMEWORKS.md                |
 
-## Bundled scripts
+## Bundled script
 
-| Script                                | Purpose                                                                                  |
-| ------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `scripts/parse-tests.mjs <dir> [..suffixes]` | List the `@S`/`@T` IDs and `@tag` markers in test and suite names, per file. Use `.testclaw-context/e2e-tests` for cloned tests. |
-| `scripts/validate-coverage.mjs <yml>` | Validate a coverage file: structure, file keys exist, no empty entries; lists referenced IDs. (Symlinked from `manual-coverage`.) |
-
-Run with `node scripts/<name>.mjs …` from this skill's directory. Don't rewrite them in `python` or as a one-off parser.
+`scripts/check-coverage.mjs <coverage.yml>` (symlinked from `manual-coverage`) — flags keys whose path is missing on disk and keys with no identifiers, and lists every `@S`/`@T`/tag the file references. ~30 lines, zero deps. Run it with `node scripts/check-coverage.mjs <yml>` from this skill's directory. It's the only script — everything else is `grep`, your file tool, or `npx js-yaml`. Don't rewrite it in `python`.
 
 ---
 
