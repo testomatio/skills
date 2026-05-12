@@ -36,10 +36,12 @@ Prefer loading test cases locally as markdown files via `sync-tests` skills, as 
 
 If the project contains **Markdown test cases** (`*.test.md`) or **automated test files** in the repo, prefer loading test cases locally as markdown files via `sync-cases` skills, as this is more efficient than using MCP for full test discovery and analysis.
 
-- Prefer filesystem search to find local `*.test.md` files or source code tests when available.
-- Use MCP only when:
+- Prefer filesystem search for discovering, reading, and analyzing local tests (to find local `*.test.md` files or source code tests when available).
+- Use MCP primarily for:
   - tests live exclusively in Testomat.io (no local copies) OR need quick test case searches (e.g. `tests_list`, `tests_search`).
   - performing point updates to remote test case.
+  - analytics and reporting.
+  - test plan management.
 (This avoids unnecessary API calls and respects the user's local test structure).
 
 ### Use TQL for Filtering
