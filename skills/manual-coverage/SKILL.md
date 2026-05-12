@@ -30,7 +30,10 @@ This skill works **only with manual tests in markdown format**.
 - **DO NOT** process unit, functional, or e2e test files.
 - **DO NOT** suggest creating new automated tests.
 - **DO NOT** edit any file other than the output coverage file (default `coverage.manual.yml`).
-- **DO NOT** write or execute ad-hoc scripts (Python, Node, shell heredocs, etc.) to parse the markdown **or to validate the output**. These projects are mostly JS environments and a stray interpreter is an unnecessary risk. Read the `.test.md` files directly with your file-reading tool; if the set is large, use `grep` to pull just the lines you need (see Step 2); validate against what you already gathered (see Step 5).
+- **Use the bundled scripts; never use Python; don't hand-roll parsers.** This skill ships small Node helpers in `scripts/` (paths below are relative to this skill's directory — they sit next to this `SKILL.md`):
+  - `scripts/parse-manual-tests.mjs [tests-dir]` — dumps every `.test.md` file's suite ID, test IDs, and tags (Step 2).
+  - `scripts/validate-coverage.mjs <coverage.yml>` — checks structure, that file keys exist, no empty entries, and lists referenced IDs (Step 5).
+  Prefer these (or just reading files with your file tool, or a `grep` one-liner) over writing anything. If a script genuinely doesn't cover a need, a short `node -e '…'` one-liner is the ceiling — never `python`/`python3` or another non-JS interpreter, and never a multi-line improvised parser.
 
 If automated test files (e.g. e2e test, unit, api)  are encountered while exploring, ignore them and continue with the manual markdown set.
 
@@ -64,22 +67,15 @@ Each manual test markdown file follows the format described in [Classical Tests 
 - **Tags** — `@tag` markers in suite/test titles and `tags:` lines inside the metadata blocks.
 - **Context** — suite title, test titles, steps, and expected results — used to reason about which source files implement each behavior.
 
-**How to extract — no scripts.** Prefer reading the `.test.md` files directly with your file-reading tool; the metadata blocks are small and self-describing. If there are many files, narrow it down first with `grep` instead of writing a parser, e.g.:
+**How to extract.** Run the bundled helper — it walks the directory and prints, per `.test.md` file, the suite ID + title, every test ID + title, and the tags:
 
 ```bash
-# IDs (suite + test) with file and line
-grep -rnE 'id:[[:space:]]*@[ST][0-9a-f]{8}' manual-tests/
-
-# tags lines inside metadata blocks
-grep -rnE '^tags:' manual-tests/
-
-# @tags used in titles
-grep -rhoE '@[A-Za-z0-9_-]+' manual-tests/ | sort -u
+node scripts/parse-manual-tests.mjs manual-tests
 ```
 
-Do **not** spawn `python`, `node -e`, or heredoc scripts to do this.
+(For a handful of files, just reading them with your file tool is fine too — the metadata blocks are small and self-describing. A `grep -rnE 'id:[[:space:]]*@[ST][0-9a-f]{8}' manual-tests/` one-liner also works for a quick look. Don't write a markdown parser; never use `python`.)
 
-If a file has no `@S` / `@T` IDs, the user has not yet pushed it to Testomat.io. Ask whether to push first via `sync-cases` or skip those files (mappings without IDs are useless to the reporter).
+If a file has no `@S` / `@T` IDs, the user has not yet pushed it to Testomat.io (the helper flags these). Ask whether to push first via `sync-cases` or skip those files (mappings without IDs are useless to the reporter).
 
 ### Step 3: Explore the codebase
 
@@ -133,14 +129,13 @@ See [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md) for the full YA
 Write the YAML to the resolved output path (default `coverage.manual.yml`). If the user supplied a different path => use it.
 Keep `#` comments next to each ID so future readers can audit the mapping without opening Testomat.io.
 
-**Validate — no scripts.** You wrote the file and you already have the project inventory and the ID set from Steps 1–3, so check against what you know rather than re-scanning:
+**Validate with the bundled script** — don't write your own checker:
 
-- **Well-formed YAML** — re-read the file you just wrote with your file tool and eyeball the structure. If you genuinely want a parser to confirm, use the JS-native CLI: `npx js-yaml coverage.manual.yml` (prints the parsed structure, errors on bad YAML).
-- **Keys resolve** — every file key must exist; cross-check against the files you saw in Step 1's `project-scan` result. For glob keys, a quick `ls <glob>` or `git ls-files <glob>` confirms at least one match.
-- **Identifiers exist** — every `@S…` / `@T…` / `@tag` must be one you extracted in Step 2. Don't re-parse the markdown; use the set you already built.
-- **No empty entries** — you control the output, so simply don't emit a key with an empty list.
+```bash
+node scripts/validate-coverage.mjs coverage.manual.yml
+```
 
-Do **not** spawn `python`, `node -e`, or heredoc scripts to validate.
+It reports any malformed lines, file keys that don't exist on disk (glob keys: it checks the literal directory prefix), keys with no identifiers, and prints all referenced `@S…` / `@T…` / tags. Then **cross-check those identifiers against the set you extracted in Step 2** — the script can't know which IDs are real, only you do. Don't re-parse the markdown to do that; use the set you already built. Never use `python`.
 
 Then display the produced YAML to the user.
 
@@ -182,6 +177,15 @@ Once the file is saved, propose any of:
 | ---------------------------- | ---------------------------------------------------------- |
 | Coverage YAML format         | ./references/COVERAGE_FILE_FORMAT.md                       |
 | Manual test markdown format  | ../generate-cases/references/test-case-format.md           |
+
+## Bundled scripts
+
+| Script                                | Purpose                                                                                  |
+| ------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `scripts/parse-manual-tests.mjs [dir]` | Dump suite ID, test IDs, and tags for every `.test.md` under `dir` (default `manual-tests`). |
+| `scripts/validate-coverage.mjs <yml>`  | Validate a coverage file: structure, file keys exist, no empty entries; lists referenced IDs. |
+
+Run with `node scripts/<name>.mjs …` from this skill's directory. Never reimplement these with `python` or an improvised parser.
 
 ---
 

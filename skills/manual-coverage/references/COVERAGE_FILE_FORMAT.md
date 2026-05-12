@@ -107,6 +107,18 @@ jobs:
             --filter "coverage:file=coverage.e2e.yml,diff=origin/main"
 ```
 
+## Validating the coverage file
+
+Both `manual-coverage` and `automation-coverage` ship `scripts/validate-coverage.mjs` (the `automation-coverage` copy is a symlink to this one). Run it from the skill's directory:
+
+```bash
+node scripts/validate-coverage.mjs coverage.manual.yml   # or coverage.e2e.yml
+```
+
+It reports malformed key/item lines, duplicate keys, file keys that don't exist on disk (for glob keys it checks the literal directory prefix), and keys with no identifiers, then lists every referenced `@S…` / `@T…` / tag. Exits non-zero if anything is wrong.
+
+The script can't know which identifiers are real — **cross-reference the listed `@S…` / `@T…` / `@tag` against the set you already extracted earlier in the workflow** (don't re-parse the test set to do this). Do not hand-roll a YAML parser, and never use `python` — these are JS projects; a short `node -e` one-liner is the ceiling if the script doesn't fit your need.
+
 ## Authoring tips
 
 - Prefer Suite IDs when most of a suite relates to a file.

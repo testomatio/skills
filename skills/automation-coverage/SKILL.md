@@ -31,7 +31,10 @@ This skill works **only with automated e2e tests** (Playwright, Cypress, Webdriv
 - **DO NOT** process manual markdown test cases (use `manual-coverage` instead).
 - **DO NOT** suggest creating new tests.
 - **DO NOT** edit any file other than the output coverage file (default `coverage.e2e.yml`).
-- **DO NOT** write or execute ad-hoc scripts (Python, Node, shell heredocs, etc.) to parse test files **or to validate the output**. These projects are mostly JS environments and a stray interpreter is an unnecessary risk. Read the test files directly with your file-reading tool; if the set is large, use `grep` to pull just the lines you need (see Step 3); validate against what you already gathered (see Step 6).
+- **Use the bundled scripts; never use Python; don't hand-roll parsers.** This skill ships small Node helpers in `scripts/` (paths below are relative to this skill's directory — they sit next to this `SKILL.md`):
+  - `scripts/parse-tests.mjs <tests-dir>` — groups the `@S`/`@T` IDs and `@tag` markers found in describe / it / test / Scenario / Feature names, per file (Step 3).
+  - `scripts/validate-coverage.mjs <coverage.yml>` — checks structure, that file keys exist, no empty entries, and lists referenced IDs (Step 6). (Same validator as `manual-coverage`, symlinked.)
+  Prefer these (or just reading files with your file tool, or a `grep` one-liner) over writing anything. If a script genuinely doesn't cover a need, a short `node -e '…'` one-liner is the ceiling — never `python`/`python3` or another non-JS interpreter, and never a multi-line improvised parser.
 
 ---
 
@@ -85,17 +88,14 @@ For each test file extract:
 - **Tags** — other `@word` markers (`@smoke`, `@jira-123`, `@regression`).
 - **What is exercised** — page objects imported, routes hit, fixtures used — used to reason about which source files each test covers.
 
-**How to extract — no scripts.** Read the test files directly with your file-reading tool. If there are many files, narrow it down first with `grep` instead of writing a parser, e.g.:
+**How to extract.** Run the bundled helper — it walks the tests directory and prints, per file, the `@S`/`@T` IDs and `@tag` markers found in test/suite names:
 
 ```bash
-# Testomatio suite/test IDs with file and line
-grep -rnE '@[ST][0-9a-f]{8}' <tests-dir>
-
-# all @tags / @ids referenced in test names
-grep -rhoE '@[A-Za-z0-9_-]+' <tests-dir> | sort -u
+node scripts/parse-tests.mjs <tests-dir>
+# e.g.  node scripts/parse-tests.mjs tests/e2e
 ```
 
-Do **not** spawn `python`, `node -e`, or heredoc scripts to do this.
+(For a handful of files, just reading them with your file tool is fine too. A `grep -rnE '@[ST][0-9a-f]{8}' <tests-dir>` one-liner also works for a quick look. Don't write a parser; never use `python`.) If the helper reports no IDs, populate them first with `npx check-tests@latest <Framework> "<glob>" --update-ids` (see Step 2).
 
 ### Step 4: Explore the source codebase
 
@@ -148,14 +148,13 @@ See [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md) for the full YA
 
 Write the YAML to the resolved output path (default `coverage.e2e.yml` in the project root). If the user supplied a different path => use it.
 
-**Validate — no scripts.** You wrote the file and you already have the project inventory and the ID set from Steps 1–4, so check against what you know rather than re-scanning:
+**Validate with the bundled script** — don't write your own checker:
 
-- **Well-formed YAML** — re-read the file you just wrote with your file tool and eyeball the structure. If you genuinely want a parser to confirm, use the JS-native CLI: `npx js-yaml coverage.e2e.yml` (prints the parsed structure, errors on bad YAML).
-- **Keys resolve** — every file key must exist; cross-check against the files you saw in Step 1's `project-scan` result. For glob keys, a quick `ls <glob>` or `git ls-files <glob>` confirms at least one match.
-- **Identifiers exist** — every `@S…` / `@T…` / `@tag` must be one you extracted in Step 3. Don't re-parse the test files; use the set you already built.
-- **No empty entries** — you control the output, so simply don't emit a key with an empty list.
+```bash
+node scripts/validate-coverage.mjs coverage.e2e.yml
+```
 
-Do **not** spawn `python`, `node -e`, or heredoc scripts to validate.
+It reports any malformed lines, file keys that don't exist on disk (glob keys: it checks the literal directory prefix), keys with no identifiers, and prints all referenced `@S…` / `@T…` / tags. Then **cross-check those identifiers against the set you extracted in Step 3** — the script can't know which IDs are real, only you do. Don't re-parse the test files to do that; use the set you already built. Never use `python`.
 
 Then display the produced YAML to the user.
 
@@ -200,6 +199,15 @@ Report:
 | ---------------------------- | --------------------------------------------- |
 | Coverage YAML format         | ./references/COVERAGE_FILE_FORMAT.md          |
 | E2E framework detection      | ./references/E2E_FRAMEWORKS.md                |
+
+## Bundled scripts
+
+| Script                                | Purpose                                                                                  |
+| ------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `scripts/parse-tests.mjs <dir> [..suffixes]` | Group `@S`/`@T` IDs and `@tag` markers found in test/suite names, per file.        |
+| `scripts/validate-coverage.mjs <yml>` | Validate a coverage file: structure, file keys exist, no empty entries; lists referenced IDs. (Symlinked from `manual-coverage`.) |
+
+Run with `node scripts/<name>.mjs …` from this skill's directory. Never reimplement these with `python` or an improvised parser.
 
 ---
 
