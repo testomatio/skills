@@ -30,11 +30,11 @@ This skill works **only with automated e2e tests** (Playwright, Cypress, Webdriv
 - **DO NOT** process unit tests.
 - **DO NOT** process manual markdown test cases (use `manual-coverage` instead).
 - **DO NOT** suggest creating new tests.
-- **DO NOT** edit any file other than the output coverage file (default `coverage.e2e.yml`).
-- **Use the bundled scripts; never use Python; don't hand-roll parsers.** This skill ships small Node helpers in `scripts/` (paths below are relative to this skill's directory — they sit next to this `SKILL.md`):
-  - `scripts/parse-tests.mjs <tests-dir>` — groups the `@S`/`@T` IDs and `@tag` markers found in describe / it / test / Scenario / Feature names, per file (Step 3).
-  - `scripts/validate-coverage.mjs <coverage.yml>` — checks structure, that file keys exist, no empty entries, and lists referenced IDs (Step 6). (Same validator as `manual-coverage`, symlinked.)
-  Prefer these (or just reading files with your file tool, or a `grep` one-liner) over writing anything. If a script genuinely doesn't cover a need, a short `node -e '…'` one-liner is the ceiling — never `python`/`python3` or another non-JS interpreter, and never a multi-line improvised parser.
+- **Only touch two files in this repo.** It may write `coverage.e2e.yml` (or the path the user gave) and add one `.testclaw-context/` line to `.gitignore` if it is missing. Nothing else — never a source or test file. If the e2e tests live in another repo, clone it into the gitignored `.testclaw-context/e2e-tests/`, never into a tracked folder (see Step 1).
+- **Use the bundled scripts. Never use Python. Don't write your own parser.** This skill ships small Node helpers next to this `SKILL.md`:
+  - `scripts/parse-tests.mjs <tests-dir>` — lists the `@S`/`@T` IDs and `@tag` markers in test and suite names, per file (Step 3).
+  - `scripts/validate-coverage.mjs <coverage.yml>` — checks the file's structure, that the file keys exist, that no entry is empty, and lists the IDs it references (Step 6). Same validator as `manual-coverage`, symlinked.
+  Use these, or just read files with your file tool, or a `grep` one-liner. If none of that fits, a short `node -e '…'` line is the limit — never `python`, never a parser you write yourself.
 
 ---
 
@@ -49,13 +49,15 @@ From the `project-scan` result, capture:
 - **Automated Tests** — the list of e2e test files (the input to Step 3).
 - **Project Overview** — languages, complexity (the framing for Step 5).
 
-If `project-scan` reports **no automated tests**, or no e2e framework is among the detected frameworks:
+If `project-scan` reports **no automated tests** (it checks `.testclaw-context/e2e-tests/` too, so this means nothing was cloned before), or no e2e framework is detected:
 - ❓ Ask the user to either:
-  1. Provide a path to the e2e tests directory (then re-run `project-scan` scoped to it).
-  2. Provide a git URL of the repo containing the e2e tests; clone it and re-run `project-scan` against the clone.
+  1. Give the path to the e2e tests (then re-run `project-scan` there).
+  2. Give the git URL of the e2e tests repo → `git clone <url> .testclaw-context/e2e-tests`, add `.testclaw-context/` to `.gitignore` if missing, and re-run `project-scan` against `.testclaw-context/e2e-tests`.
   3. Stop.
 
-If multiple frameworks are detected (e.g. Jest + Playwright), confirm with the user which one is the e2e framework — coverage filtering applies per runner.
+Never clone the tests into a tracked folder in this repo.
+
+If two frameworks are detected (say Jest and Playwright), ask which one is the e2e framework — coverage filtering runs per runner.
 
 ### Step 2: Verify Testomatio IDs are present
 
@@ -88,14 +90,15 @@ For each test file extract:
 - **Tags** — other `@word` markers (`@smoke`, `@jira-123`, `@regression`).
 - **What is exercised** — page objects imported, routes hit, fixtures used — used to reason about which source files each test covers.
 
-**How to extract.** Run the bundled helper — it walks the tests directory and prints, per file, the `@S`/`@T` IDs and `@tag` markers found in test/suite names:
+**How to extract.** Run the bundled helper. It walks the tests directory and prints, for each file, the `@S`/`@T` IDs and `@tag` markers in the test and suite names. Point it at wherever the tests are — `tests/e2e`, or the cache `.testclaw-context/e2e-tests`:
 
 ```bash
-node scripts/parse-tests.mjs <tests-dir>
-# e.g.  node scripts/parse-tests.mjs tests/e2e
+node scripts/parse-tests.mjs tests/e2e
+# or, if the tests came from the cache:
+node scripts/parse-tests.mjs .testclaw-context/e2e-tests
 ```
 
-(For a handful of files, just reading them with your file tool is fine too. A `grep -rnE '@[ST][0-9a-f]{8}' <tests-dir>` one-liner also works for a quick look. Don't write a parser; never use `python`.) If the helper reports no IDs, populate them first with `npx check-tests@latest <Framework> "<glob>" --update-ids` (see Step 2).
+(A few files? Just read them. `grep -rnE '@[ST][0-9a-f]{8}' <tests-dir>` works for a quick look. Don't write a parser. Never use `python`.) If the helper finds no IDs, add them first with `npx check-tests@latest <Framework> "<glob>" --update-ids` (see Step 2).
 
 ### Step 4: Explore the source codebase
 
@@ -148,15 +151,17 @@ See [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md) for the full YA
 
 Write the YAML to the resolved output path (default `coverage.e2e.yml` in the project root). If the user supplied a different path => use it.
 
-**Validate with the bundled script** — don't write your own checker:
+**Validate it with the bundled script** — don't write your own checker:
 
 ```bash
 node scripts/validate-coverage.mjs coverage.e2e.yml
 ```
 
-It reports any malformed lines, file keys that don't exist on disk (glob keys: it checks the literal directory prefix), keys with no identifiers, and prints all referenced `@S…` / `@T…` / tags. Then **cross-check those identifiers against the set you extracted in Step 3** — the script can't know which IDs are real, only you do. Don't re-parse the test files to do that; use the set you already built. Never use `python`.
+It reports malformed lines, file keys that don't exist (for a glob key it checks the directory prefix), keys with no identifiers, and lists every `@S…` / `@T…` / tag it references. Then check those IDs against the set you extracted in Step 3 — only you know which IDs are real. Don't re-parse the test files; use the set you already built. Never use `python`.
 
-Then display the produced YAML to the user.
+> The keys in the coverage file are paths to source files in this repo, never `.testclaw-context/...` paths. The cache holds the cloned tests; the coverage file points at the code they exercise.
+
+Then show the produced YAML to the user.
 
 ### Step 7: Show next steps
 
@@ -204,10 +209,10 @@ Report:
 
 | Script                                | Purpose                                                                                  |
 | ------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `scripts/parse-tests.mjs <dir> [..suffixes]` | Group `@S`/`@T` IDs and `@tag` markers found in test/suite names, per file.        |
+| `scripts/parse-tests.mjs <dir> [..suffixes]` | List the `@S`/`@T` IDs and `@tag` markers in test and suite names, per file. Use `.testclaw-context/e2e-tests` for cloned tests. |
 | `scripts/validate-coverage.mjs <yml>` | Validate a coverage file: structure, file keys exist, no empty entries; lists referenced IDs. (Symlinked from `manual-coverage`.) |
 
-Run with `node scripts/<name>.mjs …` from this skill's directory. Never reimplement these with `python` or an improvised parser.
+Run with `node scripts/<name>.mjs …` from this skill's directory. Don't rewrite them in `python` or as a one-off parser.
 
 ---
 
@@ -215,7 +220,7 @@ Run with `node scripts/<name>.mjs …` from this skill's directory. Never reimpl
 
 ### Recovery
 
-- **No e2e tests found** → ask for the directory path or a git URL to clone.
+- **No e2e tests found (cache included)** → ask for the path, or a git URL to clone into the gitignored `.testclaw-context/e2e-tests/`.
 - **Tests have no `@S`/`@T` IDs** → instruct the user to run `npx check-tests <Framework> "<glob>" --update-ids` (cross-link `reporter-setup`).
 - **Ambiguous source layout** → ask which directories are application code.
 

@@ -75,8 +75,13 @@ Download/Retrieves test scenarios from Testomat.io and saves them as Markdown fi
 - Backup test cases locally.
 - Refactor test cases offline.
 
+**Where to pull — two cases:**
+
+- **To edit and push back** → pull into a tracked directory: `testDir` if the user gave one, else `manual-tests/`. This is the default.
+- **To analyze only** (a coverage, duplicate-finding, or test-generation skill needs the cases as read-only context) → pull into the gitignored `.testclaw-context/manual-tests/`, and add `.testclaw-context/` to the project `.gitignore` if it is not there yet. A source-code repo must never get pulled cases committed to it. This matches `project-scan`, which pulls the *code* into `.testclaw-context/code/` when it runs inside a manual-tests repo.
+
 **Pre-Pull:**
-- Ensure `testDir` exists; otherwise create `manual-tests` folder in root.
+- Create the target directory if it does not exist (`manual-tests/` to edit, `.testclaw-context/manual-tests/` to analyze).
 
 **Command:**
 ```bash
@@ -85,8 +90,11 @@ npx check-tests pull -d <directory>
 
 **Examples:**
 ```bash
-# Pull tests to default manual-tests folder
+# To edit and push back — tracked folder
 npx check-tests pull -d manual-tests
+
+# To analyze only — gitignored cache, never committed
+npx check-tests pull -d .testclaw-context/manual-tests
 ```
 
 **More examples** you can find in "Pull" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)

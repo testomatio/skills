@@ -5,9 +5,9 @@
 //   e.g.   node parse-tests.mjs tests/e2e
 //          node parse-tests.mjs . .spec.ts .cy.js _test.js
 //
-// Walks the directory, and for every test file groups the @S/@T IDs and
+// Walks the directory, and for every test file lists the @S/@T IDs and
 // @tag markers found in describe / it / test / Scenario / Feature names.
-// Use this instead of hand-rolling a parser. (Never use python.)
+// Use this instead of writing your own parser. (Never use python.)
 
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';

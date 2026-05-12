@@ -29,11 +29,11 @@ This skill works **only with manual tests in markdown format**.
 
 - **DO NOT** process unit, functional, or e2e test files.
 - **DO NOT** suggest creating new automated tests.
-- **DO NOT** edit any file other than the output coverage file (default `coverage.manual.yml`).
-- **Use the bundled scripts; never use Python; don't hand-roll parsers.** This skill ships small Node helpers in `scripts/` (paths below are relative to this skill's directory — they sit next to this `SKILL.md`):
-  - `scripts/parse-manual-tests.mjs [tests-dir]` — dumps every `.test.md` file's suite ID, test IDs, and tags (Step 2).
-  - `scripts/validate-coverage.mjs <coverage.yml>` — checks structure, that file keys exist, no empty entries, and lists referenced IDs (Step 5).
-  Prefer these (or just reading files with your file tool, or a `grep` one-liner) over writing anything. If a script genuinely doesn't cover a need, a short `node -e '…'` one-liner is the ceiling — never `python`/`python3` or another non-JS interpreter, and never a multi-line improvised parser.
+- **Only touch two files in this repo.** This skill runs inside the user's source-code repo. It may write `coverage.manual.yml` (or the path the user gave) and add one `.testclaw-context/` line to `.gitignore` if it is missing. Nothing else — never a source file. Cases pulled from Testomat.io go into the gitignored `.testclaw-context/manual-tests/`, never into a tracked folder (see Step 1).
+- **Use the bundled scripts. Never use Python. Don't write your own parser.** This skill ships small Node helpers next to this `SKILL.md`:
+  - `scripts/parse-manual-tests.mjs [tests-dir]` — lists every `.test.md` file's suite ID, test IDs, and tags (Step 2).
+  - `scripts/validate-coverage.mjs <coverage.yml>` — checks the file's structure, that the file keys exist, that no entry is empty, and lists the IDs it references (Step 5).
+  Use these, or just read files with your file tool, or a `grep` one-liner. If none of that fits, a short `node -e '…'` line is the limit — never `python`, never a parser you write yourself.
 
 If automated test files (e.g. e2e test, unit, api)  are encountered while exploring, ignore them and continue with the manual markdown set.
 
@@ -50,13 +50,13 @@ From the `project-scan` result, capture:
 - **Project Overview** — languages, frameworks, complexity (the framing for Step 3).
 
 
-If `project-scan` reports **no manual tests**:
+If `project-scan` reports **no manual tests** (it checks the cache too, so this means nothing was pulled before):
 - ❓ Ask the user how to proceed:
-  1. Pull cases from Testomat.io — delegate to **`sync-cases`** (`npx check-tests pull -d <dir>`); after it returns, re-run `project-scan` and continue.
-  2. Point to a directory the scan missed (then re-run `project-scan` scoped to it).
+  1. Pull cases from Testomat.io — have **`sync-cases`** pull into the gitignored cache: `npx check-tests pull -d .testclaw-context/manual-tests`, then add `.testclaw-context/` to `.gitignore` if missing. Re-run `project-scan` and continue.
+  2. Point to a directory the scan missed (then re-run `project-scan` there).
   3. Stop.
 
-Do not duplicate `sync-cases` pull logic here.
+Never pull cases into a tracked folder. Don't repeat `sync-cases` pull logic here.
 
 ### Step 2: Extract test information
 
@@ -67,13 +67,15 @@ Each manual test markdown file follows the format described in [Classical Tests 
 - **Tags** — `@tag` markers in suite/test titles and `tags:` lines inside the metadata blocks.
 - **Context** — suite title, test titles, steps, and expected results — used to reason about which source files implement each behavior.
 
-**How to extract.** Run the bundled helper — it walks the directory and prints, per `.test.md` file, the suite ID + title, every test ID + title, and the tags:
+**How to extract.** Run the bundled helper. It walks the directory and prints, for each `.test.md` file, the suite ID and title, every test ID and title, and the tags. Point it at wherever the cases are — `manual-tests/`, or the cache `.testclaw-context/manual-tests/`:
 
 ```bash
 node scripts/parse-manual-tests.mjs manual-tests
+# or, if the cases came from the cache:
+node scripts/parse-manual-tests.mjs .testclaw-context/manual-tests
 ```
 
-(For a handful of files, just reading them with your file tool is fine too — the metadata blocks are small and self-describing. A `grep -rnE 'id:[[:space:]]*@[ST][0-9a-f]{8}' manual-tests/` one-liner also works for a quick look. Don't write a markdown parser; never use `python`.)
+(A few files? Just read them — the metadata blocks are short. `grep -rnE 'id:[[:space:]]*@[ST][0-9a-f]{8}' <dir>/` works for a quick look too. Don't write a markdown parser. Never use `python`.)
 
 If a file has no `@S` / `@T` IDs, the user has not yet pushed it to Testomat.io (the helper flags these). Ask whether to push first via `sync-cases` or skip those files (mappings without IDs are useless to the reporter).
 
@@ -129,15 +131,17 @@ See [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md) for the full YA
 Write the YAML to the resolved output path (default `coverage.manual.yml`). If the user supplied a different path => use it.
 Keep `#` comments next to each ID so future readers can audit the mapping without opening Testomat.io.
 
-**Validate with the bundled script** — don't write your own checker:
+**Validate it with the bundled script** — don't write your own checker:
 
 ```bash
 node scripts/validate-coverage.mjs coverage.manual.yml
 ```
 
-It reports any malformed lines, file keys that don't exist on disk (glob keys: it checks the literal directory prefix), keys with no identifiers, and prints all referenced `@S…` / `@T…` / tags. Then **cross-check those identifiers against the set you extracted in Step 2** — the script can't know which IDs are real, only you do. Don't re-parse the markdown to do that; use the set you already built. Never use `python`.
+It reports malformed lines, file keys that don't exist (for a glob key it checks the directory prefix), keys with no identifiers, and lists every `@S…` / `@T…` / tag it references. Then check those IDs against the set you extracted in Step 2 — only you know which IDs are real. Don't re-parse the markdown; use the set you already built. Never use `python`.
 
-Then display the produced YAML to the user.
+> The keys in the coverage file are paths to source files in this repo, never `.testclaw-context/...` paths. The cache holds the test cases; the coverage file points at the code they cover.
+
+Then show the produced YAML to the user.
 
 ### Step 6: Show next steps
 
@@ -160,14 +164,16 @@ TESTOMATIO_RUNGROUP="Regression 911" npx @testomatio/reporter run \
 
 Recommend committing `coverage.manual.yml` to the repository so CI and teammates use the same mapping.
 
+If you pulled the cases, tell the user they stay in the gitignored `.testclaw-context/manual-tests/`. A re-run or a follow-up question reuses them, and nothing was committed. Don't delete the cache or move it into a tracked folder.
+
 ### Step 7: Suggest follow-ups
 
 Once the file is saved, propose any of:
 
 - Scan the source for **coverage gaps** (features without manual tests). On approval, propose new manual cases (delegate to `generate-cases`).
 - Scan for **dead tests** (manual tests whose features no longer exist in source).
-- Answer ad-hoc questions like "do we have manual tests for X?".
-- After edits in the manual tests directory, push changes back via `sync-cases` (`npx check-tests push`).
+- Answer questions like "do we have manual tests for X?" from the cached cases in `.testclaw-context/manual-tests/`.
+- If the user wants to *edit* cases, not just analyze them, have `sync-cases` pull again into a tracked folder (`manual-tests/`) for editing and pushing back. The cache is read-only context, not an edit workspace.
 
 ---
 
@@ -182,10 +188,10 @@ Once the file is saved, propose any of:
 
 | Script                                | Purpose                                                                                  |
 | ------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `scripts/parse-manual-tests.mjs [dir]` | Dump suite ID, test IDs, and tags for every `.test.md` under `dir` (default `manual-tests`). |
+| `scripts/parse-manual-tests.mjs [dir]` | List the suite ID, test IDs, and tags in every `.test.md` under `dir` (default `manual-tests`; use `.testclaw-context/manual-tests` for pulled cases). |
 | `scripts/validate-coverage.mjs <yml>`  | Validate a coverage file: structure, file keys exist, no empty entries; lists referenced IDs. |
 
-Run with `node scripts/<name>.mjs …` from this skill's directory. Never reimplement these with `python` or an improvised parser.
+Run with `node scripts/<name>.mjs …` from this skill's directory. Don't rewrite them in `python` or as a one-off parser.
 
 ---
 
@@ -193,7 +199,7 @@ Run with `node scripts/<name>.mjs …` from this skill's directory. Never reimpl
 
 ### Recovery
 
-- **Tests directory empty** → delegate to `sync-cases` to pull, or ask the user for a different directory.
+- **No manual tests found (cache included)** → have `sync-cases` pull into `.testclaw-context/manual-tests/`, or ask the user for a directory the scan missed.
 - **Markdown files with no `@S`/`@T` IDs** → ask whether to push first via `sync-cases`, or skip those files.
 - **Ambiguous source layout** → ask the user which directories are application code.
 
@@ -207,9 +213,15 @@ Run with `node scripts/<name>.mjs …` from this skill's directory. Never reimpl
 
 ## Examples
 
-**Generate the mapping after pulling cases:**
+**Build the mapping in a source repo (cases pulled if needed):**
 ```
-Use manual-coverage skill to build coverage.manual.yml for our manual cases in manual-tests/
+Use manual-coverage skill to build coverage.manual.yml for our manual cases
+```
+If there are no local `.test.md` files, it pulls them into the gitignored `.testclaw-context/manual-tests/` and works from there.
+
+**Cases already local:**
+```
+Use manual-coverage skill for the cases in manual-tests/
 ```
 
 **With a custom output path:**
@@ -217,17 +229,17 @@ Use manual-coverage skill to build coverage.manual.yml for our manual cases in m
 Use manual-coverage skill, output to ops/coverage.qa.yml
 ```
 
-**Full workflow:**
-1. `sync-cases` to pull cases from Testomat.io into `manual-tests/` (skip if cases are already local).
-2. `manual-coverage` — internally delegates to `project-scan` for inventory, then produces `coverage.manual.yml`.
-3. `npx @testomatio/reporter run --kind manual --filter "coverage:file=coverage.manual.yml,diff=main"` to create a pending run with only affected cases.
+**Full workflow (source repo):**
+1. `manual-coverage` runs `project-scan`. No local cases, so it has `sync-cases` pull into `.testclaw-context/manual-tests/` (gitignored) and re-runs `project-scan`.
+2. It maps source files to suite/test/tag IDs and writes `coverage.manual.yml`. The only tracked changes are that file and one line in `.gitignore`.
+3. `npx @testomatio/reporter run --kind manual --filter "coverage:file=coverage.manual.yml,diff=main"` creates a pending run with only the affected cases.
 
 ---
 
 ## Quick Commands
 
-| Action                              | Command                                                                                              |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Pull manual cases (via sync-cases)  | `npx check-tests pull -d manual-tests`                                                               |
-| Create affected manual run          | `npx @testomatio/reporter run --kind manual --filter "coverage:file=coverage.manual.yml,diff=main"`  |
-| Group runs                          | `TESTOMATIO_RUNGROUP="Regression 911" npx @testomatio/reporter run --kind manual --filter "..."`     |
+| Action                                 | Command                                                                                              |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Pull cases into the gitignored cache  | `npx check-tests pull -d .testclaw-context/manual-tests`                                            |
+| Create affected manual run             | `npx @testomatio/reporter run --kind manual --filter "coverage:file=coverage.manual.yml,diff=main"`  |
+| Group runs                             | `TESTOMATIO_RUNGROUP="Regression 911" npx @testomatio/reporter run --kind manual --filter "..."`     |

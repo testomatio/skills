@@ -57,6 +57,20 @@ Where is the source code?
 - If user provides `Git repo` or `another folder` variant => Check if cache directory `.testclaw-context/code` already exists. If not, create it and save files or symlink to this `code/` folder.
 *The command is a no-op when the directory already exists.*
 
+#### `.testclaw-context/` — the cache directory
+
+`.testclaw-context/` holds the other half of the project — whatever a skill pulls in from elsewhere. It is always gitignored.
+
+| When you run inside…    | The cache holds…  | Path                              |
+| ----------------------- | ----------------- | --------------------------------- |
+| a source-code repo      | manual test cases | `.testclaw-context/manual-tests/` |
+| a manual-tests repo     | the app code      | `.testclaw-context/code/`         |
+| (e2e tests in own repo) | the e2e tests     | `.testclaw-context/e2e-tests/`    |
+
+Any skill that creates `.testclaw-context/...` must also add `.testclaw-context/` to the project's `.gitignore` — but only if it is not there yet. Never add it twice.
+
+On a source repo with no manual tests, `project-scan` changes no tracked file. It only creates the gitignored `.testclaw-context/` directory and, if needed, adds one line to `.gitignore`.
+
 ---
 
 ### Step 2: Project Analysis (Simplified)
@@ -77,7 +91,7 @@ Exclude:
 - Dependencies (e.g. `node_modules/`, `vendor/`, `.venv/`).
 - Build/generated output (e.g. `dist/`, `build/`, `.next/`, `target/`).
 - Coverage, reports, caches, config, lock, and environment files.
-- Ignored paths from `.gitignore`.
+- Ignored paths from `.gitignore` — but **not** `.testclaw-context/code/`. In a manual-tests repo the app code lives there, so scan it as source even though `.testclaw-context/` is gitignored.
 - TestClaw internal files (e.g. `session-factory.ts`, `system-prompt.ts`).
 [**If in doubt**, prefer excluding over including non-source files.]
 
@@ -155,7 +169,7 @@ For each detected framework:
 
 ### Manual Tests
 
-Find all `.test.md` files and parse test titles:
+Find all `.test.md` files and parse test titles. `find .` also looks inside `.testclaw-context/manual-tests/`, so a re-run after a pull finds the cached cases instead of reporting "no manual tests":
 
 ```bash
 find . -name "*.test.md" -exec awk '
@@ -170,6 +184,8 @@ find . -name "*.test.md" -exec awk '
   }
 ' {} +
 ```
+
+If the only `.test.md` files are under `.testclaw-context/manual-tests/`, say so in the inventory: they came from Testomat.io, not from this repo.
 
 ---
 

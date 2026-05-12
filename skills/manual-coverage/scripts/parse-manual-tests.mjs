@@ -5,7 +5,7 @@
 //
 // For every *.test.md file under the directory, prints the suite ID + title,
 // each test ID + title, and the tags used (from `tags:` metadata lines and
-// `@tag` markers in titles). Use this instead of hand-rolling a markdown parser.
+// `@tag` markers in titles). Use this instead of writing your own parser.
 
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
