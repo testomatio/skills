@@ -54,22 +54,27 @@ Where is the source code?
 ```
 [Waits for the user's reply.]
 
-- If user provides `Git repo` or `another folder` variant => Check if cache directory `.testclaw-context/code` already exists. If not, create it and save files or symlink to this `code/` folder.
-*The command is a no-op when the directory already exists.*
+- If user provides `Git repo` or `another folder` variant => clone or symlink it into `.testclaw-context/code/` (see the rule below). No-op if it's already there.
 
-#### `.testclaw-context/` — the cache directory
+#### Rule for pulled data — `.testclaw-context/`
 
-`.testclaw-context/` holds the other half of the project — whatever a skill pulls in from elsewhere. It is always gitignored.
+**This applies to every skill, not just `project-scan`.**
 
-| When you run inside…    | The cache holds…  | Path                              |
-| ----------------------- | ----------------- | --------------------------------- |
-| a source-code repo      | manual test cases | `.testclaw-context/manual-tests/` |
-| a manual-tests repo     | the app code      | `.testclaw-context/code/`         |
-| (e2e tests in own repo) | the e2e tests     | `.testclaw-context/e2e-tests/`    |
+1. First, see what's already in the current folder.
+2. If you need data that isn't here — manual test cases, the application code, e2e tests, a repo to clone — pull it into `.testclaw-context/` (gitignored). **Never** pull it into a regular folder like `manual-tests/` or `automated-tests/`; that pollutes the repo.
+3. If the data is already in the repo, use it where it is — you don't need `.testclaw-context/` for that.
+
+| When you run inside…    | What you'd pull in…  | Goes in…                          |
+| ----------------------- | -------------------- | --------------------------------- |
+| a source-code repo      | manual test cases    | `.testclaw-context/manual-tests/` |
+| a manual-tests repo     | the application code | `.testclaw-context/code/`         |
+| (e2e tests in own repo) | the e2e tests        | `.testclaw-context/e2e-tests/`    |
 
 Any skill that creates `.testclaw-context/...` must also add `.testclaw-context/` to the project's `.gitignore` — but only if it is not there yet. Never add it twice.
 
-On a source repo with no manual tests, `project-scan` changes no tracked file. It only creates the gitignored `.testclaw-context/` directory and, if needed, adds one line to `.gitignore`.
+(The rule is about *pulled* data. Output a skill *produces* and the user wants — a `coverage.*.yml`, new `*.test.md` files — goes in the repo as normal.)
+
+On a source repo with no manual tests, `project-scan` changes no tracked file: it only creates the gitignored `.testclaw-context/` directory and, if needed, adds one line to `.gitignore`.
 
 ---
 

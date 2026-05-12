@@ -171,7 +171,7 @@ Once the file is saved, propose any of:
 - Scan the source for **coverage gaps** (features without manual tests). On approval, propose new manual cases (delegate to `generate-cases`).
 - Scan for **dead tests** (manual tests whose features no longer exist in source).
 - Answer questions like "do we have manual tests for X?" from the cached cases in `.testclaw-context/manual-tests/`.
-- If the user wants to *edit* cases, not just analyze them, have `sync-cases` pull again into a tracked folder (`manual-tests/`) for editing and pushing back. The cache is read-only context, not an edit workspace.
+- If the user wants to *edit* cases, they can edit them right in `.testclaw-context/manual-tests/` and push back with `sync-cases` — gitignored doesn't mean read-only.
 
 ---
 
