@@ -23,18 +23,26 @@ Trigger this skill when the user wants to:
 
 ---
 
+## MCP Tools Overview
+
+Quick explanation of available Testomat.io MCP tools grouped by entity:
+- **Test:** List, search, and retrieve test cases (`tests_list`, `tests_get`, `tests_search`).
+- **Test Plan:** List, get, and search test plans (`plans_list`, `plans_get`, `plans_search`).
+- **Run:** List, get, and search test runs (`runs_list`, `runs_get`, `runs_search`).
+- **Testrun:** List and get individual test results within a run (`testruns_list`, `testruns_get`).
+- **Suite:** List, get, and search test suites/folders (`suites_list`, `suites_get`, `suites_search`).
+- **Label:** List and get labels (`labels_list`, `labels_get`).
+- **Tag:** Read-only operations to list and get tags (`tags_list`, `tags_get`, `tags_search`).
+
+> Additional CRUD tools (create, update, delete) exist for all entities but use them only when explicitly needed for targeted updates.
+
+---
+
 ## Important Guidelines
 
-Prefer loading test cases locally as markdown files via `sync-tests` skills, as this is more efficient than using MCP for full test discovery and analysis.
-
-
-- quick testcase searches
-- targeted lookups
-
+If the project contains **Markdown test cases** (`*.test.md`) or **automated test files** in the repo, prefer loading test cases locally as markdown files via `sync-cases` skills, as this is more efficient than using MCP for full test discovery and analysis.
 
 ### Prefer Local Tests Over MCP
-
-If the project contains **Markdown test cases** (`*.test.md`) or **automated test files** in the repo, prefer loading test cases locally as markdown files via `sync-cases` skills, as this is more efficient than using MCP for full test discovery and analysis.
 
 - Prefer filesystem search for discovering, reading, and analyzing local tests (to find local `*.test.md` files or source code tests when available).
 - Use MCP primarily for:
@@ -46,8 +54,10 @@ If the project contains **Markdown test cases** (`*.test.md`) or **automated tes
 
 ### Use TQL for Filtering
 
-- TQL (Testomat.io Query Language) is the primary filter for `runs_list` and `testruns_list`.
-- See [MCP Setup Reference](./references/MCP_SETUP.md) for common patterns and full syntax.
+- TQL (Testomat.io Query Language) is the primary filter for `runs_list`, `plans_list`, `testruns_list`.
+   - Supported operators: `==`, `!=`, `>`, `<`, `>=`, `<=`, `in [...]`, `%` (contains), `and`, `or`, `not`.
+
+> See [MCP Setup Reference](./references/MCP_SETUP.md) for common patterns and full syntax.
 
 ---
 
@@ -65,8 +75,8 @@ Check whether the Testomat.io MCP server is already configured in supported MCP-
 - Check whether a `testomatio` or `mcp.testomatio` entry exists.
 - Verify the MCP server is enabled when the client supports enable/disable flags.
 - Verify required arguments are present:
-    - `TESTOMATIO_PROJECT_TOKEN`.
-    - `TESTOMATIO_PROJECT_ID`.
+   - `TESTOMATIO_PROJECT_TOKEN`.
+   - `TESTOMATIO_PROJECT_ID`.
 
 **Testomat.io MCP Server Decision:**
 - If the MCP server is missing, incomplete, or disabled => continue to **Step 2: Configure MCP**.
@@ -95,8 +105,8 @@ If credentials are missing, explain where to obtain them with user's note:
 ```text
 1. Navigate to your Testomat.io project.
 2. Go to **Settings → Project → Project Reporting API key** to get the token.
-    - Copy the project token.
-    - Extract the Project ID from the project URL:: `https://app.testomat.io/projects/<project_id>`.
+   - Copy the project token.
+   - Extract the "Project ID" from the project URL: `https://app.testomat.io/projects/<project_id>`.
 ```
 
 **MCP Configuration Examples:**
@@ -152,7 +162,7 @@ The workflows below are examples of common MCP usage patterns and are not a comp
 - remote testcase operations.
 - targeted searches and updates.
 
-All actions below assume the MCP server is enabled. The skill uses the MCP CLI tools exposed in the *MCP System tools* reference.
+**All actions below assume the MCP server is enabled**. The skill uses the MCP CLI tools exposed in the *MCP Tools Overview* section.
 
 ### Workflow 1: Analyze Test Runs
 
