@@ -30,7 +30,7 @@ This skill works **only with manual tests in markdown format**.
 - **DO NOT** process unit, functional, or e2e test files.
 - **DO NOT** suggest creating new automated tests.
 - **Only touch two files in this repo.** This skill runs inside the user's source-code repo. It may write `coverage.manual.yml` (or the path the user gave) and add one `.testclaw-context/` line to `.gitignore` if it is missing. Nothing else — never a source file. Cases pulled from Testomat.io go into the gitignored `.testclaw-context/manual-tests/`, never into a tracked folder (see Step 1).
-- **Don't write scripts. Never use Python.** Read `.test.md` files with your file tool; pull out IDs and tags with `grep` (Step 2). To check the finished coverage file, pipe it through `js-yaml` into the one tiny bundled helper: `npx js-yaml coverage.manual.yml | node scripts/check-coverage.mjs` (Step 5). That's the only script. If you ever need more than a `grep`, a one-line `node -e '…'` is the limit — never `python`, never a parser of your own.
+- **Don't write scripts. Never use Python.** Read `.test.md` files with your file tool; pull out IDs and tags with `grep` (Step 2). To check the finished coverage file, pipe it through `js-yaml` into the one tiny bundled helper: `npx js-yaml coverage.manual.yml | node scripts/check-coverage.mjs` (Step 5). If more checks needed use custom script with `npx js-yaml`.
 
 If automated test files (e.g. e2e test, unit, api)  are encountered while exploring, ignore them and continue with the manual markdown set.
 
