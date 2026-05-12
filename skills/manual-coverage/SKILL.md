@@ -30,7 +30,7 @@ This skill works **only with manual tests in markdown format**.
 - **DO NOT** process unit, functional, or e2e test files.
 - **DO NOT** suggest creating new automated tests.
 - **DO NOT** edit any file other than the output coverage file (default `coverage.manual.yml`).
-- **DO NOT** write or execute ad-hoc scripts (Python, Node, shell heredocs, etc.) to parse the markdown. These projects are mostly JS environments and a stray interpreter is an unnecessary risk. Read the `.test.md` files directly with your file-reading tool; if the set is large, use `grep` to pull just the lines you need (see Step 2).
+- **DO NOT** write or execute ad-hoc scripts (Python, Node, shell heredocs, etc.) to parse the markdown **or to validate the output**. These projects are mostly JS environments and a stray interpreter is an unnecessary risk. Read the `.test.md` files directly with your file-reading tool; if the set is large, use `grep` to pull just the lines you need (see Step 2); validate against what you already gathered (see Step 5).
 
 If automated test files (e.g. e2e test, unit, api)  are encountered while exploring, ignore them and continue with the manual markdown set.
 
@@ -128,12 +128,21 @@ app/services/jira_service.rb:
 
 See [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md) for the full YAML grammar.
 
-### Step 5: Save the coverage file
+### Step 5: Save and validate the coverage file
 
 Write the YAML to the resolved output path (default `coverage.manual.yml`). If the user supplied a different path => use it.
-Display the produced YAML to the user.
-
 Keep `#` comments next to each ID so future readers can audit the mapping without opening Testomat.io.
+
+**Validate — no scripts.** You wrote the file and you already have the project inventory and the ID set from Steps 1–3, so check against what you know rather than re-scanning:
+
+- **Well-formed YAML** — re-read the file you just wrote with your file tool and eyeball the structure. If you genuinely want a parser to confirm, use the JS-native CLI: `npx js-yaml coverage.manual.yml` (prints the parsed structure, errors on bad YAML).
+- **Keys resolve** — every file key must exist; cross-check against the files you saw in Step 1's `project-scan` result. For glob keys, a quick `ls <glob>` or `git ls-files <glob>` confirms at least one match.
+- **Identifiers exist** — every `@S…` / `@T…` / `@tag` must be one you extracted in Step 2. Don't re-parse the markdown; use the set you already built.
+- **No empty entries** — you control the output, so simply don't emit a key with an empty list.
+
+Do **not** spawn `python`, `node -e`, or heredoc scripts to validate.
+
+Then display the produced YAML to the user.
 
 ### Step 6: Show next steps
 

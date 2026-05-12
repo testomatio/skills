@@ -31,7 +31,7 @@ This skill works **only with automated e2e tests** (Playwright, Cypress, Webdriv
 - **DO NOT** process manual markdown test cases (use `manual-coverage` instead).
 - **DO NOT** suggest creating new tests.
 - **DO NOT** edit any file other than the output coverage file (default `coverage.e2e.yml`).
-- **DO NOT** write or execute ad-hoc scripts (Python, Node, shell heredocs, etc.) to parse test files. These projects are mostly JS environments and a stray interpreter is an unnecessary risk. Read the test files directly with your file-reading tool; if the set is large, use `grep` to pull just the lines you need (see Step 3).
+- **DO NOT** write or execute ad-hoc scripts (Python, Node, shell heredocs, etc.) to parse test files **or to validate the output**. These projects are mostly JS environments and a stray interpreter is an unnecessary risk. Read the test files directly with your file-reading tool; if the set is large, use `grep` to pull just the lines you need (see Step 3); validate against what you already gathered (see Step 6).
 
 ---
 
@@ -144,9 +144,20 @@ tag:@smoke:
 
 See [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md) for the full YAML grammar.
 
-### Step 6: Save the coverage file
+### Step 6: Save and validate the coverage file
 
-Write the YAML to the resolved output path (default `coverage.e2e.yml` in the project root) and display it to the user (If the user supplied a different path => use it).
+Write the YAML to the resolved output path (default `coverage.e2e.yml` in the project root). If the user supplied a different path => use it.
+
+**Validate — no scripts.** You wrote the file and you already have the project inventory and the ID set from Steps 1–4, so check against what you know rather than re-scanning:
+
+- **Well-formed YAML** — re-read the file you just wrote with your file tool and eyeball the structure. If you genuinely want a parser to confirm, use the JS-native CLI: `npx js-yaml coverage.e2e.yml` (prints the parsed structure, errors on bad YAML).
+- **Keys resolve** — every file key must exist; cross-check against the files you saw in Step 1's `project-scan` result. For glob keys, a quick `ls <glob>` or `git ls-files <glob>` confirms at least one match.
+- **Identifiers exist** — every `@S…` / `@T…` / `@tag` must be one you extracted in Step 3. Don't re-parse the test files; use the set you already built.
+- **No empty entries** — you control the output, so simply don't emit a key with an empty list.
+
+Do **not** spawn `python`, `node -e`, or heredoc scripts to validate.
+
+Then display the produced YAML to the user.
 
 ### Step 7: Show next steps
 
