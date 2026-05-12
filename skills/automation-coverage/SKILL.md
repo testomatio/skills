@@ -31,6 +31,7 @@ This skill works **only with automated e2e tests** (Playwright, Cypress, Webdriv
 - **DO NOT** process manual markdown test cases (use `manual-coverage` instead).
 - **DO NOT** suggest creating new tests.
 - **DO NOT** edit any file other than the output coverage file (default `coverage.e2e.yml`).
+- **DO NOT** write or execute ad-hoc scripts (Python, Node, shell heredocs, etc.) to parse test files. These projects are mostly JS environments and a stray interpreter is an unnecessary risk. Read the test files directly with your file-reading tool; if the set is large, use `grep` to pull just the lines you need (see Step 3).
 
 ---
 
@@ -83,6 +84,18 @@ For each test file extract:
 - **Test IDs** — `@T` + 8 chars in `it` / `test` / `Scenario` blocks.
 - **Tags** — other `@word` markers (`@smoke`, `@jira-123`, `@regression`).
 - **What is exercised** — page objects imported, routes hit, fixtures used — used to reason about which source files each test covers.
+
+**How to extract — no scripts.** Read the test files directly with your file-reading tool. If there are many files, narrow it down first with `grep` instead of writing a parser, e.g.:
+
+```bash
+# Testomatio suite/test IDs with file and line
+grep -rnE '@[ST][0-9a-f]{8}' <tests-dir>
+
+# all @tags / @ids referenced in test names
+grep -rhoE '@[A-Za-z0-9_-]+' <tests-dir> | sort -u
+```
+
+Do **not** spawn `python`, `node -e`, or heredoc scripts to do this.
 
 ### Step 4: Explore the source codebase
 

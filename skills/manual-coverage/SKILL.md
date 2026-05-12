@@ -30,6 +30,7 @@ This skill works **only with manual tests in markdown format**.
 - **DO NOT** process unit, functional, or e2e test files.
 - **DO NOT** suggest creating new automated tests.
 - **DO NOT** edit any file other than the output coverage file (default `coverage.manual.yml`).
+- **DO NOT** write or execute ad-hoc scripts (Python, Node, shell heredocs, etc.) to parse the markdown. These projects are mostly JS environments and a stray interpreter is an unnecessary risk. Read the `.test.md` files directly with your file-reading tool; if the set is large, use `grep` to pull just the lines you need (see Step 2).
 
 If automated test files (e.g. e2e test, unit, api)  are encountered while exploring, ignore them and continue with the manual markdown set.
 
@@ -62,6 +63,21 @@ Each manual test markdown file follows the format described in [Classical Tests 
 - **Test IDs** — `@T` + 8 chars, found in `<!-- test ... id: @T... -->` blocks.
 - **Tags** — `@tag` markers in suite/test titles and `tags:` lines inside the metadata blocks.
 - **Context** — suite title, test titles, steps, and expected results — used to reason about which source files implement each behavior.
+
+**How to extract — no scripts.** Prefer reading the `.test.md` files directly with your file-reading tool; the metadata blocks are small and self-describing. If there are many files, narrow it down first with `grep` instead of writing a parser, e.g.:
+
+```bash
+# IDs (suite + test) with file and line
+grep -rnE 'id:[[:space:]]*@[ST][0-9a-f]{8}' manual-tests/
+
+# tags lines inside metadata blocks
+grep -rnE '^tags:' manual-tests/
+
+# @tags used in titles
+grep -rhoE '@[A-Za-z0-9_-]+' manual-tests/ | sort -u
+```
+
+Do **not** spawn `python`, `node -e`, or heredoc scripts to do this.
 
 If a file has no `@S` / `@T` IDs, the user has not yet pushed it to Testomat.io. Ask whether to push first via `sync-cases` or skip those files (mappings without IDs are useless to the reporter).
 
