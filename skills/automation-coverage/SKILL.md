@@ -31,7 +31,7 @@ This skill works **only with automated e2e tests** (Playwright, Cypress, Webdriv
 - **DO NOT** process manual markdown test cases (use `manual-coverage` instead).
 - **DO NOT** suggest creating new tests.
 - **Only touch two files in this repo.** It may write `coverage.e2e.yml` (or the path the user gave) and add one `.testclaw-context/` line to `.gitignore` if it is missing. Nothing else — never a source or test file. If the e2e tests live in another repo, clone it into the gitignored `.testclaw-context/e2e-tests/`, never into a tracked folder (see Step 1).
-- **Don't write scripts. Never use Python.** Read test files with your file tool; pull out IDs and tags with `grep` (Step 3). The skill ships one tiny helper, `scripts/check-coverage.mjs` (symlinked from `manual-coverage`), for the one fiddly bit — checking the finished coverage file (Step 6). That's the only script. If you ever need more than a `grep`, a one-line `node -e '…'` is the limit — never `python`, never a parser of your own.
+- **Don't write scripts. Never use Python.** Read test files with your file tool; pull out IDs and tags with `grep` (Step 3). To check the finished coverage file, pipe it through `js-yaml` into the one tiny bundled helper (symlinked from `manual-coverage`): `npx js-yaml coverage.e2e.yml | node scripts/check-coverage.mjs` (Step 6). That's the only script. If you ever need more than a `grep`, a one-line `node -e '…'` is the limit — never `python`, never a parser of your own.
 
 ---
 
@@ -147,14 +147,13 @@ See [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md) for the full YA
 
 Write the YAML to the resolved output path (default `coverage.e2e.yml` in the project root). If the user supplied a different path => use it.
 
-**Check it** — two steps, no script of your own:
+**Check it** — one command, run from the project root:
 
 ```bash
-npx js-yaml coverage.e2e.yml > /dev/null && echo "valid YAML"   # parses?
-node scripts/check-coverage.mjs coverage.e2e.yml                 # keys exist? empties? list IDs
+npx js-yaml coverage.e2e.yml | node scripts/check-coverage.mjs
 ```
 
-`check-coverage.mjs` flags any key whose path is missing on disk, any key with no identifiers, and prints every `@S…` / `@T…` / tag it references. Check that list against the IDs you extracted in Step 3 — only you know which are real. Don't re-parse the test files; use the set you already have. Never use `python`.
+`npx js-yaml` parses the file (and fails loudly if the YAML is malformed, so a broken file never reaches the script). `check-coverage.mjs` then flags any key whose path is missing on disk, any key with no identifiers, and prints every `@S…` / `@T…` / tag it references. Check that list against the IDs you extracted in Step 3 — only you know which are real. Don't re-parse the test files; use the set you already have. Never use `python`.
 
 > The keys in the coverage file are paths to source files in this repo, never `.testclaw-context/...` paths. The cache holds the cloned tests; the coverage file points at the code they exercise.
 
@@ -204,7 +203,13 @@ Report:
 
 ## Bundled script
 
-`scripts/check-coverage.mjs <coverage.yml>` (symlinked from `manual-coverage`) — flags keys whose path is missing on disk and keys with no identifiers, and lists every `@S`/`@T`/tag the file references. ~30 lines, zero deps. Run it with `node scripts/check-coverage.mjs <yml>` from this skill's directory. It's the only script — everything else is `grep`, your file tool, or `npx js-yaml`. Don't rewrite it in `python`.
+`scripts/check-coverage.mjs` (~25 lines, zero deps; symlinked from `manual-coverage`) — reads the parsed coverage map on stdin, flags keys whose path is missing on disk and keys with no identifiers, and lists every `@S`/`@T`/tag the file references. Feed it via `js-yaml`, from the project root:
+
+```bash
+npx js-yaml coverage.e2e.yml | node scripts/check-coverage.mjs
+```
+
+It's the only script — everything else is `grep`, your file tool, or `npx js-yaml`. Don't rewrite it in `python`.
 
 ---
 

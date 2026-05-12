@@ -30,7 +30,7 @@ This skill works **only with manual tests in markdown format**.
 - **DO NOT** process unit, functional, or e2e test files.
 - **DO NOT** suggest creating new automated tests.
 - **Only touch two files in this repo.** This skill runs inside the user's source-code repo. It may write `coverage.manual.yml` (or the path the user gave) and add one `.testclaw-context/` line to `.gitignore` if it is missing. Nothing else — never a source file. Cases pulled from Testomat.io go into the gitignored `.testclaw-context/manual-tests/`, never into a tracked folder (see Step 1).
-- **Don't write scripts. Never use Python.** Read `.test.md` files with your file tool; pull out IDs and tags with `grep` (Step 2). The skill ships one tiny helper, `scripts/check-coverage.mjs`, for the one fiddly bit — checking the finished coverage file (Step 5). That's the only script. If you ever need more than a `grep`, a one-line `node -e '…'` is the limit — never `python`, never a parser of your own.
+- **Don't write scripts. Never use Python.** Read `.test.md` files with your file tool; pull out IDs and tags with `grep` (Step 2). To check the finished coverage file, pipe it through `js-yaml` into the one tiny bundled helper: `npx js-yaml coverage.manual.yml | node scripts/check-coverage.mjs` (Step 5). That's the only script. If you ever need more than a `grep`, a one-line `node -e '…'` is the limit — never `python`, never a parser of your own.
 
 If automated test files (e.g. e2e test, unit, api)  are encountered while exploring, ignore them and continue with the manual markdown set.
 
@@ -129,14 +129,13 @@ See [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md) for the full YA
 Write the YAML to the resolved output path (default `coverage.manual.yml`). If the user supplied a different path => use it.
 Keep `#` comments next to each ID so future readers can audit the mapping without opening Testomat.io.
 
-**Check it** — two steps, no script of your own:
+**Check it** — one command, run from the project root:
 
 ```bash
-npx js-yaml coverage.manual.yml > /dev/null && echo "valid YAML"   # parses?
-node scripts/check-coverage.mjs coverage.manual.yml                 # keys exist? empties? list IDs
+npx js-yaml coverage.manual.yml | node scripts/check-coverage.mjs
 ```
 
-`check-coverage.mjs` flags any key whose path is missing on disk, any key with no identifiers, and prints every `@S…` / `@T…` / tag it references. Check that list against the IDs you extracted in Step 2 — only you know which are real. Don't re-parse the markdown; use the set you already have. Never use `python`.
+`npx js-yaml` parses the file (and fails loudly if the YAML is malformed, so a broken file never reaches the script). `check-coverage.mjs` then flags any key whose path is missing on disk, any key with no identifiers, and prints every `@S…` / `@T…` / tag it references. Check that list against the IDs you extracted in Step 2 — only you know which are real. Don't re-parse the markdown; use the set you already have. Never use `python`.
 
 > The keys in the coverage file are paths to source files in this repo, never `.testclaw-context/...` paths. The cache holds the test cases; the coverage file points at the code they cover.
 
@@ -185,7 +184,13 @@ Once the file is saved, propose any of:
 
 ## Bundled script
 
-`scripts/check-coverage.mjs <coverage.yml>` — flags keys whose path is missing on disk and keys with no identifiers, and lists every `@S`/`@T`/tag the file references. ~30 lines, zero deps. Run it with `node scripts/check-coverage.mjs <yml>` from this skill's directory. It's the only script — everything else is `grep`, your file tool, or `npx js-yaml`. Don't rewrite it in `python`.
+`scripts/check-coverage.mjs` (~25 lines, zero deps) — reads the parsed coverage map on stdin, flags keys whose path is missing on disk and keys with no identifiers, and lists every `@S`/`@T`/tag the file references. Feed it via `js-yaml`, from the project root:
+
+```bash
+npx js-yaml coverage.manual.yml | node scripts/check-coverage.mjs
+```
+
+It's the only script — everything else is `grep`, your file tool, or `npx js-yaml`. Don't rewrite it in `python`.
 
 ---
 

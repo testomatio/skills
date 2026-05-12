@@ -1,38 +1,39 @@
 #!/usr/bin/env node
-// Sanity-check a coverage.*.yml file (manual or e2e — same format):
-//   node check-coverage.mjs <coverage.yml>
+// Sanity-check a coverage.*.yml mapping (manual or e2e — same format).
 //
-// Prints any key whose path is missing on disk, any key with no
-// identifiers, and the full list of @S/@T/tag IDs it references —
-// cross-check those against the test set you already extracted.
-// Exits non-zero if a problem is found. (Never use python.)
+// `js-yaml` does the YAML parsing; this script just checks the result.
+// Run it from the project root and pipe the parsed file in:
+//
+//   npx js-yaml coverage.manual.yml | node check-coverage.mjs
+//
+// (`npx js-yaml` prints JSON, and fails loudly if the YAML is malformed,
+// so a broken file never reaches this script.)
+//
+// Reports: keys whose path is missing on disk, keys with no identifiers,
+// and the list of @S/@T/tag IDs referenced — cross-check those against
+// the test set you already extracted. Exits non-zero on any problem.
+// (Never use python.)
 
-import { readFileSync, existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
-const file = process.argv[2];
-if (!file) { console.error('usage: node check-coverage.mjs <coverage.yml>'); process.exit(64); }
+const map = JSON.parse(readFileSync(0, 'utf8')); // fd 0 = stdin
+if (!map || typeof map !== 'object' || Array.isArray(map)) {
+  console.error('expected a JSON object of "path": [ids] — pipe `npx js-yaml <file>` into me');
+  process.exit(1);
+}
 
 const ids = new Set();
-let key = null, items = 0, problems = 0;
-const flush = () => { if (key && !items) { console.log('empty:  ', key); problems++; } };
+let problems = 0;
 
-for (const line of readFileSync(file, 'utf8').split('\n')) {
-  if (!line.trim() || line.trimStart().startsWith('#')) continue;
-  const k = line.match(/^(\S.*):\s*(#.*)?$/);                 // "<path or glob>:" line
-  if (k) {
-    flush();
-    key = k[1].trim(); items = 0;
-    if (key.startsWith('tag:')) continue;                     // tag selector, not a path
-    const base = /[*?[\]]/.test(key)                          // glob → check its non-glob prefix
-      ? key.replace(/[\/\\][^\/\\]*[*?[\]].*$/, '')
-      : key;
-    if (base && !existsSync(base)) { console.log('missing:', key); problems++; }
-  } else {
-    const m = line.match(/-\s*"?(@[A-Za-z0-9_-]+)"?/);        // "- @id" line
-    if (m) { ids.add(m[1]); items++; }
-  }
+for (const [key, value] of Object.entries(map)) {
+  const list = Array.isArray(value) ? value : value == null ? [] : [value];
+  if (list.length === 0) { console.log('empty:  ', key); problems++; }
+  list.forEach((id) => ids.add(String(id)));
+
+  if (key.startsWith('tag:')) continue;                     // tag selector, not a path
+  const base = key.replace(/[\/\\][^\/\\]*[*?[\]].*$/, ''); // a glob → its non-glob prefix
+  if (base && !existsSync(base)) { console.log('missing:', key); problems++; }
 }
-flush();
 
 console.log('\nidentifiers:', [...ids].sort().join(', ') || '(none)');
 console.log(problems ? `\n${problems} problem(s) above — fix them` : '\nall keys resolve, no empty entries');

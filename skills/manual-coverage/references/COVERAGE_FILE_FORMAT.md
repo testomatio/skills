@@ -109,14 +109,13 @@ jobs:
 
 ## Checking the coverage file
 
-Two steps — no parser of your own:
+One command, run from the project root — no parser of your own:
 
 ```bash
-npx js-yaml coverage.manual.yml > /dev/null && echo "valid YAML"   # parses? errors loudly if not
-node scripts/check-coverage.mjs coverage.manual.yml                 # keys exist? empties? list IDs
+npx js-yaml coverage.manual.yml | node scripts/check-coverage.mjs   # or coverage.e2e.yml
 ```
 
-`scripts/check-coverage.mjs` ships with both `manual-coverage` and `automation-coverage` (the `automation-coverage` copy is a symlink). It's ~30 lines: flags a key whose path is missing on disk, flags a key with no identifiers, lists every `@S…` / `@T…` / tag the file references, and exits non-zero if it finds a problem.
+`npx js-yaml` parses the YAML (it fails loudly on a malformed file, so a broken one never reaches the script). `scripts/check-coverage.mjs` (~25 lines, zero deps; ships with both `manual-coverage` and `automation-coverage`, the latter as a symlink) reads that parsed map on stdin, flags any key whose path is missing on disk, flags any key with no identifiers, lists every `@S…` / `@T…` / tag the file references, and exits non-zero on a problem.
 
 The script can't tell which identifiers are real — check the listed ones against the set you extracted earlier in the workflow. Don't re-parse the test set, don't write your own YAML parser, and never use `python`.
 
