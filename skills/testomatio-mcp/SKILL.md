@@ -25,13 +25,22 @@ Trigger this skill when the user wants to:
 
 ## Important Guidelines
 
-### Prefer Filesystem Search for Local Tests
+Prefer loading test cases locally as markdown files via `sync-tests` skills, as this is more efficient than using MCP for full test discovery and analysis.
 
-If the project contains **Markdown test cases** (`*.test.md`) or **automated test files** in the repo, **do not use MCP** to list or search tests. Use local filesystem search instead.
 
-- Use MCP (`tests_list`, `tests_search`) only when the tests live exclusively in Testomat.io (no local copies).
-- Use filesystem search to find local `*.test.md` files or source code tests when available.
-This avoids unnecessary API calls and respects the user's local test structure.
+- quick testcase searches
+- targeted lookups
+
+
+### Prefer Local Tests Over MCP
+
+If the project contains **Markdown test cases** (`*.test.md`) or **automated test files** in the repo, prefer loading test cases locally as markdown files via `sync-cases` skills, as this is more efficient than using MCP for full test discovery and analysis.
+
+- Prefer filesystem search to find local `*.test.md` files or source code tests when available.
+- Use MCP only when:
+  - tests live exclusively in Testomat.io (no local copies) OR need quick test case searches (e.g. `tests_list`, `tests_search`).
+  - performing point updates to remote test case.
+(This avoids unnecessary API calls and respects the user's local test structure).
 
 ### Use TQL for Filtering
 
@@ -130,9 +139,18 @@ Available workflows:
 
 ---
 
-## Workflows
+## Possible User's Workflows
 
-All actions below assume the MCP server is enabled. The skill calls the MCP CLI tools exposed in the *MCP System tools* reference.
+The workflows below are examples of common MCP usage patterns and are not a complete list. Adapt and extend them based on user needs.
+
+**MCP is commonly used for:**
+- reading and analyzing run reports.
+- analytics and reporting.
+- test plan management.
+- remote testcase operations.
+- targeted searches and updates.
+
+All actions below assume the MCP server is enabled. The skill uses the MCP CLI tools exposed in the *MCP System tools* reference.
 
 ### Workflow 1: Analyze Test Runs
 
