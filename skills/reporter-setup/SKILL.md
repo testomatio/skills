@@ -88,7 +88,28 @@ After completing language and framework detection and/or interactive setup, outp
 
 ---
 
-## Step 2: Testomat.io Reporter Setup
+## Step 2: Configure Credentials
+
+Check if "TESTOMATIO" API key exists in `.env`:
+- **If exists**: Use it (no action needed).
+- **If missing**: Add to `.env` token placeholder (format: `tstmt_xxxxx`) :
+
+```env
+TESTOMATIO=tstmt_xxxxx
+...
+```
+
+And ask user to manually replace the placeholder by "Project Reporting API key" value.
+
+### Get API Key (if user doesn’t have it)
+
+Ask the user to obtain it from Testomat.io project:
+- Navigate to **Settings → Project → Project Reporting API key**
+_( Project path example by "project-id": `https://app.testomat.io/projects/<project-id>/settings/project` )_
+
+---
+
+## Step 3: Testomat.io Reporter Setup
 
 Based on the detected Program Language and Test framework, install and configure the appropriate reporter.
 
@@ -248,72 +269,179 @@ mvn clean test
 
 ---
 
-## Step 3: Configure Credentials
+## Step 4: Import Automated Tests to Testomat.io TMS
 
-Check if "TESTOMATIO" API key exists in `.env`:
-- **If exists**: Use it (no action needed).
-- **If missing**: Add to `.env` token placeholder (format: `tstmt_xxxxx`) :
+Import your automated test source code into Testomat.io to see test structure, code, and enable synchronization between your codebase and TMS.
 
-```env
-TESTOMATIO=tstmt_xxxxx
-...
+> Full documentation: [Testomat.io Import Overview](https://docs.testomat.io/project/import-export/)
+
+### JavaScript / TypeScript
+
+Use `check-tests` CLI tool to import tests from JavaScript/TypeScript projects.
+
+```bash
+# Install check-tests
+npx check-tests@latest <framework> "<glob-pattern>" [options]
 ```
 
-And ask user to manually replace the placeholder by "Project Reporting API key" value.
+#### Supported Frameworks & Patterns
 
-### Get API Key (if user doesn’t have it)
+| Framework | Command Example |
+|-----------|-----------------|
+| **Playwright**  | `npx check-tests@latest Playwright "tests/**/*.spec.js"` |
+| **CodeceptJS**  | `npx check-tests@latest CodeceptJS "tests/**_test.js"` |
+| **Cypress**     | `npx check-tests@latest cypress "cypress/e2e/**/*.js"` |
+| **Jest**        | `npx check-tests@latest Jest "tests/**/*.test.js"` |
+| **Mocha**       | `npx check-tests@latest mocha "test/**/*_test.js"` |
+| **WebdriverIO** | `npx check-tests@latest webdriverio "test/**/*.js"` |
 
-Ask the user to obtain it from Testomat.io project:
-- Navigate to **Settings → Project → Project Reporting API key**
-_( Project path example by "project-id": `https://app.testomat.io/projects/<project-id>/settings/project` )_
+For **TypeScript** projects, add `--typescript` flag:
 
-## Step 4: Verify Setup
+```bash
+npx check-tests@latest Playwright "tests/**/*.spec.ts" --typescript
+npx check-tests@latest Jest "tests/**/*.test.ts" --typescript
+```
+
+#### Examples
+
+```bash
+# Basic import
+npx check-tests@latest Playwright "tests/**/*.spec.js"
+
+# Import TypeScript
+npx check-tests@latest Jest "tests/**/*.test.ts" --typescript
+
+# Sync and auto-assign IDs in source code
+npx check-tests@latest CodeceptJS "tests/**_test.js" --update-ids
+```
+
+---
+
+### Java
+
+Use `testomatio.jar` CLI to import Java test code into Testomat.io.
+
+Supported Java Frameworks:
+- **JUnit** ✅
+- **TestNG** ✅
+- **Karate** (via java-reporter-karate)
+
+#### Quick Setup (One-Liner)
+
+```bash
+export TESTOMATIO=tstmt_xxxxx && \
+curl -L -O https://github.com/testomatio/java-check-tests/releases/latest/download/testomatio.jar && \
+java -jar testomatio.jar import
+```
+
+[Commands:
+- `import` - Import test code to Testomat.io (dry-run without API key).
+- `clean-ids` - Import tests without system ids.
+- `sync` -  Import tests + pull IDs into source code (alias: `update-ids`).]
+
+---
+
+### Python
+
+#### Pytest
+
+```bash
+# Sync tests with Testomat.io
+pytest --testomatio sync
+
+# Run and report tests
+pytest --testomatio report
+```
+
+#### Robot Framework
+
+```bash
+# Import tests
+robot --listener Testomatio.Import path/to/tests
+
+# Run and report
+robot --listener Testomatio.Report path/to/tests
+```
+
+---
+
+### XML / JUnit Reports (C#, PHP, Ruby, Go, Swift, etc)
+
+For languages and frameworks that don't have native Testomat.io reporters (like C#, PHP, Ruby, Go, etc), use JUnit XML format to import test results.
+
+#### Generate JUnit XML Report
+
+Configure your test framework to output results in JUnit XML format:
+
+**NUnit (C#):**
+```bash
+dotnet test --logger:"trx;LogFileName=results.xml"
+# Convert to JUnit XML if needed
+```
+
+**PHPUnit (PHP):**
+```bash
+./vendor/bin/phpunit --log-junit=results.xml
+```
+
+**Ruby (RSpec):**
+```bash
+rspec --format json --out results.json  # Then convert to JUnit XML
+```
+
+#### Import & Report to Testomat.io
+
+Use the JUnit XML importer to send results to Testomat.io:
+
+```bash
+# Basic import from JUnit XML
+npx check-tests@latest junit "path/to/results.xml"
+
+# Specify multiple XML files
+npx check-tests@latest junit "results/*.xml"
+```
+
+---
+
+## Step 5: Verify Setup
 
 Run your tests with the Testomat.io reporter to ensure everything is configured correctly.
 
-### Debug Mode (Preferred)
+### By Testomat.io MCP (Preferred)
+
+**IF Testomat.io MCP enabled:** Use the MCP to verify that test results were successfully sent to Testomat.io. After running tests, fetch the latest run to confirm data was received.
+
+**Run tests first:**
+```bash
+TESTOMATIO=tstmt_xxxxx npx <your-test-command>
+```
+
+**Success Run indicators:**
+- New run IDs appears in the logs.
+- Run status shows passed/failed status as expected.
+- You can get run informatiom by system ID.
+
+**Install DONE**: When you can fetch the new run via MCP, the reporter is correctly configured and data is being sent to Testomat.io!
+
+> More MCP tools: [Testomat.io MCP Run Management](https://github.com/testomatio/mcp/blob/main/docs/tools.md#run-management)
+
+---
+
+### Debug Mode (Alternative)
 
 Use Debug mode to capture reporter output locally **for only 1-2 tests**. This helps verify that data is generated correctly before sending it to Testomat.io.
 
-Enable Debug pipe by setting the environment variable:
+To enable debug logs, set `DEBUG` environment variable to required module name:
 
 ```bash
-TESTOMATIO_DEBUG=1 npx <your-test-command>
+DEBUG=@testomatio/reporter:pipe:testomatio npx <your-test-command>
 ```
 
 **After running,** read the test execution logs to detect whether the Testomat.io reporter is enabled and configured correctly.
 
-### HTML Report Mode (Alternative)
+> Extra debug documentation: [Testomat.io Debugging Logs](https://docs.testomat.io/not-in-use/debugging/)
 
-You can generate a local HTML report **for only 1-2 tests** to verify test execution without sending data to Testomat.io and check that html file was created:
-
-```bash
-TESTOMATIO_HTML_REPORT_SAVE=1 npx <your-test-command>
-```
-
-**More info** you can find in [Testomat.io HTML Pipe](https://docs.testomat.io/test-reporting/pipes/html/)
-
-## Step 5: Import Tests to TMS
-
-After the reporter is successfully configured and the "TESTOMATIO" API token is added to the project, push the detected tests to Testomat.io.
-(Try to use `sync-cases` skill if available for synchronize tests)
-**Do not run this step** if the reporter is not configured or the token is missing.
-
-Playwright Example:
-
-```bash
-# Import test by JavaScript
-npx check-tests@latest Playwright "**/*{.,_}{test,spec,cy}.js"
-
-# Import test by TypeScript
-npx check-tests@latest Playwright "**/*{.,_}{test,spec,cy}.js" --typescript
-
-# or If no `.env` used
-TESTOMATIO=tstmt_xxxxx npx check-tests@latest Playwright "**/*{.,_}{test,spec,cy}.js" --no-empty
-```
-
-**If all steps finished successfully**, the tests will appear in the Testomat.io project:
-- Suggest the user go to the Testomat.io UI interface and check if the tests have been added to the project scope.
+---
 
 ## Final Summary Example
 
@@ -332,12 +460,9 @@ Testomatio Reporter configuration complete:
 
 Verification:
 ✔ Tests executed successfully
-✔ Reporter generated HTML report
 ✔ Reporter ready to push results to Testomatio
+✔ Run was created and verify by MCP
 
-Next steps:
-1. Execute tests and push run results to TMS:
-TESTOMATIO=tstmt_xxxxx npx playwright test --grep "@smoke"
 ```
 
 > Documentation: https://docs.testomat.io/getting-started/
@@ -388,22 +513,51 @@ Use reporter-setup skill to install reporter and import tests to TMS
 
 ### Basic Setup (Playwright)
 
+**User Request:**
 ```
-User: Add testomatio reporter to my project
-Agent: Detected Playwright project. Installing @testomatio/reporter...
-Agent: Please replace API token in `.env` file
-Agent: Run tests with: npx playwright test and push results to TMS
+Add testomatio reporter to my Playwright project
 ```
 
----
+**Agent Workflow:**
 
-## Quick Commands
+1. **Detect Framework** - Scans project files:
+```
+Program Language: JavaScript/TypeScript
+Test Framework: Playwright
+Config file: playwright.config.ts found
+```
 
-| Action | Command |
-|--------|---------|
-| Install (JS/TS) | `npm install @testomatio/reporter --save-dev` |
-| Import to TMS (Playwright) | `npx check-tests@latest Playwright "**/*{.,_}{test,spec,cy}.js"` |
-| Import to TMS (Jest) | `npx check-tests@latest Jest "**/*.test.js"` |
-| Import to TMS (Mocha) | `npx check-tests@latest Mocha "test/**/*_test.js"` |
-| Import to TMS (CodeceptJS) | `npx check-tests@latest CodeceptJS "tests/**_test.js"` |
-| Import to TMS (Python) | `pytest --testomatio sync` |
+2. **Install Reporter** - Installs npm package:
+```
+npm install @testomatio/reporter --save-dev
+```
+
+3. **Configure Playwright** - Updates `playwright.config.ts`:
+```js
+reporter: [
+  ['@testomatio/reporter/playwright'],
+],
+```
+
+4. **Import Tests** - Import test structure to TMS:
+```
+npx check-tests@latest Playwright "tests/**/*.spec.ts" --typescript
+```
+
+5. **Verify Setup** - Uses MCP to confirm data received:
+```json
+// Run tests first and check logs
+TESTOMATIO=tstmt_xxxxx npx playwright test --grep @smoke
+
+// ...Then fetch latest run via MCP to verify - by run ids
+```
+
+**Final Output:**
+```
+✅ Reporter installed and configured
+✅ Tests imported to Testomat.io (X tests found)
+✅ Verification: New run Rxxxxxxx created with X test results
+
+Next steps:
+1. View results: https://app.testomat.io/projects/{project_id}/runs
+```
