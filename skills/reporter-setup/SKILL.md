@@ -451,45 +451,71 @@ After successfully running your first tests and checking results in Testomat.io,
 - Only trigger this "Configure Artifacts"" if the user explicitly asks for artifacts configuration or mentions wanting to save screenshots, videos, traces, or logs.
 - Artifacts are optional but highly recommended — they help debug failing tests by providing visual evidence.
 
-### Prerequisites
+**Prerequisites:** First test report executed successfully ✅
 
-- First test report executed successfully ✅
-- Tests are being sent to Testomat.io ✅
+### Check for Existing Configuration
 
-### Create S3 Bucket (if needed)
+First, check if S3 credentials already exist in `.env` file:
 
-If you don't have an S3 bucket yet, you can create one from any provider:
+```
+# Look for these variables:
+S3_ACCESS_KEY_ID=...
+S3_BUCKET=...
+S3_REGION=...
+```
+
+- **If credentials exist**: Proceed to verify configuration (Stage 2)
+- **If missing**: Proceed to Stage 1 to create bucket and configure
+
+### Stage 1.1: Create S3 Bucket (if needed)
+
+If project doesn't have S3 bucket yet, **provide step-by-step instructions** for their chosen provider based on official documentation.
+(**Recommendation: Use one S3 bucket per project** to keep artifacts organized and isolated).
 
 | Provider | Link |
 |----------|------|
 | **AWS S3** | https://s3.console.aws.amazon.com/s3 |
 | **DigitalOcean** | https://cloud.digitalocean.com/spaces |
 | **Google Cloud Storage** | https://console.cloud.google.com/storage |
+| **Cloudflare R2** | https://dash.cloudflare.com/ |
 | **Minio** | Self-hosted or cloud instance |
 
-> **Tip:** If user don't have any storage configs in env file => **Help** the user create a bucket by providing step-by-step instructions for their chosen provider by official instruction.
+**After creating the bucket, the user needs to:**
+1. Obtain S3 credentials (Access Key ID, Secret Access Key) from the provider.
+2. Choose configuration method below (Option A or B).
+3. Show summary about configured bucket store.
 
-### Configuration Options
+### Stage 1.2: Configure Bucket Credentials
 
-#### Option A: UI Configuration (Recommended - Secure)
+Choose one of the following options:
+- Option A: Testomat.io UI Configuration.
+- Option B: Project Environment Variables
 
-Configure artifacts via Testomat.io UI — credentials are stored securely and not exposed in your codebase:
+#### Option A: Testomat.io UI Configuration (Recommended - Secure)
 
-1. Navigate to your project settings:
+> ⚠️ **AI Agent cannot perform this action due to security restrictions:** Instruct the user to do this manually.
+
+**Tell the user:**
+
 ```
-https://app.testomat.io/projects/<project-id>/settings/artifacts
-```
+Due to security restrictions, I cannot access your Testomat.io project settings directly.
+Please configure artifacts manually:
+
+1. Navigate to: https://app.testomat.io/projects/<project-id>/settings/artifacts
 2. Enable "Share credentials" toggle
 3. Enter your S3 credentials:
 - Access Key ID
 - Secret Access Key
 - Bucket name
 - Region
-- Endpoint (for non-AWS providers)
+- Endpoint (for non-AWS providers like DigitalOcean, Cloudflare R2, GCS)
+```
+
+**After completing, let me know and we'll verify the configuration.**
 
 #### Option B: Environment Variables
 
-Add to your `.env` file or CI pipeline:
+Add S3 credentials to your `.env` file or CI pipeline:
 
 ```env
 # Required for all providers
@@ -498,14 +524,21 @@ S3_SECRET_ACCESS_KEY=your_secret_key
 S3_BUCKET=your_bucket_name
 S3_REGION=us-west-1
 
-# Optional: For non-AWS providers
-S3_ENDPOINT=https://ams3.digitaloceanspaces.com
+# Optional: For non-AWS providers (DigitalOcean, Minio, Cloudflare R2, GCS)
+S3_ENDPOINT=https://your-endpoint-url
 
-# Optional: Enable private access mode
+# Optional: Enable private access mode (recommended for security)
 TESTOMATIO_PRIVATE_ARTIFACTS=1
 ```
 
-### Configuration Example (AWS)
+To disable artifacts upload:
+```env
+TESTOMATIO_DISABLE_ARTIFACTS=1
+```
+
+**Configuration Examples:**
+
+#### AWS
 
 ```env
 S3_ACCESS_KEY_ID=xxx
@@ -514,12 +547,38 @@ S3_BUCKET=testomatio-artifacts
 S3_REGION=us-west-1
 ```
 
-To disable artifacts upload:
+#### Cloudflare R2
+
 ```env
-TESTOMATIO_DISABLE_ARTIFACTS=1
+S3_ACCESS_KEY_ID=xxx
+S3_SECRET_ACCESS_KEY=xxx
+S3_BUCKET=testomatio-artifacts
+S3_REGION=auto
+S3_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
+S3_FORCE_PATH_STYLE=true
 ```
 
 > More configuration options: [Testomat.io Artifacts](https://docs.testomat.io/test-reporting/artifacts/)
+
+### Stage 2: Verify Configuration
+
+After configuring credentials (either via UI or environment variables), verify artifacts are being uploaded correctly:
+
+1. **Run tests with artifacts** - Execute a test run that produces screenshots, videos, or traces:
+
+```bash
+TESTOMATIO=tstmt_xxxxx npx <your-test-command>
+```
+
+2. **Ask To Check Testomat.io UI Runs** - Navigate to the run results:
+`https://app.testomat.io/projects/<project-id>/runs`
+
+3. **Verify artifacts presence by user comments** - Click on a test with artifacts (failed tests typically have screenshots):
+- Look for 📎 attachment icon or "Artifacts" section
+- Screenshots, videos, or traces should be visible and clickable
+- For Playwright: traces should open in Playwright trace viewer
+
+> **Success indicator:** Artifacts (screenshots, videos, traces) are displayed in test results and are clickable/viewable.
 
 ---
 
