@@ -443,6 +443,86 @@ DEBUG=@testomatio/reporter:pipe:testomatio npx <your-test-command>
 
 ---
 
+## Step 6: Configure Artifacts (Optional - Trigger on User Request)
+
+After successfully running your first tests and checking results in Testomat.io, you can suggest the user configure artifacts storage to save screenshots, videos, traces, and logs alongside test results.
+
+**Important Notes:**
+- Only trigger this "Configure Artifacts"" if the user explicitly asks for artifacts configuration or mentions wanting to save screenshots, videos, traces, or logs.
+- Artifacts are optional but highly recommended — they help debug failing tests by providing visual evidence.
+
+### Prerequisites
+
+- First test report executed successfully ✅
+- Tests are being sent to Testomat.io ✅
+
+### Create S3 Bucket (if needed)
+
+If you don't have an S3 bucket yet, you can create one from any provider:
+
+| Provider | Link |
+|----------|------|
+| **AWS S3** | https://s3.console.aws.amazon.com/s3 |
+| **DigitalOcean** | https://cloud.digitalocean.com/spaces |
+| **Google Cloud Storage** | https://console.cloud.google.com/storage |
+| **Minio** | Self-hosted or cloud instance |
+
+> **Tip:** If user don't have any storage configs in env file => **Help** the user create a bucket by providing step-by-step instructions for their chosen provider by official instruction.
+
+### Configuration Options
+
+#### Option A: UI Configuration (Recommended - Secure)
+
+Configure artifacts via Testomat.io UI — credentials are stored securely and not exposed in your codebase:
+
+1. Navigate to your project settings:
+```
+https://app.testomat.io/projects/<project-id>/settings/artifacts
+```
+2. Enable "Share credentials" toggle
+3. Enter your S3 credentials:
+- Access Key ID
+- Secret Access Key
+- Bucket name
+- Region
+- Endpoint (for non-AWS providers)
+
+#### Option B: Environment Variables
+
+Add to your `.env` file or CI pipeline:
+
+```env
+# Required for all providers
+S3_ACCESS_KEY_ID=your_access_key
+S3_SECRET_ACCESS_KEY=your_secret_key
+S3_BUCKET=your_bucket_name
+S3_REGION=us-west-1
+
+# Optional: For non-AWS providers
+S3_ENDPOINT=https://ams3.digitaloceanspaces.com
+
+# Optional: Enable private access mode
+TESTOMATIO_PRIVATE_ARTIFACTS=1
+```
+
+### Configuration Example (AWS)
+
+```env
+S3_ACCESS_KEY_ID=xxx
+S3_SECRET_ACCESS_KEY=xxx
+S3_BUCKET=testomatio-artifacts
+S3_REGION=us-west-1
+```
+
+To disable artifacts upload:
+```env
+TESTOMATIO_DISABLE_ARTIFACTS=1
+```
+
+> More configuration options: [Testomat.io Artifacts](https://docs.testomat.io/test-reporting/artifacts/)
+
+---
+
 ## Final Summary Example
 
 After verifying the setup, output a short log-style summary of what was configured.
@@ -455,7 +535,7 @@ Testomatio Reporter configuration complete:
 - Reporter: @testomatio/reporter installed
 - Config updated: playwright.config.ts
 - Debug or HTML: enabled
-<!-- - Artifacts storage: not configured -->
+- Artifacts storage: configured (optional step)
 - Testomatio API key: detected (.env)
 
 Verification:
