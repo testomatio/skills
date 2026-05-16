@@ -91,6 +91,7 @@ Scan the project and collect a list of **source code files only**.
 
 Include:
 - Application source files (e.g. `.js`, `.ts`, `.py`, `.java`, `.go`, etc.).
+- View/template files — they are application source: `.html`/`.htm`, `.vue`, `.svelte`, `.hbs`/`.handlebars`, `.ejs`, `.pug`/`.jade`, `.mustache`, `.liquid`, `.erb`, `.haml`, `.slim`, `.blade.php`, `.twig`, `.j2`/`.jinja`/`.jinja2`, `.cshtml`/`.razor`, `.jsp`. Do not exclude these as "non-source"; coverage skills map UI changes through them.
 
 Exclude:
 - Dependencies (e.g. `node_modules/`, `vendor/`, `.venv/`).

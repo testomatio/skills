@@ -104,6 +104,14 @@ Use the **Project Overview** from Step 1's `project-scan` result (languages, fra
 - Dependency / build / vendor folders.
 - Framework configs (`playwright.config.*`, `cypress.config.*`, `wdio.conf.*`, `codecept.conf.*`, lock files).
 
+**Templates and views are source code — map them too.** E2E tests drive the rendered UI, so a change to a template breaks or alters the page a test asserts on. Treat view/template files as first-class mappable source alongside controllers, models, and components — do **not** skip them because they aren't `.js`/`.ts`/`.py`. Cover at least:
+
+- HTML & component templates: `.html`, `.htm`, `.vue`, `.svelte`, Angular `*.component.html`.
+- Logic-in-markup engines: `.hbs`/`.handlebars`, `.ejs`, `.pug`/`.jade`, `.mustache`, `.liquid`.
+- Server-side views: `.erb`, `.haml`, `.slim` (Rails); `.blade.php`, `.twig` (PHP); `.j2`/`.jinja`/`.jinja2` (Python); `.cshtml`/`.razor` (.NET); `.jsp` (Java).
+
+Map a template the same way as code: to the suite/test/tag whose e2e tests render and assert against that view (e.g. `app/views/sessions/new.html.erb` → the login suite).
+
 ❓ If the project structure is large or ambiguous (`project-scan` reports `large` / `very-large` complexity), ask which directories to focus on or to exclude.
 
 ### Step 5: Choose the best mapping per source file

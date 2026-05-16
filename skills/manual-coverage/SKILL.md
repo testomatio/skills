@@ -88,6 +88,14 @@ Use the **Project Overview** from Step 1's `project-scan` result (languages, fra
 
 Work with the project structure (controllers, models, services, components, pages, routes, etc.) — not the testing infrastructure.
 
+**Templates and views are source code — map them too.** A manual case walks through the rendered UI, so a change to a template alters the screen the tester checks. Treat view/template files as first-class mappable source alongside controllers, models, and components — do **not** skip them because they aren't `.js`/`.ts`/`.py`. Cover at least:
+
+- HTML & component templates: `.html`, `.htm`, `.vue`, `.svelte`, Angular `*.component.html`.
+- Logic-in-markup engines: `.hbs`/`.handlebars`, `.ejs`, `.pug`/`.jade`, `.mustache`, `.liquid`.
+- Server-side views: `.erb`, `.haml`, `.slim` (Rails); `.blade.php`, `.twig` (PHP); `.j2`/`.jinja`/`.jinja2` (Python); `.cshtml`/`.razor` (.NET); `.jsp` (Java).
+
+Map a template the same way as code: to the suite/test/tag whose manual cases exercise that screen (e.g. `app/views/sessions/new.html.erb` → the login suite).
+
 ❓ If the project structure is ambiguous or large (`project-scan` reports `large` / `very-large` complexity), ask the user which directories to focus on or to exclude.
 
 ### Step 4: Choose the best mapping per source file
