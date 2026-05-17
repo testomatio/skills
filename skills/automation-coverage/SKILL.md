@@ -28,7 +28,7 @@ Trigger this skill when the user wants to:
 This skill works **only with automated e2e tests** (Playwright, Cypress, WebdriverIO, Puppeteer, CodeceptJS, Appium, etc.).
 
 - **DO NOT** process unit tests.
-- **DO NOT** process manual markdown test cases (use `manual-coverage` instead).
+- **DO NOT** process manual markdown test cases (use `manual-coverage` instead - if already exists).
 - **DO NOT** suggest creating new tests.
 - **Only touch two files in this repo.** It may write `coverage.e2e.yml` (or the path the user gave) and add one `.testclaw-context/` line to `.gitignore` if it is missing. Nothing else — never a source or test file. If the e2e tests live in another repo, clone it into the gitignored `.testclaw-context/e2e-tests/`, never into a tracked folder (see Step 1).
 - **Don't write scripts. Never use Python.** Read test files with your file tool; pull out IDs and tags with `grep` (Step 3). To check the finished coverage file, pipe it through `js-yaml` into the one tiny bundled helper (symlinked from `manual-coverage`): `npx js-yaml coverage.e2e.yml | node scripts/check-coverage.mjs` (Step 6). That's the only script. If you ever need more than a `grep`, a one-line `node -e '…'` is the limit — never `python`, never a parser of your own.
