@@ -148,6 +148,19 @@ Use sync-cases skill to pull existing test cases from Testomat.io
 find . -name "*.test.md" -exec grep -l "feature-name" {} \;
 ```
 
+**Option D: Use find-duplicate-cases skill (Recommended)**
+
+Use `find-duplicate-cases` skill to analyze existing test cases for potential duplicates:
+- Identifies exact duplicates by title.
+- Finds semantic duplicates (same intent, similar steps).
+- Detects overlapping/subset tests.
+- Provides similarity scores and recommendations.
+- Helps avoid creating redundant test cases.
+
+When using find-duplicate-cases:
+1. Run find-duplicate-cases to find duplicates related to the changed code
+2. Use the results to skip creating tests that would be duplicates
+
 #### Step 4.2: Analyze Changed Code
 
 For each changed code file, understand:
@@ -213,6 +226,7 @@ This skill orchestrates:
 | **project-scan** | Scan codebase structure, detect frameworks, inventory existing tests |
 | **generate-cases** | Generate test cases from analyzed code changes |
 | **sync-cases** | Push/pull test cases to/from Testomat.io |
+| **find-duplicate-cases** | Find duplicates among existing tests before generating new ones |
 | **testomatio-mcp** | (Optional) Query existing tests in Testomat.io to avoid duplicates |
 
 ---
@@ -320,4 +334,5 @@ Stop execution if:
 | Generate Cases Skill | ../generate-cases/SKILL.md |
 | Sync Cases Skill | ../sync-cases/SKILL.md |
 | Project Scan Skill | ../project-scan/SKILL.md |
+| Find Duplicate Cases Skill | ../find-duplicate-cases/SKILL.md |
 | Testomat.io MCP | ../testomatio-mcp/SKILL.md |
