@@ -129,13 +129,14 @@ app/services/jira_service.rb:
 - Prefer Tag mapping when the relevant tests live across several suites.
 - Globs (`app/services/jira/**`) are valid file keys when a whole subtree maps to the same identifiers.
 - Avoid empty entries.
+- Add `#` comments next to each identifier explaining the mapping.
 
 See [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md) for the full YAML grammar.
 
 ### Step 5: Save and validate the coverage file
 
 Write the YAML to the resolved output path (default `coverage.manual.yml`). If the user supplied a different path => use it.
-Keep `#` comments next to each ID so future readers can audit the mapping without opening Testomat.io.
+(keep `#` comments next to each ID so future readers can audit the mapping without opening Testomat.io).
 
 **Check it** — one command, run from the project root:
 
