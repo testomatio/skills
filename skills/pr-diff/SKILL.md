@@ -112,8 +112,8 @@ Extract testing-relevant info from PR title, description, comments:
 Only analyze **source code** files. Skip configs, deps, tests, docs.
 
 **Include:**
-- Directories: `src/**`, `lib/**`, `app/**`, `controllers/**`, `services/**`, `models/**`, `pages/**`, `components/**`, `handlers/**`, `modules/**`
-- Root files: `.ts`, `.js`, `.tsx`, `.jsx`, `.java`, `.py`, `.go`, `.rb`, `.php`, `.cs`, `.kt`, `.swift`, `.rs`
+- Source Code Directories: `src/**`, `lib/**`, `app/**`, `controllers/**`, `services/**`, `models/**`, `pages/**`, `components/**`, `handlers/**`, `modules/**`, etc.
+- Source Code files: `.ts`, `.js`, `.tsx`, `.jsx`, `.java`, `.py`, `.go`, `.rb`, `.php`, `.cs`, `.kt`, `.swift`, `.rs`
 
 **Skip:** configs, dependencies, tests, docs, migrations, configs, other no related to source code updates.
 
@@ -121,7 +121,6 @@ Only analyze **source code** files. Skip configs, deps, tests, docs.
 - **Feature** — new files, endpoints, components, modules
 - **Fix** — bug fixes, patches, hotfixes (check commits for "fix", "bug", "hotfix")
 - **Refactor** — code restructure without behavior change
-- **Config** — only env/deployment/infrastructure changes
 
 ---
 
@@ -134,7 +133,7 @@ From the analysis, generate structured acceptance criteria:
 ```md
 ## PR Diff Summary
 
-**PR Type:** ... (feature | bugfix | refactor )
+**PR Type:** ... (feature | fix | refactor )
 **Branch:** ... (feature | bugfix | refactor )
 **Changes:** ... (one sentence describing the overall purpose of this PR)
 **Affected Files:**
