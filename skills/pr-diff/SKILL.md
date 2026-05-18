@@ -34,11 +34,14 @@ Trigger this skill when user wants to:
 
 ## Workflow: PR Diff Analysis
 
-### Step 1: Detect Branch Context
+### Step 1: Detect Branch Context & Scope Check
 
 #### Determine Current Branch
 
-Get the current working branch by simple command: `git branch --show-current`
+Get the current working branch:
+```bash
+git branch --show-current
+```
 
 #### Detect Base Branch
 
@@ -52,6 +55,20 @@ git branch -r | grep -E "(origin/HEAD|origin/main|origin/master|origin/dev|origi
 ```
 
 > If multiple candidates exist, use the first match based on the priority order above.
+
+#### Scope Check
+
+Get changed files:
+
+```bash
+git diff {BASE_BRANCH}...HEAD --name-only
+```
+
+**Skip to Step 3 with a short summary without acceptence criteria** if:
+- Branch is `master`, `main`, `dev`, or `develop`
+- No files changed, or only `*.md`/`docs/`, or only test/config files
+
+**Proceed to Step 2** if source code changed (`src/**`, `lib/**`, `app/**`, or root `.ts`/`.js`/`.tsx`/`.jsx`/`.java`/`.py`/`.go`/`.rb`/`.php`/`.cs`/`.kt`/`.swift`/`.rs`)
 
 ---
 
@@ -77,63 +94,38 @@ git fetch origin pull/{PR_NUMBER}/head
 git diff {BASE_BRANCH}...FETCH_HEAD --name-only
 ```
 
----
+#### Extract PR Context
 
-### Step 3: Analyze Changed Files
+Get PR details:
 
-#### Categorize Changes
-
-For each changed file, determine the type:
-
-| Category | Patterns | Action |
-|----------|----------|--------|
-| **Feature** | `src/**`, `controllers/**`, `services/**`, `models/**`, `pages/**`, `components/**`, root file changes in source code | Include in analysis |
-| **Fix** | Bug fixes, hotfixes, patches in `src/**`, root file changes in source code | Include in analysis |
-| **Config** | `*.config.js`, `*.config.ts`, `*.env*` | Include with note |
-| **Test** | `*.test.ts`, `*.spec.ts`, `*_test.js` | Skip (automated tests) |
-| **Test Case** | `*.test.md` with `<!-- test -->` | Skip (manual TC) |
-| **Docs** | `*.md`, `docs/` | Skip (documentation) |
-
-#### Detect PR Type
-
-Analyze to determine:
-- **Feature Implementation** — new functionality, new endpoints, new components
-- **Bug Fix** — fixes for existing issues, patches, hotfixes
-- **Refactor** — code restructuring without behavior change
-- **Config Update** — environment, deployment, infrastructure changes
-
-**Heuristics:**
-- New files added (>30% new) → likely feature
-- Migration files present → likely feature/data change
-- Fix keywords in commit messages (fix, bug, hotfix) → bug fix
-- Only config files → config update
-
----
-
-### Step 4: Read and Analyze PR Information
-
-#### Get PR Details (GitHub)
 ```bash
-# Title and description
-gh pr view {PR_NUMBER} --json title,body
-
-# Comments and reviews
-gh pr view {PR_NUMBER} --json comments,reviews
-
-# Linked issues
-gh pr view {PR_NUMBER} --json issues
+gh pr view {PR_NUMBER} --json title,body,comments,reviews,issues
 ```
 
-#### Extract Related Tickets
+Extract testing-relevant info from PR title, description, comments:
+- **Title** — feature/fix name, affected component.
+- **Description** — criteria, test scenarios.
+- **Comments** — test notes, edge cases, reproductions.
 
-Search for:
-- Issue references: `Fixes`, etc.
-- Ticket numbers: `[PROJ-123]`, `TASK-456`, `JIRA-789`
-- Keywords: `issue`, `bug`, `feature`, `task`, `ticket`
+#### Analyze Changed Files
+
+Only analyze **source code** files. Skip configs, deps, tests, docs.
+
+**Include:**
+- Directories: `src/**`, `lib/**`, `app/**`, `controllers/**`, `services/**`, `models/**`, `pages/**`, `components/**`, `handlers/**`, `modules/**`
+- Root files: `.ts`, `.js`, `.tsx`, `.jsx`, `.java`, `.py`, `.go`, `.rb`, `.php`, `.cs`, `.kt`, `.swift`, `.rs`
+
+**Skip:** configs, dependencies, tests, docs, migrations, configs, other no related to source code updates.
+
+**Detect PR Type:**
+- **Feature** — new files, endpoints, components, modules
+- **Fix** — bug fixes, patches, hotfixes (check commits for "fix", "bug", "hotfix")
+- **Refactor** — code restructure without behavior change
+- **Config** — only env/deployment/infrastructure changes
 
 ---
 
-### Step 5: Extract Acceptance Criteria
+### Step 3: Summary with Acceptance Criteria
 
 From the analysis, generate structured acceptance criteria:
 
