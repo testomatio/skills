@@ -1,6 +1,6 @@
 # Testomat.io CLI Documentation
 
-This document provides comprehensive information about the `check-tests` CLI tool for synchronizing test scenarios between your local project and Testomat.io.
+This document provides comprehensive information about the `check-tests` CLI commands, which synchronizes test scenarios, and interacts with Testomat.io test cases from your local project with TMS.
 
 ---
 
