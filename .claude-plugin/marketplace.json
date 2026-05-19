@@ -16,6 +16,11 @@
       "name": "test-automation",
       "source": "./plugins/test-automation",
       "description": "Adds a /test-automation skill for test automation (create, heal, sync results, etc)"
+    },
+    {
+      "name": "explorbot",
+      "source": "./plugins/explorbot",
+      "description": "Adds /explorbot-setup, /explorbot-fundamentals and /explorbot-plan skills to install, configure, run, debug and plan Explorbot autonomous AI web tests"
     }
   ]
 }
