@@ -3,7 +3,7 @@ name: sync-cases
 description: Synchronize test scenarios and cases between a local project and Testomat.io. Use this skill whenever the user wants to pull/export/download tests from Testomat.io; or push/import/sync new or updated test cases back to the TMS in corresponding `*.test.md` format. Supports custom directories, markdown test format and advanced import/export workflows.
 inputs:
   testDir:
-    description: "Target directory for pulled tests (default: `manual-tests`)"
+    description: "Where to put pulled tests (default: `.testclaw-context/manual-tests` — the gitignored cache). Only override with a tracked path if the repo already keeps its `*.test.md` files there."
     required: false
 license: MIT
 metadata:
@@ -75,8 +75,10 @@ Download/Retrieves test scenarios from Testomat.io and saves them as Markdown fi
 - Backup test cases locally.
 - Refactor test cases offline.
 
+**Where to pull:** into the gitignored cache `.testclaw-context/manual-tests/`, and add `.testclaw-context/` to the project `.gitignore` if it is not there yet. Pulled cases must never land in a tracked folder (`manual-tests/`, etc.) — that pollutes the repo. You can still edit them there and push back; being gitignored doesn't stop that. (If the repo *already* keeps its `*.test.md` files in a tracked folder, you don't need to pull at all — work with them where they are, or pass `-d <that folder>` for an in-place refresh.) This matches `project-scan`, which pulls the *code* into `.testclaw-context/code/` when it runs inside a manual-tests repo.
+
 **Pre-Pull:**
-- Ensure `testDir` exists; otherwise create `manual-tests` folder in root.
+- Create `.testclaw-context/manual-tests/` if it doesn't exist; ensure `.testclaw-context/` is gitignored.
 
 **Command:**
 ```bash
@@ -85,7 +87,10 @@ npx check-tests pull -d <directory>
 
 **Examples:**
 ```bash
-# Pull tests to default manual-tests folder
+# Default — pull into the gitignored cache
+npx check-tests pull -d .testclaw-context/manual-tests
+
+# Repo that already keeps its test cases tracked — refresh them in place
 npx check-tests pull -d manual-tests
 ```
 
@@ -140,14 +145,14 @@ npx check-tests push [-d <directory>] [--files <files...>]
 
 **Examples:**
 ```bash
-# Specific files (preferred when known)
-npx check-tests push --files manual-tests/login.test.md manual-tests/checkout.test.md
+# Specific files (preferred when known — e.g. just produced by generate-cases)
+npx check-tests push --files .testclaw-context/manual-tests/login.test.md .testclaw-context/manual-tests/checkout.test.md
 
 # Custom glob
-npx check-tests push --files "manual-tests/**/*.test.md"
+npx check-tests push --files ".testclaw-context/manual-tests/**/*.test.md"
 
-# Default glob (**/*.test.md) under -d
-npx check-tests push -d manual-tests
+# Default glob (**/*.test.md) under -d — cases you pulled and edited in the cache
+npx check-tests push -d .testclaw-context/manual-tests
 ```
 
 **Important constraints:**
@@ -175,7 +180,7 @@ After completing sync operations, output a short log-style summary:
 ```
 Sync Complete:
 - Action: pull/push
-- Directory: manual-tests
+- Directory: .testclaw-context/manual-tests
 - Tests synced: 15
 - Status: Success
 ```
@@ -213,9 +218,9 @@ Stop execution if:
 
 ## Examples
 
-**Pull tests:**
+**Pull tests** (lands in the gitignored `.testclaw-context/manual-tests/`):
 ```
-Use sync-cases skill to pull tests from Testomat.io in folder "beta-tests/"
+Use sync-cases skill to pull tests from Testomat.io
 ```
 
 **Push tests:**
@@ -232,10 +237,9 @@ Use sync-cases to push tests to Testomat.io
 
 ## Quick Commands
 
-| Action          | Command                                                        |
-| --------------- | -------------------------------------------------------------- |
-| Install         | `npm install check-tests --save-dev`                           |
-| Pull            | `npx check-tests pull -d <directory>`                          |
-| Push (files)    | `npx check-tests push --files <file1.test.md> <file2.test.md>` |
-| Push (glob)     | `npx check-tests push --files "<dir>/**/*.test.md"`            |
-| Push (default)  | `npx check-tests push -d <directory>` (glob: `**/*.test.md`)   |
+| Action          | Command                                                              |
+| --------------- | -------------------------------------------------------------------- |
+| Pull            | `npx check-tests pull -d .testclaw-context/manual-tests` (the default; gitignored) |
+| Push (files)    | `npx check-tests push --files <file1.test.md> <file2.test.md>`       |
+| Push (glob)     | `npx check-tests push --files "<dir>/**/*.test.md"`                  |
+| Push (default)  | `npx check-tests push -d <directory>` (glob: `**/*.test.md`)         |
