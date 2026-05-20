@@ -26,9 +26,7 @@ Trigger this skill when user wants to:
 - **Understand what changed** - analyze PR diff to see what was modified.
 - **Detect feature or fix** - determine if PR is a new feature, bug fix, or refactor.
 - **Extract acceptance criteria** - get Acceptance Criteria from PR description and code changes.
-- **Prepare manual testing** - get Acceptance Criteria to create manual test cases later.
 - **Review user's PR and suggest cases for testing** - analyze PR diff to see what was modified and how we can test it.
-- **Test a feature branch** - analyze PR diff suggest a next steps for testing.
 
 ---
 
@@ -65,8 +63,8 @@ git diff {BASE_BRANCH}...HEAD --name-only
 ```
 
 **Skip to Step 3 with a short summary without acceptence criteria** if:
-- Branch is `master`, `main`, `dev`, or `develop`
-- No files changed, or only `*.md`/`docs/`, or only test/config files
+- Currant branch is `master`, `main`, `dev`, or `develop` - user's base branch.
+- No files changed, or all changes are limited to requirements, documentation, test flows, tests, or test configuration files (`*.md`, `docs/`, `*.test.md`) — **with NO source code updates**.
 
 **Proceed to Step 2** if source code changed (`src/**`, `lib/**`, `app/**`, or root `.ts`/`.js`/`.tsx`/`.jsx`/`.java`/`.py`/`.go`/`.rb`/`.php`/`.cs`/`.kt`/`.swift`/`.rs`)
 
