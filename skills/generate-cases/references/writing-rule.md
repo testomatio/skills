@@ -17,7 +17,7 @@ Description must be clear and concise.
 Focus on whitebox testing, thus each operation and observable results must be obtained via public apis or UI.
 Prefer using UI over public apis when possible.
 If you think UI is available, and test can be achived from UI, test must use it
-Understand UI pages and components or API endpoints from source code. If source code not availble ask user for it.
+Understand UI pages and components or API endpoints from source code or design or requirements. 
 Add system checks only if it not clear how to test via public apis or UI.
 It is not a unit test, usually no direct server or code access is allowed.
 
