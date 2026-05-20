@@ -120,6 +120,44 @@ Only analyze **source code** files. Skip configs, deps, tests, docs.
 - **Fix** — bug fixes, patches, hotfixes (check commits for "fix", "bug", "hotfix")
 - **Refactor** — code restructure without behavior change
 
+#### Additional Project Context & Existing Tests Discovery (Optional)
+
+Use `project-scan` only when additional project context is needed before writing acceptance criteria.
+
+##### When to use project-scan extra knowledge
+
+Run `project-scan` if:
+- The PR introduces new functionality or a significant feature change.
+- You need to check whether similar manual tests already exist.
+- The user explicitly asks:
+  - "check for duplicates"
+  - "what tests already exist"
+  - similar requests about existing test coverage.
+
+##### When to skip project-scan
+
+Do NOT run `project-scan` if:
+- The PR is a small fix or minor UI/component update.
+- The diff already provides enough context to write ACs confidently.
+- Changes are limited to docs, requirements, tests, configs, or non-source-code updates.
+- The project does not appear to contain manual tests.
+- Existing test inventory is not relevant for the requested task.
+
+##### If `project-scan` is unavailable
+
+- Continue without checking existing tests.
+- Add this note to the AC output: `Manual test inventory not checked — verify existing tests manually if needed.`
+- Continue with `Step 3: Summary with Acceptance Criteria`
+
+##### Goal of the scan
+Use scan results only to:
+- Avoid duplicating existing manual test cases.
+- Understand project structure, frameworks, and test organization.
+- Improve relevance and consistency of generated acceptance criteria.
+
+**Do not run `project-scan` by default**.
+**Only use it when the additional context provides clear value**.
+
 ---
 
 ### Step 3: Summary with Acceptance Criteria
@@ -145,7 +183,7 @@ From the analysis, generate structured acceptance criteria:
 - ...
 ```
 
-**Rules:**
+**Summary Rules:**
 - Summary MUST be concise and includes high-level overview.
 - "Changes" is ONE sentence. Not a paragraph.
 - "Impacted Areas" should contain only meaningful business or technical impact.
