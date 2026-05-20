@@ -62,9 +62,17 @@ Get changed files:
 git diff {BASE_BRANCH}...HEAD --name-only
 ```
 
-**Skip to Step 3 with a short summary without acceptence criteria** if:
-- Currant branch is `master`, `main`, `dev`, or `develop` - user's base branch.
-- No files changed, or all changes are limited to requirements, documentation, test flows, tests, or test configuration files (`*.md`, `docs/`, `*.test.md`) — **with NO source code updates**.
+**Skip to Step 3 with a short summary only (without acceptance criteria)** if:
+- Current branch is `master`, `main`, `dev`, or `develop`.
+- No files changed.
+- All changes are **non-source-code** updates only, such as:
+   - documentation/requirements (`*.md`, `docs/**`)
+   - test flows or test documentation (`*.test.md`, `test-flows/**`, `tests/e2e`)
+   - config/infrastructure, CI/CD config  updates (`.github/workflows/**`, `Jenkinsfile`, tooling configs, dependency bumps, etc.)
+   - lint/formatter/tooling configs
+   - dependency version bumps without feature behavior changes
+   - existing test updates.
+- No application/source code behavior was changed.
 
 **Proceed to Step 2** if source code changed (`src/**`, `lib/**`, `app/**`, or root `.ts`/`.js`/`.tsx`/`.jsx`/`.java`/`.py`/`.go`/`.rb`/`.php`/`.cs`/`.kt`/`.swift`/`.rs`)
 
