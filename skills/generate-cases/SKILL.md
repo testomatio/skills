@@ -11,6 +11,7 @@ This skill helps you to generate comprehensive test cases and checklists for sof
 
 - [Testomat.io TMS Guide](./references/testomat-tms-guide.md) - Complete guide for Testomat.io compatibility
 - [Test Case Format](./references/test-case-format.md) - Test cases markdown format reference (testomatio-friendly)
+- [Writing Rules](./references/writing-rule.md) - Rules for writing test suites, test cases, preconditions, and steps (incl. AI writing patterns to avoid)
 
 ## When to Use
 
@@ -323,9 +324,12 @@ If user prompted checklist generation only (not test cases), ask user if he want
 - **Be adaptable**. Adjust depth, detail, testing type and other parameters based on user feedback.
 - **Keep scope**. Test only the functionality under test but not the related entities. If feature linked to other features, don't test them if user didn't ask for it explicitly.
 
-**Follow test case writing rules**: `./references/test-case-format.md`
+**Follow test case writing rules**:
 
-Always use provided Test case format
+- Format: `./references/test-case-format.md`
+- Content/style rules (suites, tests, preconditions, steps, anti-patterns): `./references/writing-rule.md`
+
+Always use provided Test case format and writing rules.
 
 **Don't change the user's source code. Only generate `*.test.md` files with test cases.**
 
@@ -348,6 +352,8 @@ Checklist should have hierarchical and categorized structure.
 ### Test cases format (saved to .md file(s))
 
 - Strictly follow the `./references/test-case-format.md` format. Exception: user specify format in the prompt. In this case, follow the user's format.
+
+- Strictly follow the writing rules from `./references/writing-rule.md` (suite/test descriptions, preconditions, step structure, expected results, anti-patterns).
 
 - Follow [Testomat.io TMS Guide](./references/testomat-tms-guide.md) for format and conventions (priority levels, tags, labels, etc.) (especially when using testomatio mcp)
 
