@@ -49,7 +49,7 @@ Trigger this skill when the user:
 
 - Fill input fields with suggestions when asking user to provide input.
 
-- Questions and outputs should be structured, formated to be easy to read and understand.
+- **Keep terminal/chat output to the user short, concise, well-structured and formatted.** Avoid long paragraphs, walls of text, redundant restatements, or verbose status updates. Prefer bullet lists, short headings, tables and emoji markers over prose. Show only what the user needs to make the next decision — details on request.
 
 ## Workflow (IMPORTANT: how AI tool (Claude, Cursor etc) should work with user)
 
