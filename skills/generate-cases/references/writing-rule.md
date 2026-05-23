@@ -1,27 +1,25 @@
 ## Test Suite Writing Rules
 
 
-Formulas, business rules, edge-case reasoning, and feature
-context live in the suite/test description.
+Formulas, business rules, edge-case reasoning, and feature context live in the suite/test description.
 Prerequisites which are common to all test cases must be written as bullet points in the suite description.
 Formulas, diagrams, relavant to all test cases can be included as codeblocks in the suite description.
 
 
 ## Test Case Writing Rules
 
-Describe the intent of the test case.
-Intent is needed only if title is not fully enough to explain the intent.
 
 Test case consist of description and steps
+Add the intent of the test case to the description if title is not fully enough to explain the intent.
 Description must be clear and concise.
-Focus on whitebox testing, thus each operation and observable results must be obtained via public apis or UI.
-Prefer using UI over public apis when possible.
-If you think UI is available, and test can be achived from UI, test must use it
+Focus on blackbox testing, thus each operation and observable results must be obtained via public apis or UI (unless user specifies otherwise).
+Prefer using UI (frondend tests) over public apis when possible.
+Ask user for app url and credentials, or frontend repo url to understand the application and its components.
 Understand UI pages and components or API endpoints from source code or design or requirements. 
 Add system checks only if it not clear how to test via public apis or UI.
 It is not a unit test, usually no direct server or code access is allowed.
 
-Why in description, what in steps. 
+"Why" in description, "what" in steps. 
 
 Put preparations into **preconditions**/**description** section, not as steps.
 
