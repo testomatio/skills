@@ -65,9 +65,9 @@ Each step must be simple sentences.
 Avoid using commas, subsentances
 Steps are mechanical: click, send, read, assert.
 Each step must include exact instructions
-Prefer steps that include specific values, urls
-Prefer concrete values over general words. Replace "small", "known", "around", "e.g.", "like", "(…)" with literal numbers, strings, etc. 
-If no values are availble use placholders variable names like `${url}` or `${company-title}`
+Prefer placeholder variable names like `[url]` or `[company-title]` over specific values
+Use specific values when they are important for the scenario (e.g. boundary values, format validation, locale-specific input).
+Avoid vague qualifiers like "small", "known", "around", "e.g.", "like", "(…)"; replace them with concrete placeholders or, when required, literal values.
 Avoid general statements in steps. Move general statements to the description.
 Do not chain multiple distinct actions or use unnecessary And / Or combinations in a single sequence.
 All step actions must be clear to perform via PUBLIC API or UI
