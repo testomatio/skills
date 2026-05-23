@@ -1,5 +1,7 @@
 ## Test Suite Writing Rules
 
+Important: Refer to user provided test cases first, then use these rules.
+
 
 Formulas, business rules, edge-case reasoning, and feature context live in the suite/test description.
 Prerequisites which are common to all test cases must be written as bullet points in the suite description.
@@ -22,6 +24,30 @@ It is not a unit test, usually no direct server or code access is allowed.
 "Why" in description, "what" in steps. 
 
 Put preparations into **preconditions**/**description** section, not as steps.
+
+
+## Title
+
+Title states the behavior under test from the user's perspective.
+
+- Pattern: `User can <action> <object> <qualifier>` for positive cases; `User cannot ...`, `User sees <error>`, or `System rejects ...` for negative cases.
+- Sentence case, no trailing period, single intent, concise (~80 chars max).
+- Prefer concrete qualifiers ("with valid email", "with empty password") over vague ones ("correctly", "properly").
+
+Avoid:
+
+- Filler prefixes: `Verify that ...`, `Test that ...`, `Check ...`, `Should ...`
+- Multi-intent titles joined by `and` / `then`: `User logs in and updates profile`
+- Restating the suite name in every title
+- Embedding IDs or numbers: `TC-001: Login`
+- Vague outcomes: `Successful login`, `Login works`
+
+Good vs bad:
+
+- Bad: `Verify successful login` → Good: `User can log in with valid email and password`
+- Bad: `Wrong password test` → Good: `User cannot log in with invalid password`
+- Bad: `Login and update profile` → Good: split into two tests
+- Bad: `Email validation` → Good: `User sees error when email format is invalid`
 
 
 ## Preconditions  
