@@ -65,13 +65,14 @@ Each step must be simple sentences.
 Avoid using commas, subsentances
 Steps are mechanical: click, send, read, assert.
 Each step must include exact instructions
-Prefer placeholder variable names like `[url]` or `[company-title]` over specific values
+Prefer placeholder variable names like `[url]` or `[company-title]` over specific values.
+If its url path – use specific values, e.g. `[url]/auth/login`.
 Use specific values when they are important for the scenario (e.g. boundary values, format validation, locale-specific input).
 Avoid vague qualifiers like "small", "known", "around", "e.g.", "like", "(…)"; replace them with concrete placeholders or, when required, literal values.
 Avoid general statements in steps. Move general statements to the description.
 Do not chain multiple distinct actions or use unnecessary And / Or combinations in a single sequence.
 All step actions must be clear to perform via PUBLIC API or UI
-All checks/verifications/assertions should be in **expected result**, not as separate steps.
+All checks/verifications/assertions should be in **expected result**, not as step **action**.
 You may add a codeblock after a step if needed to:
 
 - write API request
@@ -80,7 +81,19 @@ You may add a codeblock after a step if needed to:
 - to illustrate the point using pseudocode
 - etc
 
-Avoid using bold/italic formatting in steps.
+### Bold and italic in steps
+
+Use sparingly. Each style serves one purpose; otherwise write plain text.
+
+- **bold** — UI elements the user interacts with: buttons, links, fields, tabs, checkboxes, modals (e.g. `Click **Save**`, `Open **Settings** tab`).
+- *italic* — step labels (`*Action:*`, `*Expected:*`, `*Precondition:*`, `*Note:*`) and names of pages/screens/documents referenced as context (e.g. `Open the *Privacy Policy* page`).
+
+Avoid:
+
+- Bold/italic on full sentences or whole steps.
+- Combining bold and italic (`***...***`).
+- Emphasis for visual weight; rephrase or split the step instead.
+- Bold/italic in place of a placeholder (`[url]`) or a code block.
 
 If expected result has multiple conditions split them into separate lines:
 
