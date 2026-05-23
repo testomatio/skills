@@ -31,6 +31,8 @@ Trigger this skill when the user:
 
 ### User interaction
 
+- Strictly recommend user to use "PLAN" mode. Switch to "Edit" mode only on last step – writing test cases to md files.
+
 - When user interaction required, good to highlight it with question mark emoji ❓. Example:
 
 ```
@@ -55,7 +57,9 @@ This skill follows an **iterative approach**.
 **Don't omit steps and strictly ask for user approval/feedback before proceeding to the next step**.
 Generate **checklist** prior to **test cases** generation even if user request sounds like "generate test cases".
 
-WHEN AVAILABLE USE ASK TOOL WHEN ASKING USER FOR INPUT WITH CHOICES
+**When available use Ask tool when asking user for input with choices.**
+
+**Ask user for clarification if you are not sure about something, don't suggest.**
 
 ### Workflow Steps
 
