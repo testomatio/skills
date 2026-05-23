@@ -27,23 +27,23 @@ Put preparations into **preconditions**/**description** section, not as steps.
 Title states the behavior under test from the user's perspective.
 
 - Pattern: `User can <action> <object> <qualifier>` for positive cases; `User cannot ...`, `User sees <error>`, or `System rejects ...` for negative cases.
-- Sentence case, no trailing period, single intent, concise (~80 chars max).
+- Sentence case, no trailing period, single intent, ~80 chars max.
 - Prefer concrete qualifiers ("with valid email", "with empty password") over vague ones ("correctly", "properly").
 
 Avoid:
 
 - Filler prefixes: `Verify that ...`, `Test that ...`, `Check ...`, `Should ...`
-- Multi-intent titles joined by `and` / `then`: `User logs in and updates profile`
+- Multi-intent titles joined by `and` / `then`
 - Restating the suite name in every title
 - Embedding IDs or numbers: `TC-001: Login`
 - Vague outcomes: `Successful login`, `Login works`
 
 Good vs bad:
 
-- Bad: `Verify successful login` → Good: `User can log in with valid email and password`
-- Bad: `Wrong password test` → Good: `User cannot log in with invalid password`
-- Bad: `Login and update profile` → Good: split into two tests
-- Bad: `Email validation` → Good: `User sees error when email format is invalid`
+- `Verify successful login` → `User can log in with valid email and password`
+- `Wrong password test` → `User cannot log in with invalid password`
+- `Login and update profile` → split into two tests
+- `Email validation` → `User sees error when email format is invalid`
 
 ## Preconditions
 
