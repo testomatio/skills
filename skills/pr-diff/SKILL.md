@@ -88,7 +88,7 @@ gh pr diff {PR_NUMBER}
 
 ---
 
-### Step 2: Analyze PR Context
+### Step 2: Analyze PR Context and Files
 
 Collect feature and testing context from the PR.
 
