@@ -74,6 +74,7 @@ Download/Retrieves test scenarios from Testomat.io and saves them as Markdown fi
 - Export tests from TMS to markdown for bulk editing in IDE.
 - Backup test cases locally.
 - Refactor test cases offline.
+- Export only some specific suites by id.
 
 **Where to pull:** into the gitignored cache `.testclaw-context/manual-tests/`, and add `.testclaw-context/` to the project `.gitignore` if it is not there yet. Pulled cases must never land in a tracked folder (`manual-tests/`, etc.) — that pollutes the repo. You can still edit them there and push back; being gitignored doesn't stop that. (If the repo *already* keeps its `*.test.md` files in a tracked folder, you don't need to pull at all — work with them where they are, or pass `-d <that folder>` for an in-place refresh.) This matches `project-scan`, which pulls the *code* into `.testclaw-context/code/` when it runs inside a manual-tests repo.
 
@@ -85,13 +86,25 @@ Download/Retrieves test scenarios from Testomat.io and saves them as Markdown fi
 npx check-tests pull -d <directory>
 ```
 
-**Examples:**
+Optional variant - **pull by specific suite-ids**
+
+**When to use `--suite-ids`:**
+- User wants to pull only specific suites (not the entire project).
+- Initial request mentions a specific suite name or suite ID.
+- Need to export one or several specific suites without triggering a full project sync.
+
+> **Options to use:** `--suite-ids <ids>` for comma-separated suite IDs to pull (e.g. `@S12345678, @S87654321`)
+
+**Pull Examples:**
 ```bash
 # Default — pull into the gitignored cache
 npx check-tests pull -d .testclaw-context/manual-tests
 
 # Repo that already keeps its test cases tracked — refresh them in place
 npx check-tests pull -d manual-tests
+
+# Pull specific suites by IDs
+npx check-tests pull --suite-ids "@S12345678,@S87654321"
 ```
 
 **More examples** you can find in "Pull" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
@@ -239,7 +252,7 @@ Use sync-cases to push tests to Testomat.io
 
 | Action          | Command                                                              |
 | --------------- | -------------------------------------------------------------------- |
-| Pull            | `npx check-tests pull -d .testclaw-context/manual-tests` (the default; gitignored) |
+| Pull            | `npx check-tests pull -d manual-tests` (the default; gitignored) |
 | Push (files)    | `npx check-tests push --files <file1.test.md> <file2.test.md>`       |
 | Push (glob)     | `npx check-tests push --files "<dir>/**/*.test.md"`                  |
 | Push (default)  | `npx check-tests push -d <directory>` (glob: `**/*.test.md`)         |
