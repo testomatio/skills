@@ -23,10 +23,9 @@ This skill analyzes git diff/pull request changes to understand what was modifie
 ## When to Use
 
 Trigger this skill when user wants to:
-- **Understand what changed** - analyze PR diff to see what was modified.
+- **Understand what changed**, **Review user's PR and suggest cases for testing** - analyze PR diff to see what was modified and how we can test it.
 - **Detect feature or fix** - determine if PR is a new feature, bug fix, or refactor.
 - **Extract acceptance criteria** - get Acceptance Criteria from PR description and code changes.
-- **Review user's PR and suggest cases for testing** - analyze PR diff to see what was modified and how we can test it.
 
 ---
 
@@ -43,27 +42,38 @@ git branch --show-current
 
 #### Detect Base Branch
 
-Auto-detect by checking in order:
-1. `origin/HEAD` - default branch
-2. `origin/main` or `origin/master`
-3. `origin/dev` or `origin/develop`
+Auto-detect based on available context:
+
+1. **From PR context (preferred):** If a PR number is known, get the exact target branch from GitHub CLI:
 
 ```bash
-git branch -r | grep -E "(origin/HEAD|origin/main|origin/master|origin/dev|origin/develop)" | head -1
+gh pr view {PR_NUMBER} --json baseRefName
 ```
 
-> If multiple candidates exist, use the first match based on the priority order above.
+> `baseRefName` from the response => this is the PR's actual base branch.
 
-#### Scope Check
+#### Determine Changed Files
 
-Get changed files:
+Compare the current branch against the detected base branch:
 
 ```bash
 git diff {BASE_BRANCH}...HEAD --name-only
 ```
 
+If working with uncommitted local changes only:
+
+```bash
+git diff --name-only
+```
+
+For GitHub PR with full diff view:
+
+```bash
+gh pr diff {PR_NUMBER}
+```
+
 **Skip to Step 3 with a short summary only (without acceptance criteria)** if:
-- Current branch is `master`, `main`, `dev`, or `develop`.
+- Current branch is `master`, `main`, `stable` or any detected **default branch in `baseRefName`**.
 - No files changed.
 - All changes are **non-source-code** updates only, such as:
    - documentation/requirements (`*.md`, `docs/**`)
@@ -74,33 +84,15 @@ git diff {BASE_BRANCH}...HEAD --name-only
    - existing test updates.
 - No application/source code behavior was changed.
 
-**Proceed to Step 2** if source code changed (`src/**`, `lib/**`, `app/**`, or root `.ts`/`.js`/`.tsx`/`.jsx`/`.java`/`.py`/`.go`/`.rb`/`.php`/`.cs`/`.kt`/`.swift`/`.rs`)
+**Proceed to Step 2** if source code changed (`src/**`, `lib/**`, `app/**`, or root `.ts`/`.js`/`.tsx`/`.jsx`/`.java`/`.py`/`.go`/`.rb`/`.php`/`.cs`/`.kt`/`.swift`/`.rs`, etc)
 
 ---
 
-### Step 2: Get Code Changes
+### Step 2: Analyze PR Context
 
-#### Get Changed Files
+Collect feature and testing context from the PR.
 
-**Uncommitted changes (working directory):**
-```bash
-git diff --name-only
-```
-
-**Branch comparison (all commits ahead of base):**
-```bash
-git diff {BASE_BRANCH}...HEAD --name-only
-```
-
-**Specific PR (GitHub):**
-```bash
-gh pr diff {PR_NUMBER}
-# or
-git fetch origin pull/{PR_NUMBER}/head
-git diff {BASE_BRANCH}...FETCH_HEAD --name-only
-```
-
-#### Extract PR Context
+#### Extract PR Metadata & Context
 
 Get PR details:
 
@@ -131,6 +123,7 @@ Only analyze **source code** files. Skip configs, deps, tests, docs.
 #### Additional Project Context & Existing Tests Discovery (Optional)
 
 Use `project-scan` only when additional project context is needed before writing acceptance criteria.
+**Do not run `project-scan` by default**.
 
 ##### When to use project-scan extra knowledge
 
@@ -163,7 +156,6 @@ Use scan results only to:
 - Understand project structure, frameworks, and test organization.
 - Improve relevance and consistency of generated acceptance criteria.
 
-**Do not run `project-scan` by default**.
 **Only use it when the additional context provides clear value**.
 
 ---
@@ -260,4 +252,4 @@ Stop if:
 | Current branch | `git branch --show-current` |
 | Changed files | `git diff {base}...HEAD --name-only` |
 | PR diff (GitHub) | `gh pr diff {PR_NUMBER}` |
-| Find main branch | `git branch -r \| grep origin/HEAD` |
+| Base branch (from PR) | `gh pr view {PR_NUMBER} --json baseRefName` |
