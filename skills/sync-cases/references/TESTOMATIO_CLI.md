@@ -52,10 +52,11 @@ TESTOMATIO_URL=https://app.testomat.io
 
 ### Basic "check-tests" Options
 
-| Option                | Description                                 | Default           |
-| --------------------- | ------------------------------------------- | ----------------- |
-| `-h, --help`          | Display help information                    | -                 |
-| `-d, --dir <dir>`     | Test directory to scan                      | Current directory |
+| Option                | Description                                 | Default                     |
+| --------------------- | ------------------------------------------- | ----------------------------|
+| `-h, --help`          | Display help information                    | -                           |
+| `-d, --dir <dir>`     | Test directory to scan                      | Current dir  (default: `.`) |
+| `--suite-ids <ids>`   | Comma-separated suite IDs to pull (e.g. `@S12345678, @S456r4342`)  | -    |
 
 ### Testomat.io Integration Specific Project Options
 
@@ -89,6 +90,9 @@ npx check-tests pull -d manual-tests
 
 # Keep source structure
 npx check-tests pull -d manual-tests --keep-structure
+
+# Pull specific suites only
+npx check-tests pull --suite-ids "@S12345678,@S87654321"
 ```
 
 ### Push
