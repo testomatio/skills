@@ -135,9 +135,9 @@ Test steps use the `## Steps` header section with a nested markdown list format:
 ## Steps
 
 - (Step Action)
-  *Expected:* ... (Observable behavior)
+  *Expected*: ... (Observable behavior)
 - ...
-  *Expected:* ...
+  *Expected*: ...
 ```
 
 **Step format rules:**
@@ -200,11 +200,11 @@ A user should be able to log in with valid credentials.
 ## Steps
 
 - Navigate to the login page
-  *Expected:* Login form is displayed with username and password fields
+  *Expected*: Login form is displayed with username and password fields
 - Enter a valid username and password
-  *Expected:* Credentials are entered without errors
+  *Expected*: Credentials are entered without errors
 - Click the "Login" button
-  *Expected:* User is redirected to the dashboard
+  *Expected*: User is redirected to the dashboard
 
 <!-- example -->
 
@@ -238,17 +238,17 @@ Verify that a new user can successfully register with valid information.
 ## Steps
 
 - Navigate to the registration page
-  *Expected:* Registration form is displayed
+  *Expected*: Registration form is displayed
 - Enter a valid email address
-  *Expected:* Email is accepted and passes validation
+  *Expected*: Email is accepted and passes validation
 - Enter a strong password (8+ characters with uppercase, lowercase, and numbers)
-  *Expected:* Password meets complexity requirements
+  *Expected*: Password meets complexity requirements
 - Confirm the password
-  *Expected:* Passwords match
+  *Expected*: Passwords match
 - Accept the Terms of Service
-  *Expected:* Checkbox is selected
+  *Expected*: Checkbox is selected
 - Click the "Register" button
-  *Expected:* Success message is displayed and user is redirected to welcome page
+  *Expected*: Success message is displayed and user is redirected to welcome page
 ```
 
 ### Test with numbered steps
@@ -275,11 +275,11 @@ Verify that a new user can be created via POST request.
 ## Steps
 
 1. Send POST request to `/api/users` with valid user data
-   *Expected:* Response status code is 201
+   *Expected*: Response status code is 201
 2. Verify response contains user ID and created timestamp
-   *Expected:* Response includes `id` and `createdAt` fields
+   *Expected*: Response includes `id` and `createdAt` fields
 3. Send GET request to `/api/users/{id}` to retrieve the created user
-   *Expected:* User data matches the data sent in POST request
+   *Expected*: User data matches the data sent in POST request
 ```
 
 ### Test with complex nested steps
@@ -307,21 +307,21 @@ Verify that a user can complete the checkout process with multiple items in the 
 ## Steps
 
 - Add multiple products to the cart
-  *Expected:* All products appear in the cart with correct quantities and prices
+  *Expected*: All products appear in the cart with correct quantities and prices
 - Proceed to checkout
-  *Expected:* Checkout page loads with shipping address form
+  *Expected*: Checkout page loads with shipping address form
 - Fill in valid shipping address details
-  *Expected:* Form validation passes and shows no errors
+  *Expected*: Form validation passes and shows no errors
 - Select a shipping method
-  *Expected:* Shipping cost is calculated and displayed
+  *Expected*: Shipping cost is calculated and displayed
 - Select a payment method
-  *Expected:* Payment form is displayed (or guest checkout option)
+  *Expected*: Payment form is displayed (or guest checkout option)
 - Complete the payment process
-  *Expected:* Payment is processed successfully
+  *Expected*: Payment is processed successfully
 - Verify order confirmation
-  *Expected:* Order confirmation page is displayed with order number and summary
+  *Expected*: Order confirmation page is displayed with order number and summary
 - Check email for order confirmation
-  *Expected:* Confirmation email is received with matching order details
+  *Expected*: Confirmation email is received with matching order details
 ```
 
 ### Test with tags in title
