@@ -8,17 +8,20 @@ Formulas, diagrams, relavant to all test cases can be included as codeblocks in 
 
 ## Test Case Writing Rules
 
-Test case consist of description and steps
+Test case consist of description and steps.
 Add the intent of the test case to the description if title is not fully enough to explain the intent.
 Description must be clear and concise.
-Focus on blackbox testing, thus each operation and observable results must be obtained via public apis or UI (unless user specifies otherwise).
-Prefer using UI (frondend tests) over public apis when possible.
-Ask user for app url and credentials, or frontend repo url to understand the application and its components.
-Understand UI pages and components or API endpoints from source code or design or requirements.
-Add system checks only if it not clear how to test via public apis or UI.
-It is not a unit test, usually no direct server or code access is allowed.
+Focus on black-box testing, thus each operation and observable results must be obtained via public apis or UI (unless user specifies otherwise).
+Prefer using UI over public apis when possible.
+**If this is a web app** ask user to discover it
+- by looking its frontend source code
+- by accessing it on non-production environment via browser (URLs and credentials)
+- by looking at screenshots of related pages
+  Understand UI pages and components or API endpoints from source code or design or requirements.
+  Add system checks only if it not clear how to test via public apis or UI.
+  It is not a unit test, usually no direct server or code access is allowed.
 
-"Why" in description, "what" in steps.
+Golden rule: "Why" in description, "what" in steps.
 
 Put preparations into **preconditions**/**description** section, not as steps.
 
@@ -26,9 +29,17 @@ Put preparations into **preconditions**/**description** section, not as steps.
 
 Title states the behavior under test from the user's perspective.
 
-- Pattern: `User can <action> <object> <qualifier>` for positive cases; `User cannot ...`, `User sees <error>`, or `System rejects ...` for negative cases.
-- Sentence case, no trailing period, single intent, ~80 chars max.
-- Prefer concrete qualifiers ("with valid email", "with empty password") over vague ones ("correctly", "properly").
+Title structure: "<role> <action> <object> <qualifier>"
+
+Examples:
+
+- Editor can change description of a blogpost in admin panel
+- User can report a bug using widget on a web page
+- Blocked user must not be able to log in into app workspace
+- Admin can invite up to 10 user to a project via Settings Page
+- User can not edit a comment it doesn't own
+- User can retry operation when NetworkError occurs
+- User can not retry operation when network connection is disabled
 
 Avoid:
 
@@ -47,20 +58,55 @@ Good vs bad:
 
 ## Preconditions
 
+Add preconditions for actions which do not belong to actions, but are required for the test to run.
 Do not include preconditions like "service is running" if it's not explicitly mentioned by user or is not actually what the test is about.
 Define the pre-conditions and initial state of the system as bullet points.
 Avoid if not needed or is the same as the suite description.
-If relevant, include the user role
+If relevant, include the user role.
 
 ## Steps
 
+````suggestion
 Step should consist of **action** (with optional test data) and **expected result**.
+
+Test steps use the `## Steps` header section with a nested markdown list format:
+
+```markdown
+## Steps
+
+* (Step Action)
+  *Expected*: ... (Observable behavior)
+* ...
+  *Expected*: ...
+````
+
+e.g.
+
+```markdown
+## Steps
+
+- Navigate to the login page
+  *Expected*: Login form is displayed with username and password fields
+- Enter a valid username and password
+  *Expected*: Credentials are entered without errors
+- Click the "Login" button
+  *Expected*: User is redirected to the dashboard
+```
+
+Step format rules:
+
+Steps must be under a `## Steps` heading
+Use nested markdown lists (bulleted * or numbered 1.)
+Top-level items describe the action to perform
+Nested items with *Expected* (or *Expected*:, *Expected result\*) describe the observable behavior
+Expected results should be specific and verifiable
+
 Each step must be simple sentences.
-Avoid using commas, subsentances
+Avoid using commas, sub-sentences.
 Steps are mechanical: click, send, read, assert.
 Each step must include exact instructions
-Prefer placeholder variable names like `[url]` or `[company-title]` over specific values.
-If its url path – use specific values, e.g. `[url]/auth/login`.
+Prefer placeholder variable names like `${domain}` or `${company-title}` over specific values.
+Prefer using URL paths over full urls If its url path, e.g. `${domain}/auth/login`.
 Use specific values when they are important for the scenario (e.g. boundary values, format validation, locale-specific input).
 Avoid vague qualifiers like "small", "known", "around", "e.g.", "like", "(…)"; replace them with concrete placeholders or, when required, literal values.
 Avoid general statements in steps. Move general statements to the description.
@@ -78,18 +124,20 @@ You may add a codeblock after a step if needed to:
 If expected result has multiple conditions split them into separate lines:
 
 Instead of:
-_Expected:_ Comment appears in the Run's comment list with the current user as author\*
+
+`*Expected*: Comment appears in the Run's comment list with the current user as author`
 
 Use:
-_Expected:_ Comment appears in the Run's comment list
-_Expected:_ Current user is the author
+
+`*Expected*: Comment appears in the Run's comment list`
+`*Expected*: Current user is the author`
 
 ### Bold and italic in steps
 
 Use sparingly. Each style serves one purpose; otherwise write plain text.
 
 - **bold** — UI elements the user interacts with: buttons, links, fields, tabs, checkboxes, modals (e.g. `Click **Save**`, `Open **Settings** tab`).
-- _italic_ — step labels (`*Action:*`, `*Expected:*`, `*Precondition:*`, `*Note:*`) and names of pages/screens/documents referenced as context (e.g. `Open the *Privacy Policy* page`).
+- *italic* — names of pages/screens/documents referenced as context (e.g. `Open the *Privacy Policy* page`).
 
 Avoid:
 
