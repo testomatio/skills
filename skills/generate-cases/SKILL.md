@@ -11,6 +11,7 @@ This skill helps you to generate comprehensive test cases and checklists for sof
 
 - [Testomat.io TMS Guide](./references/testomat-tms-guide.md) - Complete guide for Testomat.io compatibility
 - [Test Case Format](./references/test-case-format.md) - Test cases markdown format reference (testomatio-friendly)
+- [Writing Rules](./references/writing-rule.md) - Rules for writing test suites, test cases, preconditions, and steps (incl. AI writing patterns to avoid)
 
 ## When to Use
 
@@ -22,7 +23,15 @@ Trigger this skill when the user:
 - Shares designs (Figma, Miro, screenshots, etc.) and wants test coverage
 - Mentions QA activities or testing documentation needs
 
+### Prerequisites
+
+- You already checked the project structure and identified what is the in this folder (source code, e2e tests, test cases) using /project-scan skill
+- You pulled existing Testomat.io tests using /sync-cases skill
+- You have switched to PLAN MODE if availble to start interview section
+
 ### User interaction
+
+- Strictly recommend user to use "PLAN" mode. Switch to "Edit" mode only on last step – writing test cases to md files.
 
 - When user interaction required, good to highlight it with question mark emoji ❓. Example:
 
@@ -40,13 +49,17 @@ Trigger this skill when the user:
 
 - Fill input fields with suggestions when asking user to provide input.
 
-- Questions and outputs should be structured, formated to be easy to read and understand.
+- **Keep terminal/chat output to the user short, concise, well-structured and formatted.** Avoid long paragraphs, walls of text, redundant restatements, or verbose status updates. Prefer bullet lists, short headings, tables and emoji markers over prose. Show only what the user needs to make the next decision — details on request.
 
 ## Workflow (IMPORTANT: how AI tool (Claude, Cursor etc) should work with user)
 
 This skill follows an **iterative approach**.
 **Don't omit steps and strictly ask for user approval/feedback before proceeding to the next step**.
 Generate **checklist** prior to **test cases** generation even if user request sounds like "generate test cases".
+
+**When available use Ask tool when asking user for input with choices.**
+
+**Ask user for clarification if you are not sure about something, don't suggest.**
 
 ### Workflow Steps
 
@@ -156,6 +169,8 @@ I've gathered information from the following sources:
 1. ➡️ Go to next step
 2. ✏️ Type changes
 ```
+
+You must also look for existing test cases to avoid duplicating test cases. If existing test cases found report this to user and suggest expanding them or creating a new suite.
 
 [Wait for user approval before proceeding to Step 2.]
 
@@ -301,24 +316,24 @@ Example:
 
 ### Step 5: Generate Detailed Test Cases
 
+
 **Proceed with this step only after user approval of checklist.**
 
 If user prompted checklist generation only (not test cases), ask user if he wants to generate test cases (e.g. **"Do you want to generate test cases for this checklist?"**) or proceed to test case generation.
 
-Rules:
-
 - If multiple features to test or whole product => put generated test cases of each feature in separate file.
-- Step should consist of **action** (with optional test data) and **expected result**.
-- All checks/verifications/assertions should be in **expected result**, not as separate steps.
-- **Be thorough but practical**. Cover important scenarios without overwhelming detail (unless user asks for it or select appropriate role e.g. "nerd").
-- **Use clear language**. Test steps should be unambiguous and easy to follow.
+- - **Be thorough but practical**. Cover important scenarios without overwhelming detail (unless user asks for it or select appropriate role e.g. "nerd").
 - If user provides **existing test cases**, follow their **style**.
-- **Think like a tester**. Consider not just what works, but what could break.
 - **Consider the user**. Focus on user-facing functionality first.
 - **Be adaptable**. Adjust depth, detail, testing type and other parameters based on user feedback.
 - **Keep scope**. Test only the functionality under test but not the related entities. If feature linked to other features, don't test them if user didn't ask for it explicitly.
-- Do not include **preconditions** like "service is running" if it's not explicitly mentioned by user or is not actually what the test is about.
-- Put preparations into **preconditions**/**description** section, not as steps.
+
+**Follow test case writing rules**:
+
+- Format: `./references/test-case-format.md`
+- Content/style rules (suites, tests, preconditions, steps, anti-patterns): `./references/writing-rule.md`
+
+Always use provided Test case format and writing rules.
 
 **Don't change the user's source code. Only generate `*.test.md` files with test cases.**
 
@@ -342,12 +357,17 @@ Checklist should have hierarchical and categorized structure.
 
 - Strictly follow the `./references/test-case-format.md` format. Exception: user specify format in the prompt. In this case, follow the user's format.
 
+- Strictly follow the writing rules from `./references/writing-rule.md` (suite/test descriptions, preconditions, step structure, expected results, anti-patterns).
+
 - Follow [Testomat.io TMS Guide](./references/testomat-tms-guide.md) for format and conventions (priority levels, tags, labels, etc.) (especially when using testomatio mcp)
 
 - Files naming: `feature-name.test.md` (always use the `.test.md` extension).
 - **IMPORTANT:** **Strictly follow the `./references/test-case-format.md` format** for **suites**, **tests** and **steps**.
 - Use `<!-- suite ... -->` and `<!-- test ... -->` blocks to wrap test cases.
 - If required, put `tags:` and `labels:` inside **each** `<!-- test ... -->` metadata block (see [test metadata](./references/test-case-format.md#test-metadata)). Not only on the suite block.
+- Try to reuse existing tags and labels obtained by MCP or from other test cases. 
+- Variables and placeholders always must be formatted as `${variable}` or `${placeholder}` (use backticks).
+- Do not use labels if you are not aware of any existing ones.
 - If reasonable, add test metadata like priority, preconditions, test data, labels, tags based on analyzed information and context.
 - **IMPORTANT: NEVER GENERATE test or suite IDs of ANY kind**:
   - Do NOT include Testomat.io IDs (`id: @T*`, `id: @S*`, e.g. `@T12345678`, `@S380c64db`).
