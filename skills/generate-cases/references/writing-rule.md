@@ -106,7 +106,9 @@ Avoid using commas, sub-sentences.
 Steps are mechanical: click, send, read, assert.
 Each step must include exact instructions
 Prefer placeholder variable names like `${domain}` or `${company-title}` over specific values.
-Prefer using URL paths over full urls If its url path, e.g. `${domain}/auth/login`.
+Do not add as placeholders data which is not specifically related to test. 
+Do not add preconditions as placeholders.
+Prefer using URL paths over full urls If its url path, e.g. `/auth/login`.
 Use specific values when they are important for the scenario (e.g. boundary values, format validation, locale-specific input).
 Avoid vague qualifiers like "small", "known", "around", "e.g.", "like", "(…)"; replace them with concrete placeholders or, when required, literal values.
 Avoid general statements in steps. Move general statements to the description.
