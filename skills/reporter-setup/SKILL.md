@@ -246,6 +246,16 @@ Use the appropriate `@testomatio/reporter` for Java test frameworks (JUnit, Test
 
 #### Configure
 
+It is required to ask the user to provide the TESTOMATIO environment variable before running tests.
+
+Set up the Testomat API key as an environment variable:
+
+```bash
+export TESTOMATIO=<tstmt_api_key>
+```
+
+Verify that the environment variable is configured correctly and starts with tstmt_.
+
 Add the dependency for your framework:
 
 * **TestNG:**
@@ -254,6 +264,7 @@ Add the dependency for your framework:
 <dependency>
   <groupId>io.testomat</groupId>
   <artifactId>java-reporter-testng</artifactId>
+  <version>{LATEST_STABLE_VERSION}</version>
 </dependency>
 ```
 
@@ -263,6 +274,17 @@ Add the dependency for your framework:
 <dependency>
   <groupId>io.testomat</groupId>
   <artifactId>java-reporter-junit</artifactId>
+  <version>{LATEST_STABLE_VERSION}</version>
+</dependency>
+```
+
+* **Cucumber:**
+
+```xml
+<dependency>
+  <groupId>io.testomat</groupId>
+  <artifactId>java-reporter-cucumber</artifactId>
+  <version>{LATEST_STABLE_VERSION}</version>
 </dependency>
 ```
 
@@ -272,13 +294,20 @@ Add the dependency for your framework:
 <dependency>
   <groupId>io.testomat</groupId>
   <artifactId>java-reporter-karate</artifactId>
+  <version>{LATEST_STABLE_VERSION}</version>
 </dependency>
 ```
 
-#### Run
+#### Run tests and generate a report link
 
 ```bash
 mvn clean test
+```
+
+After tests finish, scan the output for a run ID. If found, output the link to the user:
+
+```
+View results: https://app.testomat.io/projects/{project-id}/runs/{run-id}
 ```
 
 > Full documentation: [Testomat.io Java/JUnit Reporting](https://docs.testomat.io/test-reporting/junit/)
@@ -335,19 +364,24 @@ npx check-tests@latest CodeceptJS "tests/**_test.js" --update-ids
 
 ### Java
 
+It's required after every test execution.
+
 Use `testomatio.jar` CLI to import Java test code into Testomat.io.
 
 Supported Java Frameworks:
 - **JUnit** ✅
 - **TestNG** ✅
-- **Karate** (via java-reporter-karate)
 
 #### Quick Setup (One-Liner)
 
+Run ONLY from project root.
+
 ```bash
+cd <project-root>
+
 export TESTOMATIO=tstmt_xxxxx && \
 curl -L -O https://github.com/testomatio/java-check-tests/releases/latest/download/testomatio.jar && \
-java -jar testomatio.jar import
+java -jar testomatio.jar sync
 ```
 
 [Commands:
