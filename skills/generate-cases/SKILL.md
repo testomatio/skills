@@ -11,6 +11,7 @@ This skill helps you to generate comprehensive test cases and checklists for sof
 
 - [Testomat.io TMS Guide](./references/testomat-tms-guide.md) - Complete guide for Testomat.io compatibility
 - [Test Case Format](./references/test-case-format.md) - Test cases markdown format reference (testomatio-friendly)
+- [Writing Rules](./references/writing-rule.md) - Rules for writing test suites, test cases, preconditions, and steps (incl. AI writing patterns to avoid)
 
 ## When to Use
 
@@ -30,6 +31,8 @@ Trigger this skill when the user:
 
 ### User interaction
 
+- Strictly recommend user to use "PLAN" mode. Switch to "Edit" mode only on last step – writing test cases to md files.
+
 - When user interaction required, good to highlight it with question mark emoji ❓. Example:
 
 ```
@@ -46,7 +49,7 @@ Trigger this skill when the user:
 
 - Fill input fields with suggestions when asking user to provide input.
 
-- Questions and outputs should be structured, formated to be easy to read and understand.
+- **Keep terminal/chat output to the user short, concise, well-structured and formatted.** Avoid long paragraphs, walls of text, redundant restatements, or verbose status updates. Prefer bullet lists, short headings, tables and emoji markers over prose. Show only what the user needs to make the next decision — details on request.
 
 ## Workflow (IMPORTANT: how AI tool (Claude, Cursor etc) should work with user)
 
@@ -54,7 +57,9 @@ This skill follows an **iterative approach**.
 **Don't omit steps and strictly ask for user approval/feedback before proceeding to the next step**.
 Generate **checklist** prior to **test cases** generation even if user request sounds like "generate test cases".
 
-WHEN AVAILABLE USE ASK TOOL WHEN ASKING USER FOR INPUT WITH CHOICES
+**When available use Ask tool when asking user for input with choices.**
+
+**Ask user for clarification if you are not sure about something, don't suggest.**
 
 ### Workflow Steps
 
@@ -328,9 +333,12 @@ If user prompted checklist generation only (not test cases), ask user if he want
 - **Be adaptable**. Adjust depth, detail, testing type and other parameters based on user feedback.
 - **Keep scope**. Test only the functionality under test but not the related entities. If feature linked to other features, don't test them if user didn't ask for it explicitly.
 
-**Follow test case writing rules**: `./references/test-case-format.md`
+**Follow test case writing rules**:
 
-Always use provided Test case format
+- Format: `./references/test-case-format.md`
+- Content/style rules (suites, tests, preconditions, steps, anti-patterns): `./references/writing-rule.md`
+
+Always use provided Test case format and writing rules.
 
 **Don't change the user's source code. Only generate `*.test.md` files with test cases.**
 
@@ -353,6 +361,8 @@ Checklist should have hierarchical and categorized structure.
 ### Test cases format (saved to .md file(s))
 
 - Strictly follow the `./references/test-case-format.md` format. Exception: user specify format in the prompt. In this case, follow the user's format.
+
+- Strictly follow the writing rules from `./references/writing-rule.md` (suite/test descriptions, preconditions, step structure, expected results, anti-patterns).
 
 - Follow [Testomat.io TMS Guide](./references/testomat-tms-guide.md) for format and conventions (priority levels, tags, labels, etc.) (especially when using testomatio mcp)
 

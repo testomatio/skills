@@ -54,8 +54,27 @@ Where is the source code?
 ```
 [Waits for the user's reply.]
 
-- If user provides `Git repo` or `another folder` variant => Check if cache directory `.testclaw/code` already exists. If not, create it and save files or symlink to this `code/` folder.
-*The command is a no-op when the directory already exists.*
+- If user provides `Git repo` or `another folder` variant => clone or symlink it into `.testclaw-context/code/` (see the rule below). No-op if it's already there.
+
+#### Rule for pulled data — `.testclaw-context/`
+
+**This applies to every skill, not just `project-scan`.**
+
+1. First, see what's already in the current folder.
+2. If you need data that isn't here — manual test cases, the application code, e2e tests, a repo to clone — pull it into `.testclaw-context/` (gitignored). **Never** pull it into a regular folder like `manual-tests/` or `automated-tests/`; that pollutes the repo.
+3. If the data is already in the repo, use it where it is — you don't need `.testclaw-context/` for that.
+
+| When you run inside…    | What you'd pull in…  | Goes in…                          |
+| ----------------------- | -------------------- | --------------------------------- |
+| a source-code repo      | manual test cases    | `.testclaw-context/manual-tests/` |
+| a manual-tests repo     | the application code | `.testclaw-context/code/`         |
+| (e2e tests in own repo) | the e2e tests        | `.testclaw-context/e2e-tests/`    |
+
+Any skill that creates `.testclaw-context/...` must also add `.testclaw-context/` to the project's `.gitignore` — but only if it is not there yet. Never add it twice.
+
+(The rule is about *pulled* data. Output a skill *produces* and the user wants — a `coverage.*.yml`, new `*.test.md` files — goes in the repo as normal.)
+
+On a source repo with no manual tests, `project-scan` changes no tracked file: it only creates the gitignored `.testclaw-context/` directory and, if needed, adds one line to `.gitignore`.
 
 ---
 
@@ -72,12 +91,13 @@ Scan the project and collect a list of **source code files only**.
 
 Include:
 - Application source files (e.g. `.js`, `.ts`, `.py`, `.java`, `.go`, etc.).
+- View/template files — they are application source: `.html`/`.htm`, `.vue`, `.svelte`, `.hbs`/`.handlebars`, `.ejs`, `.pug`/`.jade`, `.mustache`, `.liquid`, `.erb`, `.haml`, `.slim`, `.blade.php`, `.twig`, `.j2`/`.jinja`/`.jinja2`, `.cshtml`/`.razor`, `.jsp`. Do not exclude these as "non-source"; coverage skills map UI changes through them.
 
 Exclude:
 - Dependencies (e.g. `node_modules/`, `vendor/`, `.venv/`).
 - Build/generated output (e.g. `dist/`, `build/`, `.next/`, `target/`).
 - Coverage, reports, caches, config, lock, and environment files.
-- Ignored paths from `.gitignore`.
+- Ignored paths from `.gitignore` — but **not** `.testclaw-context/code/`. In a manual-tests repo the app code lives there, so scan it as source even though `.testclaw-context/` is gitignored.
 - TestClaw internal files (e.g. `session-factory.ts`, `system-prompt.ts`).
 [**If in doubt**, prefer excluding over including non-source files.]
 
@@ -155,7 +175,7 @@ For each detected framework:
 
 ### Manual Tests
 
-Find all `.test.md` files and parse test titles:
+Find all `.test.md` files and parse test titles. `find .` also looks inside `.testclaw-context/manual-tests/`, so a re-run after a pull finds the cached cases instead of reporting "no manual tests":
 
 ```bash
 find . -name "*.test.md" -exec awk '
@@ -170,6 +190,8 @@ find . -name "*.test.md" -exec awk '
   }
 ' {} +
 ```
+
+If the only `.test.md` files are under `.testclaw-context/manual-tests/`, say so in the inventory: they came from Testomat.io, not from this repo.
 
 ---
 
