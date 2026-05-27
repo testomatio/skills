@@ -1,0 +1,26 @@
+{
+  "skill_name": "setup-pr-testing",
+  "evals": [
+    {
+      "id": 0,
+      "name": "github-cross-repo-happy-path",
+      "prompt": "The project is at FIXTURE/acme-api. Set up our PRs so they run only the manual cases affected by the change, and after the staging deploy run only the affected e2e tests. The e2e suite is not in this repo — it lives in the separate repo acme/e2e-tests, which already has a workflow e2e.yml that takes a `grep` input. Deploys happen on merge to main via the existing 'Deploy Staging' workflow.",
+      "expected_output": "Runs project-scan first; detects GitHub Actions (does not assume); reuses existing coverage.manual.yml + coverage.e2e.yml; writes a PR-opened manual workflow (reporter run --kind manual, no deploy dependency) and a separate post-deploy workflow gated on Deploy Staging success that computes the grep via --filter-list and dispatches acme/e2e-tests' existing e2e.yml; isolates the e2e job from the release; states the cross-repo token requirement.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "gitlab-missing-coverage-maps",
+      "prompt": "The project is at FIXTURE/shop-web. We want selective regression on our merge requests — only run the tests touched by the change. I don't think we have any coverage files set up yet.",
+      "expected_output": "Runs project-scan; detects GitLab CI (not GitHub); finds no coverage.*.yml; explains regression cannot work without coverage maps and proposes/delegates to manual-coverage and automation-coverage to create them before wiring .gitlab-ci.yml; asks how MRs deploy and how deploy completion is observable for the e2e flow; manual flow needs no deploy signal.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "no-e2e-suite-refuse-to-fabricate",
+      "prompt": "The project is at FIXTURE/lib-utils. Make our pull requests run the affected end-to-end tests automatically.",
+      "expected_output": "Runs project-scan; finds only Jest unit tests, no e2e framework anywhere and no e2e suite in another repo; does NOT fabricate an e2e job or pipeline; explains the automated/e2e flow needs an e2e suite first (points at authoring/automation-coverage); offers the manual flow only if manual cases exist; asks which CI is used since none is configured.",
+      "files": []
+    }
+  ]
+}
