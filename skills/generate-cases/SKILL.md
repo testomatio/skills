@@ -311,6 +311,11 @@ Example:
 
 ### Step 5: Generate Detailed Test Cases
 
+Where to store test cases?
+
+- If this workspace is empty or is for manual-tests only, test cases must be generated in root
+- If this is end-to-end testing project test cases must be generated in `manual-tests` directory
+- In any other case test cases must be generated in `.testclaw/manual-tests` (ensure `.testclaw` directory exists and git ignored)
 
 **Proceed with this step only after user approval of checklist.**
 

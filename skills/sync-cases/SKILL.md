@@ -3,7 +3,7 @@ name: sync-cases
 description: Synchronize test scenarios and cases between a local project and Testomat.io. Use this skill whenever the user wants to pull/export/download tests from Testomat.io; or push/import/sync new or updated test cases back to the TMS in corresponding `*.test.md` format. Supports custom directories, markdown test format and advanced import/export workflows.
 inputs:
   testDir:
-    description: "Target directory for pulled tests (default: `manual-tests`)"
+    description: "Target directory for pulled tests"
     required: false
 license: MIT
 metadata:
@@ -76,17 +76,23 @@ Download/Retrieves test scenarios from Testomat.io and saves them as Markdown fi
 - Refactor test cases offline.
 
 **Pre-Pull:**
-- Ensure `testDir` exists; otherwise create `manual-tests` folder in root.
+
+- If `testDir` is specified pull tests into it. Otherwise:
+- If this workspace is empty or is for manual-tests only, test must be pulled to root
+- If this is end-to-end testing project test cases must be generated in `manual-tests` directory
+- In any other case test cases must be pulled to `.testclaw/manual-tests` (ensure `.testclaw` directory exists and git ignored)
 
 **Command:**
 ```bash
 npx check-tests pull -d <directory>
 ```
 
+
+
 **Examples:**
 ```bash
 # Pull tests to default manual-tests folder
-npx check-tests pull -d manual-tests
+npx check-tests pull -d .testclaw/manual-tests
 ```
 
 **More examples** you can find in "Pull" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
@@ -104,15 +110,8 @@ Uploads/Imports local Markdown tests into Testomat.io:
 
 **Pre-Push File Filtering**
 
-Before uploading, scan the project/target folder and **include only**:
-- Files matching `*.test.md` pattern.
-- Files containing valid test blocks: `<!-- test ... -->` markers.
+If directory contains manual test cases + something else, move test cases into `.testclaw/manual-tests`
 
-**Exclude** all other `.md` files — especially:
-- `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`.
-- Project documentation (`docs/requirements.md`, `architecture.md`, etc.).
-
-> If a directory contains mixed content, skip documentation files and upload only test case files.
 
 **Pre-Push Validation:**
 1. Ensure at least one test `*.test.md` file exists.
@@ -141,30 +140,29 @@ npx check-tests push [-d <directory>] [--files <files...>]
 **Examples:**
 ```bash
 # Specific files (preferred when known)
-npx check-tests push --files manual-tests/login.test.md manual-tests/checkout.test.md
+npx check-tests push --files login.test.md checkout.test.md
 
 # Custom glob
-npx check-tests push --files "manual-tests/**/*.test.md"
+npx check-tests push --files "**/*.test.md"
 
 # Default glob (**/*.test.md) under -d
-npx check-tests push -d manual-tests
+npx check-tests push
+
+# Specify directory with manual test cases
+npx check-tests push -d .testclaw/manual-tests
+
+# Specify directory with manual test cases and specific files
+npx check-tests push -d .testclaw/manual-tests --files new_tests.md
 ```
 
 **Important constraints:**
 - Only use options explicitly documented in this skill or in the "Testomat.io CLI Documentation" ref file.
 - If you are unsure about available CLI options, run `npx check-tests --help` and use only options listed there.
 - Do **not** use an option unless it is mentioned in the documentation or in the `--help` option (e.g., `--pattern`, `--forces`).
+- Ensure you use -d when `.testclaw` or `manual-tests` directories exist. 
+- Ensure you push only the test cases directory (e.g `.testclaw/manual-tests` not `.testclaw`).
 
 **More examples** you can find in "Push" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
-
-#### Labels Handling (Intent-Based)
-
-Use `TESTOMATIO_LABELS` in sync/push **only if the user explicitly requests to set or override labels** in their query.
-
-**Triggers:**
-* "push tests with labels smoke".
-* "import tests to TMS and set label=regression":
-  - labels like `smoke,regression` example: `TESTOMATIO_LABELS="smoke,regression" npx check-tests push`
 
 ---
 

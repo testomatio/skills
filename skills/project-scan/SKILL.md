@@ -54,7 +54,7 @@ Where is the source code?
 ```
 [Waits for the user's reply.]
 
-- If user provides `Git repo` or `another folder` variant => Check if cache directory `.testclaw-context/code` already exists. If not, create it and save files or symlink to this `code/` folder.
+- If user provides `Git repo` or `another folder` variant => Check if cache directory `.testclaw/code` already exists. If not, create it and save files or symlink to this `code/` folder.
 *The command is a no-op when the directory already exists.*
 
 ---
@@ -305,4 +305,3 @@ Skill Output:
 
 > No automation tests found in the project.
 ```
-
