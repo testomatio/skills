@@ -43,6 +43,14 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 | ---------------- | ---------------------------------------------------------------------------------------------------- |
 | `reporter-setup` | Set up Testomat.io test reporting for your automation framework (Playwright, CodeceptJS, Jest, etc.) |
 
+### Explorbot
+
+| Skill                    | Description                                                                          |
+| ------------------------ | ------------------------------------------------------------------------------------ |
+| `explorbot-setup`        | First-time install & configuration of Explorbot, including initial knowledge          |
+| `explorbot-fundamentals` | Operating reference: run, drive and debug all Explorbot commands, config and outputs   |
+| `explorbot-plan`         | Author an Explorbot test plan in markdown so `explorbot test` can run it               |
+
 ---
 
 ## Repository Structure
@@ -61,6 +69,9 @@ testomatio/skills
     │   └── skills/
     │       └── [symlinks to ../../skills/*]
     ├── test-automation/
+    │   └── skills/
+    │       └── [symlinks to ../../skills/*]
+    ├── explorbot/
     │   └── skills/
     │       └── [symlinks to ../../skills/*]
     └── ...
