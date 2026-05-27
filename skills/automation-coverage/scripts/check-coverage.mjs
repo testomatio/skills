@@ -1,0 +1,1 @@
+../../manual-coverage/scripts/check-coverage.mjs

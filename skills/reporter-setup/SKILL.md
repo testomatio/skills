@@ -90,22 +90,38 @@ After completing language and framework detection and/or interactive setup, outp
 
 ## Step 2: Configure Credentials
 
-Check if "TESTOMATIO" API key exists in `.env`:
+Check if `TESTOMATIO` API key exists in `.env`:
 - **If exists**: Use it (no action needed).
-- **If missing**: Add to `.env` token placeholder (format: `tstmt_xxxxx`) :
+- **If missing**: Create or update `.env` file with a placeholder token:
 
 ```env
 TESTOMATIO=tstmt_xxxxx
 ...
 ```
 
-And ask user to manually replace the placeholder by "Project Reporting API key" value.
+> And **ASK** user to manually replace the placeholder by "Project Reporting API key" value (this way os maximum safety).
+(Below are instructions on how to do this)
 
-### Get API Key (if user doesn’t have it)
+### User's Hint: How to set API Key (if user doesn’t have it)
 
 Ask the user to obtain it from Testomat.io project:
-- Navigate to **Settings → Project → Project Reporting API key**
+```md
+1. **Open Testomat.io** => go to your project
+2. **Get API key from Setting page**: Settings → Project → Project Reporting API key**
 _( Project path example by "project-id": `https://app.testomat.io/projects/<project-id>/settings/project` )_
+3. **Update `.env`**: Replace `tstmt_xxxxx` with your actual key
+```
+
+Example message to user:
+```
+✅ Added `TESTOMATIO=tstmt_xxxxx` placeholder to .env
+
+To activate reporting:
+1. Go to Testomat.io → your project → Settings → Project
+2. Copy "Project Reporting API key"
+3. Replace `tstmt_xxxxx` in .env with your actual key
+4. Run tests: TESTOMATIO=tstmt_xxxxx npx <test-command>
+```
 
 ---
 

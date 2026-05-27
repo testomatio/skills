@@ -1,0 +1,1 @@
+../../manual-coverage/references/COVERAGE_FILE_FORMAT.md
