@@ -29,7 +29,12 @@ This skill works **only with manual tests in markdown format**.
 
 - **DO NOT** process unit, functional, or e2e test files.
 - **DO NOT** suggest creating new automated tests.
-- **Only touch two files in this repo.** This skill runs inside the user's source-code repo. It may write `coverage.manual.yml` (or the path the user gave) and add one `.testclaw-context/` line to `.gitignore` if it is missing. Nothing else — never a source file. Cases pulled from Testomat.io go into the gitignored `.testclaw-context/manual-tests/`, never into a tracked folder (see Step 1).
+- **Only touch two files in this repo.** This skill runs inside the user's source-code repo. It may write `coverage.manual.yml` (or the path the user gave) and add one `.testclaw-context/` line to `.gitignore` if it is missing. Nothing else — never a source file. Cases pulled from Testomat.io go into:
+  - **Big project with source code** → gitignored `.testclaw-context/manual-tests/`
+  - **Test-only project** (no `src/`) → tracked `manual-tests/`
+
+Never pull cases into a tracked folder in a source-code repo.
+
 - **Don't write scripts. Never use Python.** Read `.test.md` files with your file tool; pull out IDs and tags with `grep` (Step 2). To check the finished coverage file, pipe it through `js-yaml` into the one tiny bundled helper: `npx js-yaml coverage.manual.yml | node scripts/check-coverage.mjs` (Step 5). If more checks needed use custom script with `npx js-yaml`.
 
 If automated test files (e.g. e2e test, unit, api)  are encountered while exploring, ignore them and continue with the manual markdown set.
@@ -49,11 +54,14 @@ From the `project-scan` result, capture:
 
 If `project-scan` reports **no manual tests** (it checks the cache too, so this means nothing was pulled before):
 - ❓ Ask the user how to proceed:
-  1. Pull cases from Testomat.io — have **`sync-cases`** pull into the gitignored cache: `npx check-tests pull -d .testclaw-context/manual-tests`, then add `.testclaw-context/` to `.gitignore` if missing. Re-run `project-scan` and continue.
+  1. Pull cases from Testomat.io — have **`sync-cases`** pull into the appropriate location:
+     - **Source-code project** (has `src/`) → gitignored `.testclaw-context/manual-tests/`
+     - **Test-only project** (no `src/`) → tracked `manual-tests/`
+     Then add `.testclaw-context/` to `.gitignore` if needed. Re-run `project-scan` and continue.
   2. Point to a directory the scan missed (then re-run `project-scan` there).
   3. Stop.
 
-Never pull cases into a tracked folder. Don't repeat `sync-cases` pull logic here.
+Never pull cases into a tracked folder in a source-code repo. Don't repeat `sync-cases` pull logic here.
 
 ### Step 2: Extract test information
 
@@ -207,7 +215,7 @@ It's the only script — everything else is `grep`, your file tool, or `npx js-y
 
 ### Recovery
 
-- **No manual tests found (cache included)** → have `sync-cases` pull into `.testclaw-context/manual-tests/`, or ask the user for a directory the scan missed.
+- **No manual tests found (cache included)** → have `sync-cases` pull (auto-detects location based on project type), or ask the user for a directory the scan missed.
 - **Markdown files with no `@S`/`@T` IDs** → ask whether to push first via `sync-cases`, or skip those files.
 - **Ambiguous source layout** → ask the user which directories are application code.
 
@@ -225,7 +233,7 @@ It's the only script — everything else is `grep`, your file tool, or `npx js-y
 ```
 Use manual-coverage skill to build coverage.manual.yml for our manual cases
 ```
-If there are no local `.test.md` files, it pulls them into the gitignored `.testclaw-context/manual-tests/` and works from there.
+If there are no local `.test.md` files, it pulls them into the appropriate location (auto-detected: `.testclaw-context/manual-tests/` for source-code projects, `manual-tests/` for test-only projects) and works from there.
 
 **Cases already local:**
 ```
@@ -238,7 +246,7 @@ Use manual-coverage skill, output to ops/coverage.qa.yml
 ```
 
 **Full workflow (source repo):**
-1. `manual-coverage` runs `project-scan`. No local cases, so it has `sync-cases` pull into `.testclaw-context/manual-tests/` (gitignored) and re-runs `project-scan`.
+1. `manual-coverage` runs `project-scan`. No local cases, so it has `sync-cases` pull (auto-detects location) and re-runs `project-scan`.
 2. It maps source files to suite/test/tag IDs and writes `coverage.manual.yml`. The only tracked changes are that file and one line in `.gitignore`.
 3. `npx @testomatio/reporter run --kind manual --filter "coverage:file=coverage.manual.yml,diff=main"` creates a pending run with only the affected cases.
 
@@ -248,6 +256,7 @@ Use manual-coverage skill, output to ops/coverage.qa.yml
 
 | Action                                 | Command                                                                                              |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Pull cases into the gitignored cache  | `npx check-tests pull -d .testclaw-context/manual-tests`                                            |
+| Pull cases into cache (source-code project) | `npx check-tests pull -d .testclaw-context/manual-tests` (auto-detected) |
+| Pull cases into tracked folder (test-only project) | `npx check-tests pull -d manual-tests` (auto-detected) |
 | Create affected manual run             | `npx @testomatio/reporter run --kind manual --filter "coverage:file=coverage.manual.yml,diff=main"`  |
 | Group runs                             | `TESTOMATIO_RUNGROUP="Regression 911" npx @testomatio/reporter run --kind manual --filter "..."`     |
