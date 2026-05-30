@@ -1,7 +1,9 @@
-# Reporter Contract & Cross-Repo Triggering
+# Reporter Contract: counts, prepared runs & `--remote`
 
-How `@testomatio/reporter` consumes a coverage map, and the exact mechanics for
-the cross-repo e2e pattern. This is CI-independent — the CI recipes wrap these.
+How `@testomatio/reporter` consumes a coverage map, counts affected tests for
+the PR comment, prepares runs without executing them, and launches a prepared
+run on a Testomat.io CI profile. This is CI-independent — the CI config wraps
+these commands.
 
 ## 1. The coverage filter
 
@@ -20,154 +22,161 @@ through the YAML, and selects the matching tests.
   So the reporter must be launched from inside the repo whose changes you want
   to detect. Confirmed behavior, not configurable.
 
-Implication for cross-repo: if the coverage map + source live in repo A but the
-test runner runs in repo B, launch the reporter with cwd = repo A (so the diff
-is repo A's), and let the runner command `cd` into repo B.
+The whole model rests on this: the repo that holds the coverage map + git
+history is where the affected selection is computed — for the comment counts and
+for scoping the prepared run alike.
 
-## 2. Manual flow — create a pending run
+## 2. Phase 1 — affected-counts comment (`--filter-list`)
 
-No test runner. The reporter just creates a manual run in Testomat.io
-containing only the affected cases:
+`--filter-list` computes the affected tests **without executing or creating a
+run** — exactly what the PR-open notice needs. Pair it with `--format` to get a
+clean, parseable list on stdout (the banner is suppressed and logs go to
+stderr):
 
+```bash
+npx @testomatio/reporter run \
+  --filter-list "coverage:file=coverage.manual.yml,diff=$BASE" --format ids
+npx @testomatio/reporter run \
+  --filter-list "coverage:file=coverage.e2e.yml,diff=$BASE" --format ids
 ```
-npx @testomatio/reporter run --kind manual \
-  --filter "coverage:file=coverage.manual.yml,diff=<base-branch>"
+
+`--format` values: `ids` (comma-separated, default), `newline` (one per line —
+easy to `wc -l`), `json`, `grep` (`(@Sxxxx|@Tyyyy|...)`).
+
+- Count the entries per map; empty output = `0`.
+- Assemble one line, e.g. `0 automated tests, 10 manual tests are affected by
+  this PR`, and post it via the CI's PR/MR comment API (GitHub / GitLab /
+  Bitbucket). Prefer updating one existing comment over re-posting.
+- Needs `TESTOMATIO` (API key) for the `coverage:` resolution. Creates nothing,
+  must never fail the PR check.
+
+## 3. Phase 2 — create the regression runs on merge
+
+### 3a. Manual run — created pending, not executed
+
+No test runner; the reporter creates a manual run containing only the affected
+cases for testers to pick up:
+
+```bash
+npx @testomatio/reporter start --kind manual \
+  --filter "coverage:file=coverage.manual.yml,diff=$BASE"
 ```
 
-- Needs `TESTOMATIO` (API key) in env.
-- `<base-branch>` for a PR is normally the target branch (`main`/`master`).
-- Safe to run the instant a PR opens. No deploy dependency. Non-blocking.
-- **Required in practice for `setup-pr-testing`:**
-  - `TESTOMATIO_TITLE` — meaningful run title. For PR-opened triggers derive
-    from PR title + number (e.g. `PR Add invoice export #482`).
-  - `TESTOMATIO_RUNGROUP_TITLE` — the rungroup bucket the run lands in
-    (week / day / milestone / submodule / release — whichever the user picked
-    in Step 4 of the skill). Supports `/` nesting for sub-grouping.
-  - `TESTOMATIO_ENV` (optional) — target environment label.
+- Required env: `TESTOMATIO`, `TESTOMATIO_TITLE` (merge commit, e.g. `report for
+  commit <sha>`), `TESTOMATIO_RUNGROUP_TITLE` (the rungroup bucket; supports `/`
+  nesting). `TESTOMATIO_ENV` optional.
 
-## 3. Automated flow — run only affected tests
+### 3b. Automated run — prepared as a shared run, not executed
 
-The reporter wraps the runner command and injects the framework-appropriate
-grep (`--grep`, `--testNamePattern`, Cypress env, etc.) for the matched IDs:
+`start` creates the run scoped to the affected e2e tests and returns its id
+**without running anything**. Created as a *shared* run so the later execute
+step — and any parallel executors — converge on this one run by title:
 
+```bash
+RUN_ID=$(TESTOMATIO_SHARED_RUN=1 \
+  TESTOMATIO_TITLE="report for commit $SHA" \
+  TESTOMATIO_SHARED_RUN_TIMEOUT=$DEPLOY_MINUTES \
+  npx @testomatio/reporter start --filter "coverage:file=coverage.e2e.yml,diff=$BASE" \
+  | tail -n1)
 ```
-npx @testomatio/reporter run "<runner cmd>" \
-  --filter "coverage:file=coverage.e2e.yml,diff=<base>"
+
+- `--filter` scopes the prepared run to the affected tests; that scope is stored
+  on the run and reused at launch time (§4).
+- **Output:** the run id is the last line of stdout — capture with `tail -n1`.
+- Required env: `TESTOMATIO`, `TESTOMATIO_TITLE`, `TESTOMATIO_RUNGROUP_TITLE`.
+
+### Shared-run env vars (the convergence mechanism)
+
+- `TESTOMATIO_SHARED_RUN=1` — report/launch into the run matching
+  `TESTOMATIO_TITLE` instead of creating a new one. All parallel reporters with
+  the same title land in the same run.
+- `TESTOMATIO_TITLE` — the match key. The prepare step (§3b) and the execute
+  step (§4) **must** use the identical title.
+- `TESTOMATIO_SHARED_RUN_TIMEOUT` — minutes the title stays matchable, **default
+  20**. After it elapses a new run is created instead. Set it above the typical
+  merge→deploy duration, or the execute step won't attach to the prepared run.
+  Example: `TESTOMATIO_SHARED_RUN_TIMEOUT=120` for a 2-hour window.
+
+## 4. Phase 3 — launch the prepared run on CI (`reporter run --remote`)
+
+`reporter run --remote <profile>` asks Testomat.io to dispatch the project's CI
+profile (configured under **Settings → CI**) for an already-prepared run,
+instead of executing tests locally. This replaces the old cross-repo dispatch:
+the CI profile owns the runner, browsers, environment URLs and secrets — the
+reporter just triggers it.
+
+```bash
+TESTOMATIO_RUN=$RUN_ID \
+TESTOMATIO_SHARED_RUN=1 \
+TESTOMATIO_TITLE="report for commit $SHA" \
+npx @testomatio/reporter run --remote <profile>
+```
+
+- `TESTOMATIO_RUN=$RUN_ID` points the launch at the run prepared in §3b. With no
+  fresh `--filter`, Testomat.io greps that run's **own stored scope**, so only
+  the affected e2e tests run — no need to recompute the diff at deploy time.
+- The CI profile name must exist on the project, otherwise the call fails with
+  `CI launch failed: No settings for <profile>`. `--remote` cannot be combined
+  with `--filter-list`.
+- Testomat.io passes the run id into the dispatched workflow, so the e2e tests
+  running there report back into the same prepared run.
+- On success the CLI prints the launched profile and run URL, then exits 0; the
+  run transitions as the CI reports results.
+
+**Decoupled deploy (no `RUN_ID` to hand over).** If the deploy pipeline can't
+carry `RUN_ID`, drop it and let the shared-run **title** match the prepared run
+— keep `TESTOMATIO_SHARED_RUN=1` and the identical `TESTOMATIO_TITLE`, and make
+sure the shared-run timeout (§3b) is still open. Carrying `RUN_ID` is the more
+direct link when the same pipeline does merge→deploy; matching by title is the
+fallback for a separate deploy pipeline.
+
+**Optional CI overrides.** `--remote-param key=value` (repeatable) forwards
+values into the CI profile config at launch (e.g. `--remote-param branch=main`).
+The same launch config can be set via env: `TESTOMATIO_CI_PROFILE` (= the
+profile) and `TESTOMATIO_CI_PARAMS` (= comma-separated `key=value` overrides).
+
+## 5. Inline exception — execute in this pipeline (no CI profile)
+
+When the e2e suite runs in this pipeline (mobile, API/contract, or an existing
+same-repo job) rather than via a CI profile, launch the prepared run by wrapping
+the runner directly after deploy:
+
+```bash
+TESTOMATIO_RUN=$RUN_ID npx @testomatio/reporter run "<runner cmd>" \
+  --filter "coverage:file=coverage.e2e.yml,diff=$BASE"
 ```
 
 Examples of `<runner cmd>`: `npx playwright test`, `npx cypress run`,
-`npx codeceptjs run`, `npx wdio`. Run this from the repo that holds the
-coverage map + git history (see §1).
+`npx codeceptjs run`, `npx wdio`. The reporter injects the framework-appropriate
+grep for the matched IDs and reports into `$RUN_ID`.
 
-- **Required in practice for `setup-pr-testing`:**
-  - `TESTOMATIO_TITLE` — for commit-triggered runs derive from the commit
-    subject + short SHA; for tag/release-triggered runs use the tag name.
-  - `TESTOMATIO_RUNGROUP_TITLE` — same strategy as the manual flow unless the
-    user split them.
-  - `TESTOMATIO_ENV` (optional) — target environment label.
+## 6. Diff base caveats
 
-## 4. Inspect-only (dry run) — get the selection without running
+- **Comment + on-merge runs**: `diff=<target-branch>` (e.g. `main`) — the
+  natural "what this PR changes".
+- **If you recompute at deploy time**: the meaningful diff is *what was just
+  deployed*. On a squash/rebase merge that is one commit, so `diff=<sha>~1`
+  works. With **multi-commit** pushes onto the deploy branch, `~1` under-selects
+  — diff against the previously-deployed SHA (persist it between deploys).
+  Preferably avoid recomputing: the prepared run already carries its scope, so
+  the `--remote` launch reuses it (§4) and no deploy-time diff is needed.
+  Surface this to the user rather than hard-coding silently.
 
-`--filter-list` is the documented mode to compute the affected tests **without
-executing** them (docs: coverage pipe → "Retrieve a list of tests matching your
-filter"). Use it when the selection must be computed in one repo and the tests
-run elsewhere.
+## 7. Required environment
 
-Pair it with `--format=grep` to get the alternation string directly on stdout
-(no parsing needed):
-
-```bash
-GREP=$(npx @testomatio/reporter run \
-  --filter-list "coverage:file=coverage.e2e.yml,diff=$BASE" --format=grep)
-# -> GREP = "(@Sxxxx|@Tyyyy|...)";  use as: <runner> --grep "$GREP"
-```
-
-Other `--format` values: `json`, `newline`, `ids` (default: comma-separated).
-
-Only proceed to trigger the run when `$GREP` is non-empty — an empty grep
-means "nothing affected", and most runners treat an empty grep as "run
-everything".
-
-## 5. `reporter start` — pre-create an empty run
-
-`start` initiates a new test run in Testomat.io and returns its identifier,
-**without running any tests**. Use it when the selection is computed in one
-repo (this one) but the tests run in another job or another repo, and you want
-their results to attach to a single, pre-titled run that already lives in the
-correct rungroup.
-
-```bash
-RUN_ID=$(npx @testomatio/reporter start --kind automated | tail -n1)
-```
-
-- `--kind` — `automated`, `manual`, or `mixed`.
-- Required env: `TESTOMATIO`. In practice also set `TESTOMATIO_TITLE` and
-  `TESTOMATIO_RUNGROUP_TITLE` so the run is created with the right metadata.
-  `TESTOMATIO_ENV` optional.
-- **Output:** the run ID is the last line of stdout — capture with `tail -n1`.
-- **Pair:** the consuming job (whatever runs the tests — same repo or
-  another) exports `TESTOMATIO_RUN=$RUN_ID`. Any subsequent `@testomatio/reporter`
-  call there will attach to that run instead of creating a new one.
-
-## 6. Cross-repo e2e pattern (preferred when e2e lives elsewhere)
-
-Roles:
-
-- **Source repo** (this one): owns `coverage.e2e.yml` + the diff + the run's
-  identity (title, rungroup). After the deploy signal: computes `$GREP` via
-  §4, pre-creates the run via §5, then triggers the e2e repo carrying both
-  `$GREP` and `$RUN_ID`.
-- **E2E repo**: already has a workflow that accepts a grep/filter input + a
-  run ID and runs the suite against the deployed environment. We trigger that
-  existing workflow — we do **not** duplicate it.
-
-Why this split: the e2e repo holds the runner, browsers, environment URLs and
-secrets. Reproducing all that in the source repo is duplication and a secret-
-sprawl risk. The source repo only needs its own coverage map + git + a Testomat.io
-API key.
-
-**Four explicit stages:**
-
-1. Compute the selection: `GREP=$(reporter run --filter-list … --format=grep)`
-   (§4).
-2. If `$GREP` is empty → stop. Nothing was affected.
-3. Pre-create the run: `RUN_ID=$(reporter start … | tail -n1)` (§5).
-4. Trigger the e2e repo's workflow with inputs `{grep: $GREP, run: $RUN_ID,
-   test_env: <env name>}`. The e2e repo's runner job exports
-   `TESTOMATIO_RUN=<run input>` so its reports attach to the pre-created run.
-
-Triggering mechanism — whatever cross-repo pipeline/workflow trigger the CI
-offers, carrying the grep + run + env as inputs/variables. The built-in CI
-token usually cannot reach another repo — a PAT / project access token / app
-token / deploy trigger token with permission on the e2e repo is required.
-State this to the user as a provisioning step.
-
-If the e2e repo's workflow does **not** yet accept `grep` + `run` + `test_env`
-inputs, that is a small addition there — describe the contract (`SKILL.md` §6
-"When the e2e repo has no dispatchable workflow") and hand the user a draft;
-do not silently restructure their pipeline.
-
-## 7. Diff base caveats
-
-- **Manual, on PR open**: `diff=<target-branch>` (e.g. `main`) — the natural
-  "what this PR changes".
-- **Automated, after deploy**: the meaningful diff is *what was just deployed*.
-  On a squash/rebase merge that is one commit, so `diff=<deployed_sha>~1`
-  works. If the project lands **multi-commit** pushes onto the deploy branch,
-  `~1` under-selects — instead diff against the previously-deployed SHA
-  (carry/persist it between deploys). Always surface this assumption to the user
-  rather than hard-coding silently.
-
-## 8. Required environment
-
-- `TESTOMATIO` — Testomat.io API key (both flows; in both repos for cross-repo).
-- `TESTOMATIO_TITLE` — meaningful run title. Required in practice for every
-  `setup-pr-testing` reporter call (manual, automated, `start`).
-- `TESTOMATIO_RUNGROUP_TITLE` — rungroup the run lands in. Required in
-  practice for every `setup-pr-testing` reporter call. Supports `/` nesting.
-- `TESTOMATIO_RUN` — **cross-repo only.** Set in the e2e repo's runner job to
-  the run ID returned by `reporter start` in the source repo, so its reports
-  attach to the pre-created run.
+- `TESTOMATIO` — Testomat.io API key (every phase that talks to Testomat.io).
+- `TESTOMATIO_TITLE` — run title; derive from the merge commit. The automated
+  prepare (§3b) and execute (§4) steps MUST use the same value.
+- `TESTOMATIO_RUNGROUP_TITLE` — rungroup for the created runs. Supports `/`
+  nesting.
+- `TESTOMATIO_SHARED_RUN` — `1` to converge on the title-matched run (automated
+  prepare + execute).
+- `TESTOMATIO_SHARED_RUN_TIMEOUT` — minutes the shared title stays matchable
+  (default 20); set above the merge→deploy duration.
+- `TESTOMATIO_RUN` — the prepared run id; set on the execute step to launch that
+  specific run.
+- `TESTOMATIO_CI_PROFILE` / `TESTOMATIO_CI_PARAMS` — env equivalents of
+  `--remote` / `--remote-param`.
 - `TESTOMATIO_ENV` (optional) — target environment label.
-- Cross-repo CI: a token authorized to trigger the e2e repo's CI (PAT /
-  project access token / app token; the built-in CI token usually cannot).
+- A Testomat.io **CI profile** (Settings → CI) is required for `--remote`; it is
+  configured in Testomat.io, not as a repo secret.

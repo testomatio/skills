@@ -3,23 +3,30 @@
   "evals": [
     {
       "id": 0,
-      "name": "github-cross-repo-happy-path",
-      "prompt": "The project is at FIXTURE/acme-api. Set up our PRs so they run only the manual cases affected by the change, and after the staging deploy run only the affected e2e tests. The e2e suite is not in this repo — it lives in the separate repo acme/e2e-tests, which already has a workflow e2e.yml that takes a `grep` input. Deploys happen on merge to main via the existing 'Deploy Staging' workflow.",
-      "expected_output": "Runs project-scan first; detects GitHub Actions (does not assume); reuses existing coverage.manual.yml + coverage.e2e.yml; writes a PR-opened manual workflow (reporter run --kind manual, no deploy dependency) and a separate post-deploy workflow gated on Deploy Staging success that computes the grep via --filter-list and dispatches acme/e2e-tests' existing e2e.yml; isolates the e2e job from the release; states the cross-repo token requirement.",
+      "name": "github-remote-profile-happy-path",
+      "prompt": "The project is at FIXTURE/acme-api. On each PR I want a comment showing how many manual and automated tests the change affects. After the PR is merged and the staging deploy finishes, run only the affected e2e tests. The e2e suite runs through our Testomat.io CI profile 'staging-e2e'. Deploys happen on merge to main via the existing 'Deploy Staging' workflow.",
+      "expected_output": "Runs project-scan first; detects GitHub Actions (does not assume); reuses existing coverage.manual.yml + coverage.e2e.yml. Phase 1: a non-blocking PR-opened job computes affected counts with reporter run --filter-list for both maps and posts/updates a single PR comment like '0 automated tests, 10 manual tests are affected by this PR'; creates no runs. Phase 2 (on merge): reporter start --kind manual creates a pending manual run, and reporter start with TESTOMATIO_SHARED_RUN=1, TESTOMATIO_TITLE set to the merge commit, and TESTOMATIO_SHARED_RUN_TIMEOUT above the deploy duration prepares the automated run scoped to the e2e map without executing it, capturing RUN_ID. Phase 3 (after Deploy Staging succeeds): a non-failing job runs reporter run --remote staging-e2e with TESTOMATIO_RUN=$RUN_ID + the same shared title, launching the affected e2e on the CI profile. Sets meaningful title (merge commit) and rungroup; isolates the execute job from the release; does NOT dispatch a foreign repo directly.",
       "files": []
     },
     {
       "id": 1,
       "name": "gitlab-missing-coverage-maps",
-      "prompt": "The project is at FIXTURE/shop-web. We want selective regression on our merge requests — only run the tests touched by the change. I don't think we have any coverage files set up yet.",
-      "expected_output": "Runs project-scan; detects GitLab CI (not GitHub); finds no coverage.*.yml; explains regression cannot work without coverage maps and proposes/delegates to manual-coverage and automation-coverage to create them before wiring .gitlab-ci.yml; asks how MRs deploy and how deploy completion is observable for the e2e flow; manual flow needs no deploy signal.",
+      "prompt": "The project is at FIXTURE/shop-web. I want each MR to comment how many tests it affects, and after merge+deploy run only the affected tests. I don't think we have any coverage files set up yet.",
+      "expected_output": "Runs project-scan; detects GitLab CI (not GitHub); finds no coverage.*.yml; explains both the affected-counts comment and the regression runs cannot work without coverage maps and proposes/delegates to manual-coverage and automation-coverage to create them before wiring .gitlab-ci.yml; asks how merges deploy, how deploy completion is observable, and roughly how long deploys take (for the shared-run timeout); notes the PR-open comment needs no deploy answers.",
       "files": []
     },
     {
       "id": 2,
       "name": "no-e2e-suite-refuse-to-fabricate",
       "prompt": "The project is at FIXTURE/lib-utils. Make our pull requests run the affected end-to-end tests automatically.",
-      "expected_output": "Runs project-scan; finds only Jest unit tests, no e2e framework anywhere and no e2e suite in another repo; does NOT fabricate an e2e job or pipeline; explains the automated/e2e flow needs an e2e suite first (points at authoring/automation-coverage); offers the manual flow only if manual cases exist; asks which CI is used since none is configured.",
+      "expected_output": "Runs project-scan; finds only Jest unit tests, no e2e framework anywhere; does NOT fabricate an e2e job, pipeline, or --remote launch; explains the automated phase needs an e2e suite first (points at authoring/automation-coverage); offers the PR-open comment (manual count only) and an on-merge pending manual run if manual cases exist; asks which CI is used since none is configured.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "no-ci-profile-for-remote",
+      "prompt": "The project is at FIXTURE/acme-api. Use --remote to run our affected e2e tests after deploy, and comment the affected counts on each PR. We use GitHub Actions and deploy on tag v*.",
+      "expected_output": "Runs project-scan; detects GitHub Actions; confirms whether a Testomat.io CI profile exists for --remote and, finding none, explains --remote dispatches a configured profile and cannot work without one, pointing the user to Testomat.io Settings > CI to create it. Still wires phase 1 (PR-open counts comment) and phase 2 (on-merge manual run + prepared automated shared run titled by commit). Wires the phase-3 reporter run --remote execute step keyed off the tag/deploy-complete signal as non-failing, to be enabled once the profile exists; offers the inline-runner exception if the e2e suite can run in this pipeline instead.",
       "files": []
     }
   ]

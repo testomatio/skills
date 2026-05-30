@@ -1,44 +1,56 @@
 ---
 name: setup-pr-testing
-description: Set up change-aware PR regression testing — wire CI so every pull request runs only the manual and automated/e2e tests affected by the diff, via Testomat.io coverage maps and @testomatio/reporter. Use this skill when the user wants PR-triggered regression, "run only affected tests on PRs", selective manual runs per PR, post-deploy e2e on PRs, a coverage-driven CI pipeline, weekly/grouped PR regression runs in a rungroup, creating a Testomat.io run in CI and dispatching e2e tests to another repo, deploy-on-tag / on-release / on-merge regression, or to connect coverage.manual.yml / coverage.e2e.yml to their CI. CI-agnostic — adapts to whatever CI the project already uses (GitHub Actions, GitLab CI, Jenkins, Bitbucket, CircleCI, etc.). Trigger it even if the user only says "make PRs run the right tests" or "set up regression for pull requests".
+description: Set up change-aware PR regression testing — wire CI so each pull request posts a comment listing how many manual and automated tests its diff affects, and so that after the PR is merged and deployed only those affected tests are actually run, via Testomat.io coverage maps and @testomatio/reporter. Use this skill when the user wants PR-triggered regression, "comment affected test counts on PRs", "run only affected tests after merge/deploy", selective manual runs per PR, post-deploy e2e, a coverage-driven CI pipeline, weekly/grouped regression runs in a rungroup, launching automated regression on Testomat.io CI via `--remote`, or to connect coverage.manual.yml / coverage.e2e.yml to their CI. CI-agnostic — adapts to whatever CI the project already uses (GitHub Actions, GitLab CI, Jenkins, Bitbucket, CircleCI, etc.). Trigger it even if the user only says "make PRs comment affected tests" or "run the right tests after merge".
 license: MIT
 metadata:
   author: Testomat.io
-  version: 1.0.0
+  version: 2.0.0
 ---
 
 # SETUP-PR-TESTING SKILL: What I do
 
-I wire a project's CI so each **pull request** (or deploy thereof) runs only the
-tests affected by its change — not the whole suite. There are exactly two flows,
-and they are independent:
+I wire a project's CI so a pull request's change drives testing in **three
+phases** — a cheap notice while the PR is open, real runs once it is merged, and
+execution once it is deployed. Nothing heavy happens until the change is
+actually going somewhere.
 
 ```
-PR open      ──▶ Regression Manual Tests      coverage.manual.yml ──▶ reporter run --kind manual
-                                              + TESTOMATIO_TITLE + TESTOMATIO_RUNGROUP_TITLE
+PR opened   ──▶ NOTICE ONLY — comment the affected test counts on the PR
+                reporter run --filter-list  (manual map + e2e map) → counts
+                posted via the CI's native PR-comment API (GitHub / GitLab / Bitbucket)
+                no runs created · never blocks the PR
+                  e.g. "0 automated tests, 10 manual tests are affected by this PR"
 
-deploy done  ──▶ Regression Automated Tests   coverage.e2e.yml
-   ├─ same repo:   ──▶ reporter run "<runner>"   + TITLE + RUNGROUP
-   └─ cross repo:  ──▶ reporter run --filter-list … --format=grep    (compute selection)
-                   ──▶ reporter start                                 (pre-create empty run, capture ID)
-                   ──▶ dispatch e2e repo with {grep, run=<id>, env}   (tests there export TESTOMATIO_RUN)
+PR merged   ──▶ Manual regression run (created, pending)
+                reporter start --kind manual --filter "coverage:file=coverage.manual.yml,diff=<base>"
+                titled by the merge commit · in a rungroup · testers pick it up
+
+            ──▶ Automated regression run (created, NOT executed)
+                reporter start --filter "coverage:file=coverage.e2e.yml,diff=<base>"
+                TESTOMATIO_SHARED_RUN=1 · TESTOMATIO_TITLE="report for commit <sha>"
+                TESTOMATIO_SHARED_RUN_TIMEOUT=<covers the merge→deploy gap>
+                → capture RUN_ID
+
+deploy done ──▶ Launch automated execution on Testomat.io CI
+                reporter run --remote <ci-profile>
+                  (TESTOMATIO_RUN=$RUN_ID  +  same shared-run title + TESTOMATIO_SHARED_RUN=1)
+                Testomat.io dispatches the project's CI profile; the affected e2e
+                tests run there and report back into the same prepared run.
 ```
 
-Both flows are **change-aware**: a coverage map (`coverage.*.yml`) maps source
+Every phase is **change-aware**: a coverage map (`coverage.*.yml`) maps source
 files → test/suite IDs, and `@testomatio/reporter` filters by the PR diff so
-only impacted tests are selected.
+only impacted tests are counted, prepared, and run.
 
-Every run — manual or automated — lands in Testomat.io with a meaningful
-**title** and inside a **rungroup**. The grouping strategy (week / day /
-milestone / submodule / release) is the user's call; we ask, we do not invent.
-
-For cross-repo e2e, the run is **pre-created in the source repo** (where the
-diff and coverage map live) and the resulting run ID is passed into the e2e
-repo so its test results attach to the same run instead of opening a new one.
+The big shift from older setups: **execution moved to after merge+deploy**, the
+**PR-open step is now just an informational comment**, and **automated tests are
+launched through Testomat.io's `--remote` CI profile** instead of this repo
+reaching into another repo's pipeline. If the e2e tests live elsewhere, the CI
+profile points there — the reporter never triggers a foreign repo directly.
 
 I do **not** invent tests, write CI from guesswork, or assume a CI system. I
 discover the project, confirm the unknowns with the user, reuse existing
-coverage maps (or delegate creating them), and express the two flows in
+coverage maps (or delegate creating them), and express the three phases in
 whatever CI the project actually uses.
 
 ## What this skill is and isn't
@@ -46,26 +58,33 @@ whatever CI the project actually uses.
 This skill is the **method**, not a catalogue of CI snippets. The valuable,
 non-obvious knowledge is:
 
-1. the two-flow model and how they differ (manual = no deploy dependency;
-   automated = after deploy, never blocks the release);
-2. the `@testomatio/reporter` command contract — title/rungroup env vars, the
-   `reporter start` "empty run" pattern, and the cross-repo `--filter-list
-   --format=grep` → `start` → dispatch flow (see
+1. the three-phase model and why each phase is gated where it is (comment =
+   harmless, on open; manual run = on merge, no deploy needed; automated run =
+   prepared on merge, executed only after deploy, never blocking the release);
+2. the `@testomatio/reporter` command contract — `--filter-list` for the notice
+   counts, `reporter start` to create runs without executing, the shared-run
+   env vars (`TESTOMATIO_SHARED_RUN`, `TESTOMATIO_TITLE`,
+   `TESTOMATIO_SHARED_RUN_TIMEOUT`), and `reporter run --remote <profile>` to
+   launch a prepared run on Testomat.io CI (see
    [references/REPORTER_CONTRACT.md](references/REPORTER_CONTRACT.md));
-3. the decisions — coverage maps required, where e2e runs, what to ask the user
-   (deploy trigger, completion signal, rungroup strategy, diff base).
+3. the decisions — coverage maps required, whether a Testomat.io CI profile
+   exists for `--remote`, and what to ask the user (deploy trigger, completion
+   signal, rungroup strategy, diff base, shared-run timeout).
 
 Translating a trigger into a specific CI's YAML/Groovy/config is **not** special
 knowledge — you already know how GitHub Actions, GitLab CI, Jenkins, or any
-other CI express "run on PR open", "run after job X", and "don't fail the
-pipeline". Write that yourself for the CI in front of you. Do not expect, or
-add, a per-CI recipe file.
+other CI express "run on PR open", "run on merge", "run after deploy", "post a
+PR comment", and "don't fail the pipeline". Write that yourself for the CI in
+front of you. **Do not write explicit per-CI workflow files into this skill or
+expect a per-CI recipe file** — give the agent the contract and let it author
+the config for whatever CI it finds.
 
 ## When to use
 
-- "Run only the tests affected by a PR", "selective regression on pull requests".
-- "Create a pending manual run for each PR with just the relevant cases".
-- "Run e2e tests after a PR is deployed, but only the affected ones".
+- "Comment how many tests a PR affects", "show affected test counts on PRs".
+- "Run only the affected tests after a PR is merged and deployed".
+- "Create a pending manual regression run per merged PR with just the relevant cases".
+- "Launch affected e2e on Testomat.io CI after deploy", "use `--remote` for regression".
 - "Hook coverage.manual.yml / coverage.e2e.yml into our CI".
 
 ---
@@ -77,31 +96,48 @@ add, a per-CI recipe file.
   depend on its result.
 - **Never assume the CI system, and never hardcode one.** Identify the CI the
   project already uses by reading the repo; if you cannot tell, ask. Then write
-  config for *that* CI from your own knowledge of it.
+  config for *that* CI from your own knowledge of it. Do not bake per-CI
+  workflow files into this skill.
 - **Regression cannot work without a coverage map.** If the needed
   `coverage.*.yml` is missing, the only correct move is to propose creating it
-  via the coverage skills — not to hand-write a mapping or skip filtering.
-- **Confirm the end system's PR flow with the user.** We do not know how their
-  PRs deploy or how a deploy completion is observable. Ask — do not guess.
-- **The automated-regression job must never fail the deploy/release pipeline.**
-  It is observation, not a gate. Isolate it.
-- **Every run gets a meaningful title.** Set `TESTOMATIO_TITLE` on every reporter
-  call — manual and automated, same-repo and cross-repo. Derive it from the
-  scope in hand: PR title + PR number for PR-triggered flows; commit subject +
-  short SHA for commit-triggered flows; tag name for tag/release-triggered
-  flows. Never leave the run untitled.
-- **Every run lands in a rungroup.** Set `TESTOMATIO_RUNGROUP_TITLE` on every
-  reporter call. The grouping strategy — week, day, milestone, submodule,
-  release — is the user's choice; ask in Step 4. Reuse the same strategy for
-  the manual and automated flows unless the user explicitly splits them.
-- **Cross-repo e2e MUST pre-create the run here.** When the e2e suite lives in
-  another repo, create the run in *this* repo with `reporter start` (carrying
-  title + rungroup), capture the run ID, and pass it to the e2e repo as
-  `TESTOMATIO_RUN`. The e2e repo must not create its own run — the title and
-  rungroup belong with the diff, which lives here.
+  via the coverage skills — not to hand-write a mapping or skip filtering. The
+  PR-open comment also needs the maps to count affected tests.
+- **PR open is a NOTICE ONLY.** On PR open/update, compute affected counts with
+  `--filter-list` and post a PR comment. **Never create runs and never block the
+  PR** in this phase. Counts only — e.g. `0 automated tests, 10 manual tests are
+  affected by this PR`. Must work on GitHub, GitLab, and Bitbucket using each
+  one's native PR/MR comment API.
+- **Regression runs are created on MERGE, not on PR open.** When the PR merges:
+  create the manual run (pending) and create the automated run (prepared, not
+  executed). Nothing executes until deploy.
+- **Automated run is prepared, then launched separately.** On merge, create it
+  with `reporter start` as a **shared run** keyed by the merge commit
+  (`TESTOMATIO_SHARED_RUN=1`, `TESTOMATIO_TITLE="report for commit <sha>"`) and
+  do **not** execute it. After deploy, launch it with `reporter run --remote
+  <profile>`.
+- **Set the shared-run timeout to span the merge→deploy gap.** The shared run is
+  matched by title only within `TESTOMATIO_SHARED_RUN_TIMEOUT` minutes (default
+  20). If deploy takes longer, the execute step won't attach to the prepared run
+  and a stray new run appears. Ask how long deploys take and set the timeout
+  above it (e.g. `TESTOMATIO_SHARED_RUN_TIMEOUT=120`).
+- **Execute automated through `--remote`, never by triggering another repo.**
+  `reporter run --remote <profile>` asks Testomat.io to dispatch the project's
+  configured CI profile. Do not reach into a foreign repo's pipeline with a PAT
+  and `{grep, run, env}` inputs anymore — that responsibility now lives in the
+  Testomat.io CI profile (configured under **Settings → CI**).
+- **The automated execute step must never fail the deploy/release pipeline.** It
+  is observation, not a gate. Isolate it (a non-failing job keyed off the deploy
+  signal).
+- **Every created run gets a meaningful title.** Set `TESTOMATIO_TITLE` on every
+  `start`/`run` call that creates or launches a run. Derive it from the merge
+  commit (subject + short SHA), e.g. `report for commit <sha>`. The automated
+  prepare and execute steps MUST use the **same** title so they converge on one
+  shared run.
+- **Every created run lands in a rungroup.** Set `TESTOMATIO_RUNGROUP_TITLE` on
+  the manual and automated runs. The grouping strategy (week / day / milestone /
+  release / submodule) is the user's choice; ask in Step 4.
 - **Only touch CI config and (if asked) coverage files.** Do not modify
-  application or test source. When e2e tests live in another repo, do not edit
-  that repo blindly — produce the change and tell the user where it goes.
+  application or test source.
 
 ---
 
@@ -117,281 +153,244 @@ Run **`project-scan`**. From its result capture:
 - **Manual tests** — are there `*.test.md` cases (here or pullable from Testomat.io)?
 - **Automated tests** — present in this repo, or only elsewhere?
 
-This tells you which of the two flows are even applicable.
+This tells you which maps you can build counts from, and which phases apply
+(manual-only vs manual + automated).
 
 ### Step 2 — Identify the CI system (do not assume)
 
 Read the repo to see which CI it already uses — its CI config files / dotfiles
 make this obvious. If nothing is configured, or several CIs are present, **ask
-the user which CI runs their PRs**. You do not need a lookup table or recipes
-for this; once you know the CI, you know how to write for it.
+the user which CI runs their PRs**. Once you know the CI, you know how to write
+its triggers and how to post a PR/MR comment with it.
 
 ### Step 3 — Locate or create the coverage maps
 
 Look for existing coverage files in the repo root: `coverage.manual.yml`,
-`coverage.e2e.yml`, or any `coverage*.yml`. Inspect the keys to confirm they
-map this repo's source.
+`coverage.e2e.yml`, or any `coverage*.yml`. Inspect the keys to confirm they map
+this repo's source.
 
-For each flow the user wants:
+For each kind of test the user has:
 
 - **Map exists** → reuse it. Validate it still resolves (the coverage skills
   bundle a checker) before wiring CI to it.
-- **Map missing** → regression for that flow **will not work**. Propose
-  creating it and, on agreement, delegate:
-  - manual flow → **`manual-coverage`** → produces `coverage.manual.yml`
-  - automated/e2e flow → **`automation-coverage`** → produces `coverage.e2e.yml`
+- **Map missing** → both the affected-count comment and the regression run for
+  that kind **will not work**. Propose creating it and, on agreement, delegate:
+  - manual → **`manual-coverage`** → `coverage.manual.yml`
+  - automated/e2e → **`automation-coverage`** → `coverage.e2e.yml`
 
-Do not proceed to CI for a flow whose map does not exist.
+You need a map for each kind you want to report or run. The PR-open comment can
+list only the kinds whose maps exist.
 
-### Step 4 — Ask the unknowns about the end system's PR flow
+### Step 4 — Ask the unknowns
 
-We cannot see how their PRs deploy, and we do not know how they want runs
-grouped. Before designing the flows, ask (skip whatever the project-scan / CI
-config already clearly answers — read their CI files first so you don't ask
-something already there):
+Read their CI files first so you don't ask what's already there, then confirm:
 
-1. **When does a deploy that should trigger e2e happen?** Surface the common
-   options so the user can pick:
-   - on merge to the main/deploy branch,
-   - on a release event (GitHub Release published, GitLab release created,
-     etc.),
+1. **When does a deploy that should trigger automated execution happen?** Offer
+   the common options:
+   - on merge to the main/deploy branch (deploy is part of that pipeline),
+   - on a release event (GitHub Release published, GitLab release created),
    - on a git tag (e.g. `v*`),
-   - on every commit / push to a deploy branch,
-   - on each push to the PR branch (preview environment),
-   - never — deploy is manual, run e2e on demand.
-2. **How does that deploy signal its completion?** This gates the e2e run. We
-   need a concrete, observable signal — for example a deploy job/stage
-   completing, a `workflow_run`/pipeline-finished event, a deployment event, a
-   status check turning green, a release/tag being created, or a health
-   endpoint going 200. Ask which one their system actually exposes.
-3. **What rungroup strategy should PR Regression runs use?** Every run goes
-   into a rungroup; the question is *what defines a group*. Common choices to
-   offer (let the user pick or write their own):
-   - **week** — e.g. `PR Regression W2 May 2026` (one recipe:
-     `W$(( ($(date +%-d) - 1) / 7 + 1 )) $(date +'%B %Y')`),
-   - **day** — e.g. `PR Regression 2026-05-27`,
-   - **milestone** — the active sprint/milestone label,
+   - on every push to a deploy branch,
+   - never automated — deploy is manual, launch e2e on demand.
+2. **How does that deploy signal its completion?** This gates the execute step.
+   Need a concrete, observable signal — a deploy job/stage completing, a
+   `workflow_run`/pipeline-finished event, a deployment event, a status check
+   going green, a release/tag created, or a health endpoint returning 200.
+3. **How long does merge → deploy-complete usually take?** This sets
+   `TESTOMATIO_SHARED_RUN_TIMEOUT` (minutes, default 20) so the execute step
+   still matches the prepared shared run. Pick a value comfortably above the
+   typical deploy duration.
+4. **What rungroup strategy should regression runs use?** Every created run goes
+   into a rungroup; the question is what defines a group:
+   - **week** — e.g. `Regression W2 May 2026`
+     (`W$(( ($(date +%-d) - 1) / 7 + 1 )) $(date +'%B %Y')`),
+   - **day** — e.g. `Regression 2026-05-27`,
+   - **milestone** — the active sprint/milestone,
    - **release** — the upcoming release/version tag,
-   - **submodule** — the project area touched (useful in monorepos).
-   Default to one strategy for both manual and automated unless the user
-   explicitly splits them.
-4. **Diff base** for "what changed": usually the PR's target branch
-   (`main`/`master`) for the PR-open manual run; for a post-deploy run it is
-   the range that was just deployed (see
-   [references/REPORTER_CONTRACT.md](references/REPORTER_CONTRACT.md) on the
-   one-commit-per-deploy caveat).
+   - **submodule** — the project area touched (monorepos).
+   Default to one strategy for both the manual and automated runs unless the
+   user splits them.
+5. **Diff base** for "what changed": for the PR-open comment and the on-merge
+   runs, the PR's target branch (`main`/`master`) is the natural base. For a
+   post-deploy range see the one-commit-per-deploy caveat in
+   [references/REPORTER_CONTRACT.md](references/REPORTER_CONTRACT.md).
 
-**Manual regression does not need the deploy answers (Q1, Q2, and the
-post-deploy half of Q4).** A manual run can be created and left pending the
-moment the PR opens — testers pick it up whenever. It still needs the rungroup
-answer from Q3.
+**The PR-open comment needs none of the deploy answers (Q1–Q3).** It only needs
+the coverage maps and a base branch (Q5). **The manual run needs only the
+rungroup answer (Q4)** — it is created pending on merge regardless of deploy.
 
-### Step 5 — Decide WHERE the automated/e2e tests run
+### Step 5 — Confirm how automated execution is launched (`--remote`)
 
-This is the key architectural choice. Use the project-scan result.
+Automated execution runs through a **Testomat.io CI profile** triggered by
+`reporter run --remote <profile>`. Decide and confirm:
 
-**Default — cross-repo dispatch (preferred for browser / UI e2e).**
-For Playwright, Cypress, CodeceptJS, WebdriverIO, Puppeteer and similar
-browser-driven suites, prefer running the tests in a **dedicated e2e repo**
-even if a thin e2e folder also exists here. Reasons:
+- **Is there a CI profile configured on the project?** (Testomat.io → **Settings
+  → CI**.) It names the workflow Testomat.io dispatches — in this repo or in a
+  dedicated e2e repo. If none exists, that is a prerequisite the user must set up
+  (point them at the CI configuration page); `--remote` cannot work without it.
+- **The CI profile owns the runner, browsers, environment URLs, and secrets.**
+  This is exactly why `--remote` replaces cross-repo dispatch: the source repo
+  only needs its coverage map + git history to *prepare* the scoped run; the CI
+  profile decides *where and how* the suite actually executes. No PAT, no
+  foreign-repo trigger, no `{grep, run, env}` inputs to maintain.
+- **Exceptions — run inline in this pipeline instead of `--remote`:**
+  - **Mobile (Appium, Detox, native simulators)** — bound to specific OS images
+    and signing material on the test job; keep it in this pipeline.
+  - **API / contract tests** that exercise a server this repo can spin up — run
+    against `localhost`; not gated on a remote deploy or a CI profile.
+  - **An existing same-repo e2e job that already works** — don't fight it; you
+    can still prepare the run here and let that job execute it.
+  For these, after deploy run the reporter wrapping the runner directly
+  (`reporter run "<runner cmd>" --filter "coverage:file=coverage.e2e.yml,diff=<base>"`) on the
+  prepared run instead of `--remote`.
+- **No e2e suite anywhere (only unit/integration here).** Do not stand up an e2e
+  job. Set up the comment (manual only) and the manual run; tell the user the
+  automated phase needs an e2e suite first (point at `automation-coverage` / test
+  authoring).
 
-- the e2e repo already owns the heavy setup — browsers, fixtures, environment
-  URLs, secrets, parallelism config;
-- duplicating that setup in the source repo's pipeline causes secret sprawl
-  and CI drift;
-- the source repo only needs its own coverage map + git history to compute the
-  selection.
+### Step 6 — Wire the three phases into the project's CI
 
-Pattern: this repo computes the grep, pre-creates the run via `reporter start`,
-and triggers the **existing workflow in the e2e repo** with `{grep, run, env}`.
-Step 6(b) details the ordering; the contract is in
-[references/REPORTER_CONTRACT.md](references/REPORTER_CONTRACT.md).
+Express each applicable phase in the CI from Step 2, in that CI's own syntax —
+you know it. The skill-specific parts are the reporter commands, the env vars,
+and the structural rules; the trigger/secret/job scaffolding and the PR-comment
+call are ordinary CI config you write for whatever system it is.
 
-**Exceptions — run in this repo's pipeline instead:**
+**(a) PR opened → affected-counts comment (notice only).**
 
-- **Mobile (Appium, Detox, native iOS/Android simulators).** The runner is
-  bound to specific OS images, emulators and signing material that live with
-  the test job. Remote-triggering a mobile pipeline rarely buys anything; keep
-  it here.
-- **Low-level / setup-heavy frameworks** where the e2e job is already wired
-  into this repo for legitimate reasons (compiled-in test harnesses,
-  fixtures generated from this repo's build, etc.). Don't fight an existing
-  setup that works.
-- **API / contract tests** that exercise a server this repo can spin up. Start
-  the app locally, check out the API-tests repo if needed, run against
-  `localhost`. They are not gated on a remote deploy.
-
-**Same-repo path remains valid** when the e2e suite genuinely belongs here and
-the setup cost is low. Run it directly with the reporter wrapping the runner.
-
-**No e2e suite anywhere (only unit/integration here).** Do **not** stand up an
-e2e job from this repo. Set up the manual flow only and tell the user the
-automated flow needs an e2e suite first (point them at `automation-coverage` /
-test authoring).
-
-### Step 6 — Wire the two flows into the project's CI
-
-Express each applicable flow in the CI identified in Step 2, in that CI's own
-syntax — you know it. The skill-specific parts are the reporter commands, the
-env vars, and the structural rules below; the trigger/secret/job scaffolding
-is ordinary CI config you write for whatever system it is.
-
-**Manual regression** — always safe, no deploy dependency:
-
-- Trigger: PR opened (add reopened/synchronize if the user wants refreshes).
-- Required env on the job: `TESTOMATIO` (API key), `TESTOMATIO_TITLE`,
-  `TESTOMATIO_RUNGROUP_TITLE`.
-  - `TESTOMATIO_TITLE` — derived from the PR: e.g. `PR <pr-title> #<pr-number>`.
-  - `TESTOMATIO_RUNGROUP_TITLE` — computed from the strategy chosen in Step 4.
-    One recipe for a week-bucket strategy:
-    `PR Regression W<week-of-month> <Month> <Year>`. The expression itself is
-    CI-shell trivia (use whatever date/expression syntax the CI gives you).
-- Command (no runner — this only creates the run):
+- Trigger: PR/MR opened (add reopened/synchronize if the user wants the comment
+  to refresh on new commits).
+- For each coverage map that exists, compute the affected count with a
+  `--filter-list` dry run — it lists matching IDs without running anything:
   ```
-  npx @testomatio/reporter run --kind manual \
-    --filter "coverage:file=coverage.manual.yml,diff=<base-branch>"
+  npx @testomatio/reporter run \
+    --filter-list "coverage:file=coverage.manual.yml,diff=<base>" --format ids
+  npx @testomatio/reporter run \
+    --filter-list "coverage:file=coverage.e2e.yml,diff=<base>" --format ids
   ```
-- Result: a pending manual run in Testomat.io, titled and grouped, containing
-  only affected cases. Testers pick it up from the rungroup.
+  Count the IDs (empty output = `0`). Assemble a one-line comment, e.g.
+  `0 automated tests, 10 manual tests are affected by this PR`.
+- Post it with the CI's native PR/MR comment mechanism (GitHub PR comment,
+  GitLab MR note, Bitbucket PR comment). Prefer updating a single existing
+  comment over adding a new one on every push.
+- This phase **creates no runs** and must **never fail the PR check**.
 
-**Automated/e2e regression** — after deploy, never blocks the pipeline:
+**(b) PR merged → create the regression runs.**
+
+- Trigger: PR merged into the main/deploy branch.
+- Required env on these calls: `TESTOMATIO` (API key), `TESTOMATIO_TITLE`,
+  `TESTOMATIO_RUNGROUP_TITLE`. Title derives from the merge commit
+  (e.g. `report for commit <short-sha>`); rungroup from Step 4.
+
+  **Manual run** — created pending, testers pick it up; nothing executes:
+  ```
+  npx @testomatio/reporter start --kind manual \
+    --filter "coverage:file=coverage.manual.yml,diff=<base>"
+  ```
+
+  **Automated run** — prepared as a shared run, **not executed**:
+  ```
+  TESTOMATIO_SHARED_RUN=1 \
+  TESTOMATIO_TITLE="report for commit <short-sha>" \
+  TESTOMATIO_SHARED_RUN_TIMEOUT=<minutes covering deploy> \
+  npx @testomatio/reporter start \
+    --filter "coverage:file=coverage.e2e.yml,diff=<base>"
+  ```
+  Capture the printed run id as `RUN_ID` and carry it to the execute step
+  (pipeline output/artifact). The shared title + timeout let the execute step
+  (and any parallel executors) converge on this same prepared run.
+
+**(c) Deploy done → launch automated execution via `--remote`.**
 
 - Trigger: the deploy-completion signal from Step 4 — never "PR opened".
-- Required env on every reporter call: `TESTOMATIO`, `TESTOMATIO_TITLE`,
-  `TESTOMATIO_RUNGROUP_TITLE`.
-  - Title derivation depends on the trigger: commit subject + short SHA for
-    commit-triggered, tag name for tag/release-triggered.
-  - Rungroup: reuse the same strategy as the manual flow unless the user
-    split them in Step 4.
+- Launch the prepared run on the Testomat.io CI profile, reusing the same title
+  and shared-run flag, and pointing at the prepared run:
+  ```
+  TESTOMATIO_RUN=$RUN_ID \
+  TESTOMATIO_SHARED_RUN=1 \
+  TESTOMATIO_TITLE="report for commit <short-sha>" \
+  npx @testomatio/reporter run --remote <ci-profile>
+  ```
+  `TESTOMATIO_RUN=$RUN_ID` ties the launch to the run prepared in (b); with no
+  fresh `--filter`, Testomat.io greps that run's own stored scope, so only the
+  affected e2e tests run. Testomat.io dispatches the CI profile; the suite runs
+  there and reports back into the same run.
+- If the deploy pipeline is fully decoupled and cannot carry `RUN_ID`, the
+  execute step matches the prepared run by its shared-run **title** instead —
+  which is why the title must be identical and the shared-run timeout must still
+  be open. Keep `TESTOMATIO_SHARED_RUN=1` and the same `TESTOMATIO_TITLE`.
+- **Isolation:** keep this off the release's critical path — a separate
+  job/pipeline keyed off the deploy signal, set non-failing for the release
+  (`continue-on-error`, `allow_failure: true`, etc.). It reports to Testomat.io;
+  it must not gate the deploy.
+- **Inline exception (Step 5):** when not using a CI profile, replace the
+  `--remote` call with the runner wrapped directly, on the prepared run:
+  ```
+  TESTOMATIO_RUN=$RUN_ID npx @testomatio/reporter run "<runner cmd>" \
+    --filter "coverage:file=coverage.e2e.yml,diff=<base>"
+  ```
 
-**(a) Same-repo run** — when Step 5 picked the same-repo path:
-
-```
-npx @testomatio/reporter run "<test runner cmd>" \
-  --filter "coverage:file=coverage.e2e.yml,diff=<base>"
-```
-
-The reporter creates the run, runs the filtered tests, and closes it.
-
-**(b) Cross-repo dispatch** — when Step 5 picked the cross-repo path. Four
-explicit stages, in order:
-
-1. **Compute the grep** from this repo using the `--filter-list --format=grep`
-   dry-run (full mechanics in
-   [references/REPORTER_CONTRACT.md](references/REPORTER_CONTRACT.md)):
-   ```
-   GREP=$(npx @testomatio/reporter run \
-     --filter-list "coverage:file=coverage.e2e.yml,diff=<base>" --format=grep)
-   ```
-2. **Skip the dispatch if `$GREP` is empty.** Nothing was affected; do not
-   trigger the e2e repo (most runners interpret an empty grep as "run
-   everything").
-3. **Pre-create the empty run here** with `reporter start`, carrying title +
-   rungroup, and capture the ID from stdout:
-   ```
-   RUN_ID=$(npx @testomatio/reporter start --kind automated | tail -n1)
-   ```
-4. **Trigger the e2e repo's workflow** with `{grep: $GREP, run: $RUN_ID,
-   test_env: <env name>}` as inputs (whatever the CI's cross-repo trigger
-   mechanism is — repository_dispatch, pipeline trigger, project access token,
-   etc.). The e2e repo's job must export `TESTOMATIO_RUN=<run input>` so its
-   test results attach to this pre-created run.
-
-- **Isolation:** keep the automated flow off the release's critical path —
-  a separate workflow/pipeline triggered by the deploy signal, with the job
-  set non-failing for the release (every CI has such a knob: `continue-on-error`,
-  `allow_failure: true`, etc.). It reports to Testomat.io; it must not gate
-  the deploy.
-
-Always state the secrets/tokens the user must provision — the Testomat.io API
-key (in both repos for the cross-repo path), and for cross-repo triggering a
-token allowed to trigger the other repo (a CI's built-in token usually cannot
-reach another repo; this typically means a PAT, project access token, or app
-token with the appropriate scope).
-
-#### When the e2e repo has no dispatchable workflow
-
-If the e2e repo does not already accept a `grep` + `run` + `test_env` trigger,
-do not silently restructure their pipeline. Propose a small dispatchable
-workflow with this contract:
-
-- **Inputs:**
-  - `grep` — runner filter (e.g. `(@Sxxxx|@Tyyyy|@Tzzzz)`).
-  - `run` — Testomat.io run ID to attach results to.
-  - `test_env` (or `target_env`) — which environment the suite should hit
-    (e.g. `beta`, `staging`, `preview-pr-123`).
-- **Behavior:**
-  - Set `TESTOMATIO_RUN=<run input>` in the test job's env.
-  - Invoke the runner with the grep applied (the runner's `--grep` /
-    `--testNamePattern` / equivalent), pointed at the chosen `test_env`.
-  - Report results via `@testomatio/reporter` as normal — because
-    `TESTOMATIO_RUN` is set, they attach to the pre-created run rather than
-    creating a new one.
-
-Produce a draft of this workflow in the e2e repo's CI syntax, name the file
-path it belongs at, and tell the user to commit it there. Do not push to
-another repo on the user's behalf.
+State the secrets the user must provision — the `TESTOMATIO` API key on the jobs
+that talk to Testomat.io, and a token allowed to post PR/MR comments for phase
+(a) (the CI's built-in token usually suffices for same-repo comments). A CI
+profile for `--remote` is configured in Testomat.io, not via a repo secret.
 
 ### Step 7 — Summarize and hand off
 
 Report concisely:
 
-- CI system targeted; files written in this repo (and, for a separate e2e
-  repo, the file the user must commit *there* — you cannot push it for them).
-- Which flows are wired; which were skipped and why (missing coverage map / no
-  e2e suite).
-- Title scheme chosen for each flow (e.g. "PR title + #number" for manual,
-  "commit subject + SHA" for automated).
-- Rungroup strategy chosen and where the value is computed (the CI shell
-  expression / script step).
-- For cross-repo e2e: that the run is pre-created in **this** repo and the
-  e2e repo's job exports `TESTOMATIO_RUN`; also whether a new dispatchable
-  workflow was proposed for the e2e repo (and where it should be committed).
-- Secrets/tokens to add before it works — `TESTOMATIO` in both repos for the
-  cross-repo path; cross-repo trigger token (PAT/project token/app) on the
-  source side.
-- Any assumption that needs the user's confirmation (deploy signal, diff base,
+- CI system targeted; files written in this repo.
+- Which phases are wired (comment / manual run / automated prepare / automated
+  execute) and which were skipped and why (missing coverage map / no e2e suite /
+  no CI profile).
+- The comment format and where its counts come from (which maps, which base).
+- Title scheme (merge commit) and that the automated prepare + execute steps
+  share one title; rungroup strategy and where it is computed.
+- Shared-run timeout chosen and the deploy duration it must cover.
+- How automated execution is launched: the `--remote <profile>` CI profile (or
+  the inline-runner exception), and that `RUN_ID` (or the shared title) links
+  the prepare and execute steps.
+- Secrets/tokens to add before it works; that a Testomat.io CI profile must
+  exist for `--remote`.
+- Any assumption needing confirmation (deploy signal, diff base, timeout,
   rungroup recipe).
-- Recommend committing the coverage map(s) so CI and the team share one
-  mapping.
+- Recommend committing the coverage map(s) so CI and the team share one mapping.
 
 ---
 
 ## Examples
 
-**Example 1 — e2e suite in a separate repo**
-Input: "Make our PRs run the manual cases and, after deploy, the affected e2e
-tests. E2E lives in a sibling repo."
-Output: ask the rungroup question (user picks weekly). PR-opened job creates a
-titled manual run (`PR <title> #<n>`) inside `PR Regression W<n> <Month> <Year>`.
-A separate job keyed off the deploy-completion signal: computes the grep with
-`--filter-list --format=grep`, pre-creates the run with `reporter start`
-(same title scheme, same rungroup), captures the run ID, and triggers the e2e
-repo's existing workflow with `{grep, run, test_env}`. Tokens listed; the
-automated job set non-failing for the release. All written in the project's
-own CI.
+**Example 1 — comment on open, regression after merge+deploy, e2e via CI profile**
+Input: "Comment how many tests each PR touches, then after we merge and deploy,
+run the affected e2e and create a manual run."
+Output: ask the rungroup (weekly), deploy signal, and deploy duration. On PR
+open, a non-blocking job posts `N automated, M manual tests affected` computed
+with `--filter-list`. On merge: a pending manual run (`report for commit <sha>`
+in `Regression W<n> <Month> <Year>`) and a prepared automated shared run with the
+same title and `TESTOMATIO_SHARED_RUN_TIMEOUT` above the deploy time; `RUN_ID`
+captured. On deploy-complete: a non-failing job runs `reporter run --remote
+<profile>` with that `RUN_ID` + shared title, launching the affected e2e on
+Testomat.io CI. All written in the project's own CI.
 
 **Example 2 — no coverage files yet**
 Input: "Set up selective regression on our pull requests."
-Output: find no `coverage.*.yml`; explain regression can't work without them;
-delegate to `manual-coverage` / `automation-coverage`; only then wire the CI.
+Output: find no `coverage.*.yml`; explain the comment and the regression runs
+can't work without them; delegate to `manual-coverage` / `automation-coverage`;
+only then wire the CI.
 
 **Example 3 — only unit tests in repo**
 Input: "Run affected e2e on PRs."
-Output: project-scan finds no e2e framework anywhere; set up the manual flow if
-manual cases exist; explain the automated flow needs an e2e suite first; do not
-fabricate an e2e job.
+Output: project-scan finds no e2e framework anywhere; set up the PR-open comment
+(manual count only) and the on-merge manual run if manual cases exist; explain
+the automated phase needs an e2e suite first; do not fabricate an e2e job.
 
-**Example 4 — deploy-on-tag, release-grouped runs, e2e repo has no dispatch yet**
-Input: "We deploy when we push a `v*` tag. Group runs by release. Our e2e
-tests are in a separate repo that doesn't have a workflow we can trigger."
-Output: rungroup strategy = release (`PR Regression <tag>`). Tag-creation event
-is the deploy trigger; deploy job completion is the signal. Source repo computes
-grep, pre-creates the run titled with the tag, and would dispatch — but the e2e
-repo has no dispatchable workflow yet. Propose a workflow file for the e2e repo
-with inputs `{grep, run, test_env}` and `TESTOMATIO_RUN` wired into the runner
-job; hand it to the user to commit in the e2e repo. Wire the source side once
-the e2e workflow exists.
+**Example 4 — no CI profile configured**
+Input: "Use `--remote` to run our e2e after deploy."
+Output: confirm there is no Testomat.io CI profile yet; explain `--remote`
+dispatches a configured profile and cannot work without one; point the user at
+Testomat.io **Settings → CI** to add the profile that runs the e2e suite; wire
+the prepare step now and the `--remote` execute step once the profile exists.
+Until then, offer the inline-runner exception (Step 5) if the e2e suite can run
+in this pipeline.
 
 ---
 
@@ -399,7 +398,7 @@ the e2e workflow exists.
 
 | Description                            | File                            |
 | -------------------------------------- | ------------------------------- |
-| Reporter command contract & cross-repo | references/REPORTER_CONTRACT.md |
+| Reporter command contract & `--remote` | references/REPORTER_CONTRACT.md |
 
 ## Related skills
 
