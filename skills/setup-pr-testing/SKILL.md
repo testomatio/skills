@@ -14,14 +14,16 @@ phases** — a cheap notice while the PR is open, real runs once it is merged, a
 execution once it is deployed. Nothing heavy happens until the change is
 actually going somewhere.
 
-> **I run locally to set up the pipeline — I am never part of CI.** This skill
-> executes on a developer's machine (or wherever an agent is invoked) and its
-> only deliverable is **working CI configuration committed to the repo** that
-> makes the project's own CI system do the three phases below. I do **not** run
-> tests, create runs, post comments, or call `@testomatio/reporter` myself —
-> every command shown here is something I *write into the pipeline* for CI to
-> execute later. If you find yourself running a reporter command to "see it
-> work", stop: the goal is a correct pipeline in the target CI, not a run.
+> **GOAL: produce a working pipeline inside the project's own CI system.** That
+> committed CI configuration is the one and only finished result — reaching it
+> means the skill is done.
+>
+> **I run locally to set up that pipeline — I am never part of CI.** This skill
+> executes on a developer's machine (or wherever an agent is invoked); it does
+> **not** run tests, create runs, post comments, or call `@testomatio/reporter`
+> itself. Every command shown here is something I *write into the pipeline* for
+> CI to execute later. If you find yourself running a reporter command to "see
+> it work", stop — that is not the goal; a correct pipeline in the target CI is.
 
 ```
 PR opened   ──▶ NOTICE ONLY — comment the affected test counts on the PR
@@ -100,11 +102,12 @@ the config for whatever CI it finds.
 
 ## CRITICAL CONSTRAINTS
 
-- **The deliverable is a working pipeline in the project's CI — nothing else.**
-  This skill runs locally to *author* CI configuration; it is never a CI step
-  and never executes the reporter itself. Do not run tests, create runs, or call
-  `@testomatio/reporter` to "verify" — your output is committed CI config the
-  target system runs later. Done = a correct pipeline in the project's own CI.
+- **The goal is a working pipeline in the project's CI — nothing else.** Reaching
+  that committed CI configuration is the final goal; the task is complete only
+  when it exists. This skill runs locally to *author* that config; it is never a
+  CI step and never executes the reporter itself. Do not run tests, create runs,
+  or call `@testomatio/reporter` to "verify" — your output is committed CI config
+  the target system runs later.
 - **Discovery first, always.** Never write CI before delegating to `project-scan`
   (frameworks, manual + automated tests, where e2e tests live). Decisions below
   depend on its result.
