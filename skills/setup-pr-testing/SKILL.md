@@ -37,10 +37,10 @@ PR merged   ──▶ Manual regression run (created, pending)
                 titled by the merge commit · in a rungroup · testers pick it up
 
             ──▶ Automated regression run (created, NOT executed)
-                reporter start --filter "coverage:file=coverage.e2e.yml,diff=<base>"
+                reporter start --filter "coverage:file=coverage.e2e.yml,diff=<base>" --format id
                 TESTOMATIO_SHARED_RUN=1 · TESTOMATIO_TITLE="report for commit <sha>"
                 TESTOMATIO_SHARED_RUN_TIMEOUT=<covers the merge→deploy gap>
-                → capture RUN_ID
+                → capture RUN_ID (stdout is just the id with --format id)
 
 deploy done ──▶ Launch automated execution on Testomat.io CI
                 reporter run --remote <ci-profile>
@@ -306,15 +306,16 @@ call are ordinary CI config you write for whatever system it is.
 
   **Automated run** — prepared as a shared run, **not executed**:
   ```
-  TESTOMATIO_SHARED_RUN=1 \
+  RUN_ID=$(TESTOMATIO_SHARED_RUN=1 \
   TESTOMATIO_TITLE="report for commit <short-sha>" \
   TESTOMATIO_SHARED_RUN_TIMEOUT=<minutes covering deploy> \
   npx @testomatio/reporter start \
-    --filter "coverage:file=coverage.e2e.yml,diff=<base>"
+    --filter "coverage:file=coverage.e2e.yml,diff=<base>" --format id)
   ```
-  Capture the printed run id as `RUN_ID` and carry it to the execute step
-  (pipeline output/artifact). The shared title + timeout let the execute step
-  (and any parallel executors) converge on this same prepared run.
+  `--format id` makes `start` print only the run id to stdout, so `RUN_ID`
+  captures it cleanly; carry it to the execute step (pipeline output/artifact).
+  The shared title + timeout let the execute step (and any parallel executors)
+  converge on this same prepared run.
 
 **(c) Deploy done → launch automated execution via `--remote`.**
 

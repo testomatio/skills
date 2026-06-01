@@ -76,13 +76,13 @@ step — and any parallel executors — converge on this one run by title:
 RUN_ID=$(TESTOMATIO_SHARED_RUN=1 \
   TESTOMATIO_TITLE="report for commit $SHA" \
   TESTOMATIO_SHARED_RUN_TIMEOUT=$DEPLOY_MINUTES \
-  npx @testomatio/reporter start --filter "coverage:file=coverage.e2e.yml,diff=$BASE" \
-  | tail -n1)
+  npx @testomatio/reporter start --filter "coverage:file=coverage.e2e.yml,diff=$BASE" --format id)
 ```
 
 - `--filter` scopes the prepared run to the affected tests; that scope is stored
   on the run and reused at launch time (§4).
-- **Output:** the run id is the last line of stdout — capture with `tail -n1`.
+- **Output:** `--format id` makes `start` print only the run id to stdout (banner
+  and logs go to stderr), so `RUN_ID=$(...)` captures just the id.
 - Required env: `TESTOMATIO`, `TESTOMATIO_TITLE`, `TESTOMATIO_RUNGROUP_TITLE`.
 
 ### Shared-run env vars (the convergence mechanism)
