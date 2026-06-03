@@ -6,7 +6,16 @@
 
 Basically, this flow is pretty simple: you have requirements and you need test cases. To achieve this, follow the steps below.
 
-<img src="./simple-flow.jpg.jpg" alt="Simple flow" height="100" />
+```mermaid
+flowchart LR
+    feature(["📋 Feature<br/>to test"]) ==> qa["🔮 Senior AI QA"] ==> result(["✅ Test cases<br/>in Testomat.io"])
+
+    classDef startEnd fill:#b9f6c4,stroke:#2e7d32,stroke-width:2px,color:#111
+    classDef ai fill:#e1bee7,stroke:#8e24aa,stroke-width:2px,color:#111
+
+    class feature,result startEnd
+    class qa ai
+```
  
 ## 𓊍 Steps
 
@@ -20,7 +29,60 @@ That's it. Everything will be done under the hood. As a result you will have tes
 
 The full flow looks like this:
 
-<img src="./full-flow.jpg" alt="Full flow" height="300" />
+```mermaid
+%% Pre-requisites: AI agent installed + testomatio/skills installed
+flowchart LR
+    feature(["📋 Feature"])
+
+    subgraph context["1️⃣ &nbsp; Provide context for the AI agent"]
+        direction TB
+        codebase["💻 Codebase/repo"]
+        design["🎨 Design<br/><i>Figma, Miro, etc.</i>"]
+        criteria["🎫 Acceptance criteria<br/><i>Jira, Linear, etc.</i>"]
+        existing["🧪 Existing test cases<br/><i>Testomat.io</i>"]
+        docs["📚 Docs/wiki<br/><i>Confluence, Notion, etc.</i>"]
+        sources(["📦 Sources"])
+
+        codebase -->|files / MCP| sources
+        design -->|MCP| sources
+        criteria -->|MCP| sources
+        existing -->|MCP| sources
+        docs -->|MCP / files| sources
+    end
+
+    subgraph generate["2️⃣ Generate test cases"]
+        direction LR
+        prompt["💬 Prompt the agent<br/><small><i>e.g. &quot; I need test cases for feature JIR-123,<br/>focus on functional smoke&quot;</i></small>"]
+        AIQA["🔮 Senior AI QA"]
+        interview["👤 User interview"]
+        checklist["✅ Checklist"]
+        cases["📝 Test cases"]
+        synccases["🔄 <i>sync-cases</i> skill"]
+
+        prompt --- AIQA
+        AIQA -->| analyzing sources | interview
+        interview --> checklist --> cases --> synccases
+
+        checklist -. refine .-> interview
+        cases -. refine .-> interview
+    end
+
+    result(["✅ Test cases<br/>in Testomat.io"])
+
+    feature ==> context
+    feature ~~~ codebase
+    feature ~~~ docs
+    sources ==>|Run AI agent| prompt
+    synccases ==> result
+
+    classDef terminal fill:#b9f6c4,stroke:#2e7d32,stroke-width:2px,color:#111
+    classDef agent fill:#e1bee7,stroke:#8e24aa,stroke-width:2px,color:#111
+    classDef step fill:#eef1f5,stroke:#90a4ae,color:#111
+
+    class feature,result terminal
+    class AIQA agent
+    class codebase,design,criteria,existing,docs,sources,prompt,interview,checklist,cases,synccases step
+```
 
 ### 0. Install skills
 
