@@ -4,7 +4,9 @@ AI skills for test management workflows with [Testomat.io](https://testomat.io).
 
 ## Quick Start
 
-`npx skills add testomatio/skills`
+```bash
+npx skills add testomatio/skills`
+```
 
 ## Install
 
@@ -50,6 +52,25 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 | `explorbot-setup`        | First-time install & configuration of Explorbot, including initial knowledge          |
 | `explorbot-fundamentals` | Operating reference: run, drive and debug all Explorbot commands, config and outputs   |
 | `explorbot-plan`         | Author an Explorbot test plan in markdown so `explorbot test` can run it               |
+
+---
+
+## Flows
+
+<img src="./docs/flows/flows.png" alt="Flows" height="300" />
+
+Testomat.io provides a comprehensive set of flows for QA engineers:
+
+- Generate test cases from requirements
+<!-- - Improve test cases
+- Sync test cases to Testomat.io
+- Add test reporter to your automation project
+- Generate test cases from requirements
+- Improve test cases
+- Sync test cases to Testomat.io
+- Add test reporter to your automation project -->
+
+Refer to [docs/flows](./docs/flows) for more detailed examples of flows.
 
 ---
 
