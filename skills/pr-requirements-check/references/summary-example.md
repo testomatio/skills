@@ -1,6 +1,6 @@
 # PR Requirements Summary — Example
 
-This file is a **filled-in example** of the artifact produced by the `pr-requirements-check` skill and saved to corresponding file.
+A filled-in example of the artifact produced by the `pr-requirements-check` skill.
 
 ---
 
@@ -35,22 +35,23 @@ This file is a **filled-in example** of the artifact produced by the `pr-require
 
 **Scope Verification:**
 - ✅ In scope: PRJ-789 AC1 (export button on the user list) — addressed in `src/pages/UserList.tsx` and `src/components/ExportModal.tsx`
+- ✅ In scope: PRJ-789 AC2 (admin-only) — addressed in `ExportService.ts` permission check
+- ⚠️ Out of scope / missing: PRJ-789 AC3 (email notification for >10k exports) — no implementation found
 - ➕ Extra (not in ticket): i18n strings for German locale (`i18n/de.json`) — ticket only mentioned English
 
 **Ambiguities, Edge Cases & Open Questions:**
-- Ticket does not specify CSV column order — needs product confirmation.
+- CSV column order not specified — needs product confirmation.
 - Concurrent exports by the same admin — no rate limiting or deduplication specified.
-- Export of 50k+ users (memory/timeout) — no performance budget in the ticket.
-- Localization of date/time fields in the CSV — not specified (UTC vs. user locale).
+- 50k+ user export (memory/timeout) — no performance budget in the ticket.
+- CSV date/time localization (UTC vs. user locale) — not specified.
 - Backward compatibility with existing scheduled exports (if any) — not addressed.
 
 **Acceptance Criteria:**
-- Admin opens user list with filters applied and clicks "Export" → modal appears with row count estimate
-- Admin clicks "Start export" with fewer than 10k matching users → CSV file downloads immediately with columns `id, name, email, created_at` in that order
-- Non-admin opens user list → "Export" action is hidden (or returns 403 if accessed via API)
-- Admin triggers export of >10k matching users → export is queued and an email notification is sent when the file is ready *(NOT IMPLEMENTED IN THIS PR — see Scope Verification)*
-- User without an email address is included in the CSV → email field is empty string
-- Export of an empty filtered list → button is disabled OR an empty CSV is downloaded with only the header row
-- Exporting 50k+ users completes without server timeout or out-of-memory error
-- CSV dates are formatted in the user's locale timezone (or UTC — confirm with product)
-- German admin sees the export modal translated into German
+- Admin opens user list with filters and clicks "Export" → modal appears with row count estimate
+- Admin starts export with <10k matching users → CSV downloads with columns `id, name, email, created_at` in that order
+- Non-admin opens user list → "Export" action is hidden (or returns 403 via API)
+- Admin triggers >10k user export → export is queued, email sent when ready *(NOT IMPLEMENTED — see Scope Verification)*
+- User without email is included → email field is empty string in CSV
+- Empty filtered list → button disabled OR empty CSV with header only
+- 50k+ user export completes without server timeout or OOM
+- German admin sees the export modal translated
