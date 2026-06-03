@@ -40,7 +40,7 @@ Quick explanation of available Testomat.io MCP tools grouped by entity:
 
 ## Important Guidelines
 
-If the project contains **Markdown test cases** (`*.test.md`) or **automated test files** in the repo, prefer loading test cases locally as markdown files via `sync-cases` skills, as this is more efficient than using MCP for full test discovery and analysis.
+If the project contains **Markdown test cases** (`*.test.md`) or **automated test files** in the repo, prefer loading test cases locally as markdown files via `sync-test-cases-with-tms` skills, as this is more efficient than using MCP for full test discovery and analysis.
 
 ### Prefer Local Tests Over MCP
 

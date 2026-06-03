@@ -1,0 +1,1 @@
+../../qa-manual-tests-to-code-coverage/references/COVERAGE_FILE_FORMAT.md
