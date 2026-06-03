@@ -3,7 +3,7 @@ name: sync-cases
 description: Synchronize test scenarios and cases between a local project and Testomat.io. Use this skill whenever the user wants to pull/export/download tests from Testomat.io; or push/import/sync new or updated test cases back to the TMS in corresponding `*.test.md` format. Supports custom directories, markdown test format and advanced import/export workflows.
 inputs:
   testDir:
-    description: "Where to put pulled tests (default: `.testclaw-context/manual-tests` — the gitignored cache). Only override with a tracked path if the repo already keeps its `*.test.md` files there."
+    description: "Target directory for pulled tests"
     required: false
 license: MIT
 metadata:
@@ -76,10 +76,14 @@ Download/Retrieves test scenarios from Testomat.io and saves them as Markdown fi
 - Refactor test cases offline.
 - Export only some specific suites by id.
 
-**Where to pull:** into the gitignored cache `.testclaw-context/manual-tests/`, and add `.testclaw-context/` to the project `.gitignore` if it is not there yet. Pulled cases must never land in a tracked folder (`manual-tests/`, etc.) — that pollutes the repo. You can still edit them there and push back; being gitignored doesn't stop that. (If the repo *already* keeps its `*.test.md` files in a tracked folder, you don't need to pull at all — work with them where they are, or pass `-d <that folder>` for an in-place refresh.) This matches `project-scan`, which pulls the *code* into `.testclaw-context/code/` when it runs inside a manual-tests repo.
+**Where to pull:** into the gitignored cache `.testclaw/manual-tests/`, and add `.testclaw/` to the project `.gitignore` if it is not there yet. Pulled cases must never land in a tracked folder (`manual-tests/`, etc.) — that pollutes the repo. You can still edit them there and push back; being gitignored doesn't stop that. (If the repo *already* keeps its `*.test.md` files in a tracked folder, you don't need to pull at all — work with them where they are, or pass `-d <that folder>` for an in-place refresh.) This matches `project-scan`, which pulls the *code* into `.testclaw/code/` when it runs inside a manual-tests repo.
 
 **Pre-Pull:**
-- Create `.testclaw-context/manual-tests/` if it doesn't exist; ensure `.testclaw-context/` is gitignored.
+
+- If `testDir` is specified pull tests into it. Otherwise:
+- If this workspace is empty or is for manual-tests only, test must be pulled to root
+- If this is end-to-end testing project test cases must be generated in `manual-tests` directory
+- In any other case test cases must be pulled to `.testclaw/manual-tests` (ensure `.testclaw` directory exists and git ignored)
 
 **Command:**
 ```bash
@@ -98,7 +102,7 @@ Optional variant - **pull by specific suite-ids**
 **Pull Examples:**
 ```bash
 # Default — pull into the gitignored cache
-npx check-tests pull -d .testclaw-context/manual-tests
+npx check-tests pull -d .testclaw/manual-tests
 
 # Repo that already keeps its test cases tracked — refresh them in place
 npx check-tests pull -d manual-tests
@@ -122,15 +126,8 @@ Uploads/Imports local Markdown tests into Testomat.io:
 
 **Pre-Push File Filtering**
 
-Before uploading, scan the project/target folder and **include only**:
-- Files matching `*.test.md` pattern.
-- Files containing valid test blocks: `<!-- test ... -->` markers.
+If directory contains manual test cases + something else, move test cases into `.testclaw/manual-tests`
 
-**Exclude** all other `.md` files — especially:
-- `README.md`, `CHANGELOG.md`, `CONTRIBUTING.md`.
-- Project documentation (`docs/requirements.md`, `architecture.md`, etc.).
-
-> If a directory contains mixed content, skip documentation files and upload only test case files.
 
 **Pre-Push Validation:**
 1. Ensure at least one test `*.test.md` file exists.
@@ -158,31 +155,30 @@ npx check-tests push [-d <directory>] [--files <files...>]
 
 **Examples:**
 ```bash
-# Specific files (preferred when known — e.g. just produced by generate-cases)
-npx check-tests push --files .testclaw-context/manual-tests/login.test.md .testclaw-context/manual-tests/checkout.test.md
+# Specific files (preferred when known)
+npx check-tests push --files login.test.md checkout.test.md
 
 # Custom glob
-npx check-tests push --files ".testclaw-context/manual-tests/**/*.test.md"
+npx check-tests push --files "**/*.test.md"
 
-# Default glob (**/*.test.md) under -d — cases you pulled and edited in the cache
-npx check-tests push -d .testclaw-context/manual-tests
+# Default glob (**/*.test.md) under -d
+npx check-tests push
+
+# Specify directory with manual test cases
+npx check-tests push -d .testclaw/manual-tests
+
+# Specify directory with manual test cases and specific files
+npx check-tests push -d .testclaw/manual-tests --files new_tests.md
 ```
 
 **Important constraints:**
 - Only use options explicitly documented in this skill or in the "Testomat.io CLI Documentation" ref file.
 - If you are unsure about available CLI options, run `npx check-tests --help` and use only options listed there.
 - Do **not** use an option unless it is mentioned in the documentation or in the `--help` option (e.g., `--pattern`, `--forces`).
+- Ensure you use -d when `.testclaw` or `manual-tests` directories exist. 
+- Ensure you push only the test cases directory (e.g `.testclaw/manual-tests` not `.testclaw`).
 
 **More examples** you can find in "Push" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
-
-#### Labels Handling (Intent-Based)
-
-Use `TESTOMATIO_LABELS` in sync/push **only if the user explicitly requests to set or override labels** in their query.
-
-**Triggers:**
-* "push tests with labels smoke".
-* "import tests to TMS and set label=regression":
-  - labels like `smoke,regression` example: `TESTOMATIO_LABELS="smoke,regression" npx check-tests push`
 
 ---
 
@@ -193,7 +189,7 @@ After completing sync operations, output a short log-style summary:
 ```
 Sync Complete:
 - Action: pull/push
-- Directory: .testclaw-context/manual-tests
+- Directory: .testclaw/manual-tests
 - Tests synced: 15
 - Status: Success
 ```
@@ -231,7 +227,7 @@ Stop execution if:
 
 ## Examples
 
-**Pull tests** (lands in the gitignored `.testclaw-context/manual-tests/`):
+**Pull tests** (lands in the gitignored `.testclaw/manual-tests/`):
 ```
 Use sync-cases skill to pull tests from Testomat.io
 ```
