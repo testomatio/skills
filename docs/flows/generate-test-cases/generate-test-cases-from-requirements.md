@@ -8,7 +8,7 @@ Basically, this flow is pretty simple: you have requirements and you need test c
 
 ```mermaid
 flowchart LR
-    feature(["📋 Feature]) ==> qa["🔮 Senior AI QA"] ==> result(["✅ Test cases<br/>in Testomat.io"])
+    feature(["📋 Feature"]) ==> qa["🔮 Senior AI QA"] ==> result(["✅ Test cases<br/>in Testomat.io"])
 
     classDef startEnd fill:#b9f6c4,stroke:#2e7d32,stroke-width:2px,color:#111
     classDef ai fill:#e1bee7,stroke:#8e24aa,stroke-width:2px,color:#111
