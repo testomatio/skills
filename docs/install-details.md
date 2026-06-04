@@ -45,10 +45,10 @@ For Claude Code skills are grouped into plugins which could be installed from th
 /test-management
 
 # or call skill directly
-/test-management:generate-cases
+/test-management:qa-write-test-cases
 
 # or just use skill name
-generate-cases
+qa-write-test-cases
 
 # or skill will be loaded automatically on a relevant prompt
 "create test cases for login feature"

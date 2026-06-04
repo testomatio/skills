@@ -1,0 +1,1 @@
+../../qa-manual-tests-to-code-coverage/scripts/check-coverage.mjs

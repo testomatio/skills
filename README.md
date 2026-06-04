@@ -4,7 +4,9 @@ AI skills for test management workflows with [Testomat.io](https://testomat.io).
 
 ## Quick Start
 
-`npx skills add testomatio/skills`
+```bash
+npx skills add testomatio/skills`
+```
 
 ## Install
 
@@ -28,20 +30,20 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 
 | Skill                  | Description                                                                                          |
 | ---------------------- | ---------------------------------------------------------------------------------------------------- |
-| `generate-cases`       | Generate test cases and checklists from requirements, tickets, or feature descriptions               |
+| `qa-write-test-cases`       | Generate test cases and checklists from requirements, tickets, or feature descriptions               |
 | `improve-test-cases`   | Analyze and improve existing markdown test cases for clarity                                         |
-| `find-duplicate-cases` | Find duplicate, near-duplicate, and overlapping test cases                                           |
-| `sync-cases`           | Synchronize Markdown test scenarios between local project and Testomat.io                            |
-| `manual-coverage`      | Map manual test cases to source files; generate `coverage.manual.yml` for affected-only runs         |
-| `automation-coverage`  | Map e2e tests to source files; generate `coverage.e2e.yml` to run only the tests affected by a diff  |
-| `testomatio-flow`      | Orchestrate complete test case lifecycle: generate, improve, analyze coverage, upload to TMS         |
-| `project-scan` | Scan project source code to inventory languages, frameworks, and existing tests |
+| `detect-duplicate-test-cases` | Find duplicate, near-duplicate, and overlapping test cases                                           |
+| `sync-test-cases-with-tms`           | Synchronize Markdown test scenarios between local project and Testomat.io                            |
+| `qa-manual-tests-to-code-coverage`      | Map manual test cases to source files; generate `coverage.manual.yml` for affected-only runs         |
+| `e2e-test-coverage-mapping`  | Map e2e tests to source files; generate `coverage.e2e.yml` to run only the tests affected by a diff  |
+| `senior-qa-testing-workflow`      | Orchestrate complete test case lifecycle: generate, improve, analyze coverage, upload to TMS         |
+| `scan-automation-project` | Scan project source code to inventory languages, frameworks, and existing tests |
 
 ### Automation
 
 | Skill            | Description                                                                                          |
 | ---------------- | ---------------------------------------------------------------------------------------------------- |
-| `reporter-setup` | Set up Testomat.io test reporting for your automation framework (Playwright, CodeceptJS, Jest, etc.) |
+| `qa-e2e-tests-reporting` | Set up Testomat.io test reporting for your automation framework (Playwright, CodeceptJS, Jest, etc.) |
 
 ### Explorbot
 
@@ -53,16 +55,35 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 
 ---
 
+## Flows
+
+<img src="./docs/flows/flows.png" alt="Flows" height="300" />
+
+Testomat.io provides a comprehensive set of flows for QA engineers:
+
+- Generate test cases from requirements
+<!-- - Improve test cases
+- Sync test cases to Testomat.io
+- Add test reporter to your automation project
+- Generate test cases from requirements
+- Improve test cases
+- Sync test cases to Testomat.io
+- Add test reporter to your automation project -->
+
+Refer to [docs/flows](./docs/flows) for more detailed examples of flows.
+
+---
+
 ## Repository Structure
 
 ```
 testomatio/skills
 ├── skills/                    # Agent-agnostic skills (canonical source)
-│   ├── find-duplicate-cases/
-│   ├── generate-cases/
+│   ├── detect-duplicate-test-cases/
+│   ├── qa-write-test-cases/
 │   ├── improve-test-cases/
-│   ├── reporter-setup/
-│   ├── sync-cases/
+│   ├── qa-e2e-tests-reporting/
+│   ├── sync-test-cases-with-tms/
 │   └── ...
 └── plugins/                   # Claude Code plugin wrappers
     ├── test-management/
