@@ -1,5 +1,5 @@
 ---
-name: pr-requirements-check
+name: qa-pr-requirements-analyzer
 description: Analyze a pull request's context - title, description, comments, linked issues, attached schemas/images — to understand the original intent, verify scope against the linked ticket, surface ambiguities and edge cases, and produce a structured requirements summary with testable acceptance criteria. Use this skill when the user wants to understand WHAT a PR is supposed to do (not just what code changed), check whether the PR matches its linked ticket/task or generate acceptance criteria from PR/ticket context rather than from code.
 license: MIT
 metadata:
@@ -7,7 +7,7 @@ metadata:
   version: 1.1.0
 ---
 
-# PR-REQUIREMENTS-CHECK SKILL: What I Do
+# QA-PR-REQUIREMENTS-ANALYZER SKILL: What I Do
 
 This skill reviews a pull request's **context** - the human-written parts: title, description, comments, linked tickets, attached images - to extract the original requirements, verify scope, and produce a requirements summary that downstream skills (`generate-cases`) can consume.
 
@@ -25,9 +25,9 @@ It is the **complement** of `pr-diff`:
 | Skill | Input | Output | Focus |
 |-------|-------|--------|-------|
 | `pr-diff` | git diff, changed files | AC from code changes | "what the code does" |
-| `pr-requirements-check` | PR title, description, comments, linked issue | summary or requirements with scope verification, AC | "what the PR is supposed to do" |
+| `qa-pr-requirements-analyzer` | PR title, description, comments, linked issue | summary or requirements with scope verification, AC | "what the PR is supposed to do" |
 
-> Use them together for a full picture. Use `pr-requirements-check` alone when the question is "is this PR doing the right thing?" rather than "what does this PR do?".
+> Use them together for a full picture. Use `qa-pr-requirements-analyzer` alone when the question is "is this PR doing the right thing?" rather than "what does this PR do?".
 
 ---
 

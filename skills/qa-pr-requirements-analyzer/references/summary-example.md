@@ -1,6 +1,6 @@
 # PR Requirements Summary — Example
 
-A filled-in example of the artifact produced by the `pr-requirements-check` skill.
+A filled-in example of the artifact produced by the `qa-pr-requirements-analyzer` skill.
 
 ---
 
