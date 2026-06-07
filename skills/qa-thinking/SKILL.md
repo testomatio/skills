@@ -1,6 +1,6 @@
 ---
 name: qa-thinking
-description: Analyze a feature a developer is building from a QA perspective — edge cases, negative flows, abuses, unobvious scenarios — and write acceptance criteria. Use when asked "what could go wrong?", "what am I missing?", "review this as QA", or for acceptance criteria before tests exist.
+description: Analyze a feature a developer is building from a QA perspective edge cases, negative flows, abuses, unobvious scenarios and write acceptance criteria. Use when asked "what could go wrong?", "what am I missing?", "review this as QA", or for acceptance criteria before tests exist.
 ---
 
 
@@ -21,6 +21,14 @@ Think:
 - What end-to-end test scenarios you can recommend?
 - What test coverage you recommend (percent of unit, e2e, manual)
 
+Output:
+
+- list number and scope of unit/e2e tests if they are available (Section: ☑️ What is already tested)
+- ask questions to resolve important ambiguity of feature (Section: 👓 What must be clarified)
+- propose up to 10 important test scenarios first (not more) (Section: 🔬 What must be verified)
+- prefer simple wording and short sentences 
+- when asked for more propose other bunch of test scenarios
+- do not list all automated unit/e2e test scenario (prefer generalize them and expand when user asks you to)
 
 Outcomes:
 
