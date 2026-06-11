@@ -38,6 +38,7 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 | `qa-manual-tests-to-code-coverage`      | Map manual test cases to source files; generate `coverage.manual.yml` for affected-only runs         |
 | `e2e-test-coverage-mapping`  | Map e2e tests to source files; generate `coverage.e2e.yml` to run only the tests affected by a diff  |
 | `senior-qa-testing-workflow`      | Orchestrate complete test case lifecycle: generate, improve, analyze coverage, upload to TMS         |
+| `senior-ai-qa`         | Strategic QA advisor: interview & scan to build context, assess QA maturity, deliver a prioritized roadmap, and route work to the right skills |
 | `scan-automation-project` | Scan project source code to inventory languages, frameworks, and existing tests |
 
 ### Automation
