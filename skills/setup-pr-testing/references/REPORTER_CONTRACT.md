@@ -7,12 +7,16 @@ these commands.
 
 ## 1. The coverage filter
 
-A coverage map (`coverage.manual.yml` / `coverage.e2e.yml`) maps source globs →
-test/suite IDs/tags. The reporter resolves *changed files* via git, maps them
-through the YAML, and selects the matching tests.
+A coverage map maps source globs → test/suite IDs/tags. There is one map per
+Testomat.io project, and its suffix says which kinds of tests it selects:
+`coverage.<slug>.yml` (manual + automated), `coverage.<slug>.manual.yml`
+(manual only), `coverage.<slug>.e2e.yml` (automated only). Legacy
+`coverage.manual.yml` / `coverage.e2e.yml` are single-kind maps. The reporter
+resolves *changed files* via git, maps them through the YAML, and selects the
+matching tests.
 
 ```
---filter "coverage:file=<path-to-coverage.yml>,diff=<git-ref>"
+--filter "coverage:file=<path-to-coverage-map>,diff=<git-ref>"
 ```
 
 - `file=` — path to the coverage map. **May be absolute.** It is read with
@@ -23,66 +27,81 @@ through the YAML, and selects the matching tests.
   to detect. Confirmed behavior, not configurable.
 
 The whole model rests on this: the repo that holds the coverage map + git
-history is where the affected selection is computed — for the comment counts and
-for scoping the prepared run alike.
+history is where the affected selection is computed — for the comment counts
+and for scoping the prepared run alike.
+
+### The `--kind` rule
+
+The map's suffix decides the `--kind` flag on `start`/`run`:
+
+| Map                          | `--kind`        |
+| ---------------------------- | --------------- |
+| `coverage.<slug>.manual.yml` | `--kind manual` |
+| `coverage.<slug>.yml`        | `--kind mixed`  |
+| `coverage.<slug>.e2e.yml`    | *(no flag)*     |
 
 ## 2. Phase 1 — affected-counts comment (`--filter-list`)
 
 `--filter-list` computes the affected tests **without executing or creating a
 run** — exactly what the PR-open notice needs. Pair it with `--format` to get a
 clean, parseable list on stdout (the banner is suppressed and logs go to
-stderr):
+stderr). Run it once per coverage map:
 
 ```bash
 npx @testomatio/reporter run \
-  --filter-list "coverage:file=coverage.manual.yml,diff=$BASE" --format ids
-npx @testomatio/reporter run \
-  --filter-list "coverage:file=coverage.e2e.yml,diff=$BASE" --format ids
+  --filter-list "coverage:file=<map>,diff=$BASE" --format ids
 ```
 
 `--format` values: `ids` (comma-separated, default), `newline` (one per line —
 easy to `wc -l`), `json`, `grep` (`(@Sxxxx|@Tyyyy|...)`).
 
 - Count the entries per map; empty output = `0`.
-- Assemble one line, e.g. `0 automated tests, 10 manual tests are affected by
-  this PR`, and post it via the CI's PR/MR comment API (GitHub / GitLab /
-  Bitbucket). Prefer updating one existing comment over re-posting.
+- Assemble one line: per-kind counts when `.manual`/`.e2e` maps exist (`0
+  automated tests, 10 manual tests are affected by this PR`); a mixed map
+  yields one combined count (`12 tests (manual + automated) are affected`).
+  Post it via the CI's PR/MR comment API (GitHub / GitLab / Bitbucket); prefer
+  updating one existing comment over re-posting.
 - Needs `TESTOMATIO` (API key) for the `coverage:` resolution. Creates nothing,
   must never fail the PR check.
 
 ## 3. Phase 2 — create the regression runs on merge
 
-### 3a. Manual run — created pending, not executed
+One run per coverage map, with `--kind` per the rule in §1.
+
+### 3a. Manual-only map — run created pending, complete at creation
 
 No test runner; the reporter creates a manual run containing only the affected
-cases for testers to pick up:
+cases for testers to pick up. Nothing happens at deploy time:
 
 ```bash
 npx @testomatio/reporter start --kind manual \
-  --filter "coverage:file=coverage.manual.yml,diff=$BASE"
+  --filter "coverage:file=coverage.<slug>.manual.yml,diff=$BASE"
 ```
 
-- Required env: `TESTOMATIO`, `TESTOMATIO_TITLE` (merge commit, e.g. `report for
-  commit <sha>`), `TESTOMATIO_RUNGROUP_TITLE` (the rungroup bucket; supports `/`
-  nesting). `TESTOMATIO_ENV` optional.
+- Required env: `TESTOMATIO`, `TESTOMATIO_TITLE` (merge commit, e.g. `report
+  for commit <sha>`), `TESTOMATIO_RUNGROUP_TITLE` (the rungroup bucket;
+  supports `/` nesting). `TESTOMATIO_ENV` optional.
 
-### 3b. Automated run — prepared as a shared run, not executed
+### 3b. Map containing automated tests — prepared as a shared run, not executed
 
-`start` creates the run scoped to the affected e2e tests and returns its id
+`start` creates the run scoped to the affected tests and returns its id
 **without running anything**. Created as a *shared* run so the later execute
-step — and any parallel executors — converge on this one run by title:
+step — and any parallel executors — converge on this one run by title. A mixed
+map adds `--kind mixed` (its manual cases are immediately pending for
+testers); an e2e-only map takes no `--kind`:
 
 ```bash
 RUN_ID=$(TESTOMATIO_SHARED_RUN=1 \
   TESTOMATIO_TITLE="report for commit $SHA" \
   TESTOMATIO_SHARED_RUN_TIMEOUT=$DEPLOY_MINUTES \
-  npx @testomatio/reporter start --filter "coverage:file=coverage.e2e.yml,diff=$BASE" --format id)
+  npx @testomatio/reporter start --kind mixed \
+    --filter "coverage:file=coverage.<slug>.yml,diff=$BASE" --format id)
 ```
 
-- `--filter` scopes the prepared run to the affected tests; that scope is stored
-  on the run and reused at launch time (§4).
-- **Output:** `--format id` makes `start` print only the run id to stdout (banner
-  and logs go to stderr), so `RUN_ID=$(...)` captures just the id.
+- `--filter` scopes the prepared run to the affected tests; that scope is
+  stored on the run and reused at launch time (§4).
+- **Output:** `--format id` makes `start` print only the run id to stdout
+  (banner and logs go to stderr), so `RUN_ID=$(...)` captures just the id.
 - Required env: `TESTOMATIO`, `TESTOMATIO_TITLE`, `TESTOMATIO_RUNGROUP_TITLE`.
 
 ### Shared-run env vars (the convergence mechanism)
@@ -103,7 +122,8 @@ RUN_ID=$(TESTOMATIO_SHARED_RUN=1 \
 profile (configured under **Settings → CI**) for an already-prepared run,
 instead of executing tests locally. This replaces the old cross-repo dispatch:
 the CI profile owns the runner, browsers, environment URLs and secrets — the
-reporter just triggers it.
+reporter just triggers it. Applies to every run prepared in §3b (mixed and
+e2e-only); manual-only runs have no launch phase:
 
 ```bash
 TESTOMATIO_RUN=$RUN_ID \
@@ -114,11 +134,12 @@ npx @testomatio/reporter run --remote <profile>
 
 - `TESTOMATIO_RUN=$RUN_ID` points the launch at the run prepared in §3b. With no
   fresh `--filter`, Testomat.io greps that run's **own stored scope**, so only
-  the affected e2e tests run — no need to recompute the diff at deploy time.
+  the affected automated tests run — no need to recompute the diff at deploy
+  time.
 - The CI profile name must exist on the project, otherwise the call fails with
   `CI launch failed: No settings for <profile>`. `--remote` cannot be combined
   with `--filter-list`.
-- Testomat.io passes the run id into the dispatched workflow, so the e2e tests
+- Testomat.io passes the run id into the dispatched workflow, so the tests
   running there report back into the same prepared run.
 - On success the CLI prints the launched profile and run URL, then exits 0; the
   run transitions as the CI reports results.
@@ -137,13 +158,13 @@ profile) and `TESTOMATIO_CI_PARAMS` (= comma-separated `key=value` overrides).
 
 ## 5. Inline exception — execute in this pipeline (no CI profile)
 
-When the e2e suite runs in this pipeline (mobile, API/contract, or an existing
-same-repo job) rather than via a CI profile, launch the prepared run by wrapping
-the runner directly after deploy:
+When the automated suite runs in this pipeline (mobile, API/contract, or an
+existing same-repo job) rather than via a CI profile, launch the prepared run
+by wrapping the runner directly after deploy:
 
 ```bash
 TESTOMATIO_RUN=$RUN_ID npx @testomatio/reporter run "<runner cmd>" \
-  --filter "coverage:file=coverage.e2e.yml,diff=$BASE"
+  --filter "coverage:file=<map>,diff=$BASE"
 ```
 
 Examples of `<runner cmd>`: `npx playwright test`, `npx cypress run`,

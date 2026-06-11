@@ -32,8 +32,7 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 | `improve-test-cases`   | Analyze and improve existing markdown test cases for clarity                                         |
 | `find-duplicate-cases` | Find duplicate, near-duplicate, and overlapping test cases                                           |
 | `sync-cases`           | Synchronize Markdown test scenarios between local project and Testomat.io                            |
-| `manual-coverage`      | Map manual test cases to source files; generate `coverage.manual.yml` for affected-only runs         |
-| `automation-coverage`  | Map e2e tests to source files; generate `coverage.e2e.yml` to run only the tests affected by a diff  |
+| `qa-test-coverage-map` | Map manual and automated tests to source files; generate a per-project `coverage.*.yml` for affected-only runs |
 | `testomatio-flow`      | Orchestrate complete test case lifecycle: generate, improve, analyze coverage, upload to TMS         |
 | `project-scan` | Scan project source code to inventory languages, frameworks, and existing tests |
 
