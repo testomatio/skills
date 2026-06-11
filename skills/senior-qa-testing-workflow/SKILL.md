@@ -39,8 +39,7 @@ The skill orchestrates these specialized capabilities:
 | **improve-test-cases**  | Improve existing test cases quality                 |
 | **sync-test-cases-with-tms**          | Upload test cases to Testomat.io TMS                |
 | **qa-e2e-tests-reporting**      | Add Testomat.io reporter to your automation project |
-| **qa-manual-tests-to-code-coverage**     | Map manual test cases to source files (`coverage.manual.yml`) |
-| **e2e-test-coverage-mapping** | Map automated e2e tests to source files (`coverage.e2e.yml`) |
+| **qa-test-coverage-map** | Map manual and automated tests to source files (per-project `coverage.*.yml`) |
 | **scan-automation-project** | Scan project source code to inventory languages, frameworks, and existing tests |
 
 <!-- TODO: autotests-fixer, traceability-matrix -->
