@@ -81,7 +81,7 @@ per-CI workflow files into this skill.
 
 - **The deliverable is committed CI config — never execute the reporter
   yourself.**
-- **Discovery first.** Delegate to `project-scan` before writing anything.
+- **Discovery first.** Delegate to `scan-automation-project` before writing anything.
 - **Never assume or hardcode the CI system.** Read the repo; if unclear, ask.
 - **No coverage map → no regression.** Missing maps are created via the
   `qa-test-coverage-map` skill, never hand-written; filtering is never skipped.
@@ -108,7 +108,7 @@ per-CI workflow files into this skill.
 
 ## Workflow
 
-### Step 1 — Discover (delegate to `project-scan`)
+### Step 1 — Discover (delegate to `scan-automation-project`)
 
 Capture: is there an e2e framework (unit/integration don't count), are there
 manual `.test.md` cases, do automated tests live here or elsewhere. This tells
@@ -268,7 +268,7 @@ nothing can be counted or filtered without a map; delegate to `qa-test-coverage-
 only then wire CI.
 
 **Example 3 — manual-only project**
-project-scan finds `.test.md` cases and no e2e framework → wire the PR comment
+scan-automation-project finds `.test.md` cases and no e2e framework → wire the PR comment
 (manual count) and the on-merge `start --kind manual` run from
 `coverage.<slug>.manual.yml`. No deploy phase at all; explain the automated
 phase needs an e2e suite first. Never fabricate an e2e job.
@@ -289,6 +289,6 @@ offer the inline-runner exception meanwhile.
 
 ## Related skills
 
-`project-scan` (mandatory first), `qa-test-coverage-map` (creates the maps this skill
-consumes), `reporter-setup` (install the reporter if the project has no
+`scan-automation-project` (mandatory first), `qa-test-coverage-map` (creates the maps this skill
+consumes), `qa-e2e-tests-reporting` (install the reporter if the project has no
 Testomat.io integration yet).

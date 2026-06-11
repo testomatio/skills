@@ -1,6 +1,6 @@
 ---
 name: qa-test-coverage-map
-description: Map tests to the source code they cover and generate a per-project coverage map (`coverage.<project>.yml`) consumed by `@testomatio/reporter --filter "coverage:..."`. Handles manual markdown test cases and automated e2e tests (Playwright, Cypress, WebdriverIO, CodeceptJS, Puppeteer, Appium) in one file. Use this skill when the user wants to run only the tests affected by a code change, generate a coverage file (any coverage*.yml), build a code-to-test traceability matrix, or set up change-aware regression — for manual QA, automated suites, or both. Replaces the former manual-coverage and automation-coverage skills.
+description: Map tests to the source code they cover and generate a per-project coverage map (`coverage.<project>.yml`) consumed by `@testomatio/reporter --filter "coverage:..."`. Handles manual markdown test cases and automated e2e tests (Playwright, Cypress, WebdriverIO, CodeceptJS, Puppeteer, Appium) in one file. Use this skill when the user wants to run only the tests affected by a code change, generate a coverage file (any coverage*.yml), build a code-to-test traceability matrix, or set up change-aware regression — for manual QA, automated suites, or both. Replaces the separate qa-manual-tests-to-code-coverage and e2e-test-coverage-mapping skills.
 license: MIT
 metadata:
   author: Testomat.io
@@ -42,11 +42,11 @@ from the old scheme; offer to migrate them when you touch them.
 
 ## Constraints
 
-- **Write only the coverage file(s)**, plus one `.testclaw-context/` line in
+- **Write only the coverage file(s)**, plus one `.testclaw/` line in
   `.gitignore` if missing. Never modify source or test files.
-- **Pulled or cloned material lives in the gitignored `.testclaw-context/`**:
-  manual cases pulled from Testomat.io → `.testclaw-context/manual-tests/`, an
-  external e2e repo → `.testclaw-context/e2e-tests/`. Never into a tracked
+- **Pulled or cloned material lives in the gitignored `.testclaw/`**:
+  manual cases pulled from Testomat.io → `.testclaw/manual-tests/`, an
+  external e2e repo → `.testclaw/e2e-tests/`. Never into a tracked
   folder. Tests already in the repo are used where they are.
 - **Only tests carrying Testomat.io IDs can be mapped.** A map without real
   `@S`/`@T` IDs is useless to the reporter.
@@ -57,17 +57,17 @@ from the old scheme; offer to migrate them when you touch them.
 
 ## Workflow
 
-### 1. Discover (delegate to `project-scan`)
+### 1. Discover (delegate to `scan-automation-project`)
 
-Run **`project-scan`**. It reports which test kinds exist (manual `.test.md`
+Run **`scan-automation-project`**. It reports which test kinds exist (manual `.test.md`
 files, automated e2e frameworks), the languages, and the project shape — that
 determines the file name(s) and everything after.
 
 If a kind the user expects is missing locally:
 
-- manual cases → have `sync-cases` pull them:
-  `npx check-tests pull -d .testclaw-context/manual-tests`
-- e2e tests in another repo → `git clone <url> .testclaw-context/e2e-tests`
+- manual cases → have `sync-test-cases-with-tms` pull them:
+  `npx check-tests pull -d .testclaw/manual-tests`
+- e2e tests in another repo → `git clone <url> .testclaw/e2e-tests`
 - otherwise ask for the directory, or stop.
 
 If several automated frameworks are detected, ask which one is the e2e suite.
@@ -83,7 +83,7 @@ If the user supplied an output path, use it.
 
 - **Manual cases** carry IDs in metadata comments —
   `<!-- suite ... id: @S... -->`, `<!-- test ... id: @T... -->`, plus `tags:`
-  lines ([format reference](../generate-cases/references/test-case-format.md)).
+  lines ([format reference](../qa-write-test-cases/references/test-case-format.md)).
 - **Automated tests** carry IDs in test titles —
   `describe('user settings @S92321384')`, `it('updates avatar @Ta011dfa3')`
   (per-framework syntax: [E2E_FRAMEWORKS.md](./references/E2E_FRAMEWORKS.md)).
@@ -99,9 +99,9 @@ Also read the tests themselves — titles, steps, page objects, routes — to
 understand which source files each one exercises.
 
 **Missing IDs?** The tests haven't been synced with Testomat.io yet. Manual
-cases: push via `sync-cases` first. Automated tests:
+cases: push via `sync-test-cases-with-tms` first. Automated tests:
 `npx check-tests@latest <Framework> "<glob>" --update-ids` (see
-`reporter-setup`). Don't map tests without IDs.
+`qa-e2e-tests-reporting`). Don't map tests without IDs.
 
 ### 4. Map source files to identifiers
 
@@ -144,7 +144,7 @@ npx js-yaml coverage.<slug>.yml | node scripts/check-coverage.mjs
 `js-yaml` fails loudly on malformed YAML; the checker flags keys whose path is
 missing on disk and keys with no identifiers, and lists every referenced ID —
 cross-check that list against the set you extracted in Step 3. Map keys are
-repo paths, never `.testclaw-context/...` paths. Show the final YAML to the
+repo paths, never `.testclaw/...` paths. Show the final YAML to the
 user.
 
 ### 6. Hand off
@@ -171,7 +171,7 @@ post-merge regression runs). If cases were pulled, they stay in the gitignored
 cache for reuse — don't delete or commit them.
 
 Useful follow-ups: scan for coverage gaps (source with no tests → delegate to
-`generate-cases`) or dead tests (tests whose feature no longer exists).
+`qa-write-test-cases`) or dead tests (tests whose feature no longer exists).
 
 ## References
 
@@ -179,7 +179,7 @@ Useful follow-ups: scan for coverage gaps (source with no tests → delegate to
 | --------------------------- | ------------------------------------------------ |
 | Coverage YAML format        | ./references/COVERAGE_FILE_FORMAT.md             |
 | E2E framework detection     | ./references/E2E_FRAMEWORKS.md                   |
-| Manual test markdown format | ../generate-cases/references/test-case-format.md |
+| Manual test markdown format | ../qa-write-test-cases/references/test-case-format.md |
 
 ## Bundled script
 
@@ -194,7 +194,7 @@ tests" → one `coverage.billing-app.yml` mapping source files to both kinds of
 identifiers.
 
 **Manual-only, nothing local:** cases are pulled into
-`.testclaw-context/manual-tests/`, mapped, and written to
+`.testclaw/manual-tests/`, mapped, and written to
 `coverage.billing-app.manual.yml`. Tracked changes: that file and one
 `.gitignore` line.
 
@@ -203,6 +203,6 @@ Testomat.io projects → `coverage.shop.yml` + `coverage.admin.yml`.
 
 ## Related skills
 
-`project-scan` (mandatory first), `sync-cases` (pull/push manual cases),
-`reporter-setup` (reporter install + `--update-ids`), `generate-cases` (author
+`scan-automation-project` (mandatory first), `sync-test-cases-with-tms` (pull/push manual cases),
+`qa-e2e-tests-reporting` (reporter install + `--update-ids`), `qa-write-test-cases` (author
 missing cases), `setup-pr-testing` (consume the map in CI).

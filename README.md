@@ -4,7 +4,9 @@ AI skills for test management workflows with [Testomat.io](https://testomat.io).
 
 ## Quick Start
 
-`npx skills add testomatio/skills`
+```bash
+npx skills add testomatio/skills`
+```
 
 ## Install
 
@@ -28,19 +30,47 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 
 | Skill                  | Description                                                                                          |
 | ---------------------- | ---------------------------------------------------------------------------------------------------- |
-| `generate-cases`       | Generate test cases and checklists from requirements, tickets, or feature descriptions               |
+| `qa-write-test-cases`       | Generate test cases and checklists from requirements, tickets, or feature descriptions               |
+| `qa-thinking`          | Analyze a feature from a QA perspective — edge cases, negative flows, abuses, unobvious scenarios — and propose acceptance criteria |
 | `improve-test-cases`   | Analyze and improve existing markdown test cases for clarity                                         |
-| `find-duplicate-cases` | Find duplicate, near-duplicate, and overlapping test cases                                           |
-| `sync-cases`           | Synchronize Markdown test scenarios between local project and Testomat.io                            |
+| `detect-duplicate-test-cases` | Find duplicate, near-duplicate, and overlapping test cases                                           |
+| `sync-test-cases-with-tms`           | Synchronize Markdown test scenarios between local project and Testomat.io                            |
 | `qa-test-coverage-map` | Map manual and automated tests to source files; generate a per-project `coverage.*.yml` for affected-only runs |
-| `testomatio-flow`      | Orchestrate complete test case lifecycle: generate, improve, analyze coverage, upload to TMS         |
-| `project-scan` | Scan project source code to inventory languages, frameworks, and existing tests |
+| `senior-qa-testing-workflow`      | Orchestrate complete test case lifecycle: generate, improve, analyze coverage, upload to TMS         |
+| `scan-automation-project` | Scan project source code to inventory languages, frameworks, and existing tests |
 
 ### Automation
 
 | Skill            | Description                                                                                          |
 | ---------------- | ---------------------------------------------------------------------------------------------------- |
-| `reporter-setup` | Set up Testomat.io test reporting for your automation framework (Playwright, CodeceptJS, Jest, etc.) |
+| `qa-e2e-tests-reporting` | Set up Testomat.io test reporting for your automation framework (Playwright, CodeceptJS, Jest, etc.) |
+
+### Explorbot
+
+| Skill                    | Description                                                                          |
+| ------------------------ | ------------------------------------------------------------------------------------ |
+| `explorbot-setup`        | First-time install & configuration of Explorbot, including initial knowledge          |
+| `explorbot-fundamentals` | Operating reference: run, drive and debug all Explorbot commands, config and outputs   |
+| `explorbot-plan`         | Author an Explorbot test plan in markdown so `explorbot test` can run it               |
+
+---
+
+## Flows
+
+<img src="./docs/flows/flows.png" alt="Flows" height="300" />
+
+Testomat.io provides a comprehensive set of flows for QA engineers:
+
+- Generate test cases from requirements
+<!-- - Improve test cases
+- Sync test cases to Testomat.io
+- Add test reporter to your automation project
+- Generate test cases from requirements
+- Improve test cases
+- Sync test cases to Testomat.io
+- Add test reporter to your automation project -->
+
+Refer to [docs/flows](./docs/flows) for more detailed examples of flows.
 
 ---
 
@@ -49,17 +79,20 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 ```
 testomatio/skills
 ├── skills/                    # Agent-agnostic skills (canonical source)
-│   ├── find-duplicate-cases/
-│   ├── generate-cases/
+│   ├── detect-duplicate-test-cases/
+│   ├── qa-write-test-cases/
 │   ├── improve-test-cases/
-│   ├── reporter-setup/
-│   ├── sync-cases/
+│   ├── qa-e2e-tests-reporting/
+│   ├── sync-test-cases-with-tms/
 │   └── ...
 └── plugins/                   # Claude Code plugin wrappers
     ├── test-management/
     │   └── skills/
     │       └── [symlinks to ../../skills/*]
     ├── test-automation/
+    │   └── skills/
+    │       └── [symlinks to ../../skills/*]
+    ├── explorbot/
     │   └── skills/
     │       └── [symlinks to ../../skills/*]
     └── ...

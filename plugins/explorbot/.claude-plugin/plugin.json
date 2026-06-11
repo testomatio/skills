@@ -1,0 +1,8 @@
+{
+  "name": "explorbot",
+  "description": "Install, configure, run, debug and plan Explorbot autonomous AI web tests",
+  "version": "0.0.1",
+  "author": {
+    "name": "Testomat.io"
+  }
+}

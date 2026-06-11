@@ -61,5 +61,5 @@ npx check-tests@latest WebdriverIO "**/*.{test,e2e}.js" --update-ids
 
 ## Related skills
 
-- `reporter-setup` — install `@testomatio/reporter` and import tests via `check-tests`.
-- `sync-cases` — pull/push manual cases. See its [Testomat.io CLI reference](../../sync-cases/references/TESTOMATIO_CLI.md) for the full `check-tests` command set, including `--update-ids`.
+- `qa-e2e-tests-reporting` — install `@testomatio/reporter` and import tests via `check-tests`.
+- `sync-test-cases-with-tms` — pull/push manual cases. See its [Testomat.io CLI reference](../../sync-test-cases-with-tms/references/TESTOMATIO_CLI.md) for the full `check-tests` command set, including `--update-ids`.
