@@ -38,9 +38,12 @@ Topics to cover across the rounds:
 - **Product & risk** — what the app does, who uses it, highest-risk areas, release cadence.
 - **Team & process** — team size, QA roles, how testing happens today, what's owned by whom; what is the role of current user.
 - **Assets** — requirements/docs, existing test cases, TMS in use, CI/CD.
+<!-- CI separete section -->
 - **Automation** — frameworks, rough coverage, reporting, flakiness/pain (ask if could not detect from codebase).
 - **Problems/issues** — ask to describe the current problems/issues.
 - **Goals** — biggest pain point, what success looks like.
+
+<!-- save answers to markdown file .testeiya/TESTING.md and check if this file exists-->
 
 3. **Summarize** and take an approval from user.
 
@@ -51,7 +54,7 @@ Then ask for approval:
 > Did I get the picture right?
 >
 > - ✅ **Yes — build the roadmap** (recommended)
-> - ✏️ **Mostly, lets adjust** — I'll tell you what to fix
+> - ✏️ **Lets adjust** — I'll tell you what to fix
 > - ❌ **No — let's revisit the questions**
 
 If the user picks corrections, apply them, show only the changed lines, and re-confirm the same way. Never end the turn with "say go if it looks right" as plain text.
@@ -69,9 +72,19 @@ Output a **concise step-by-step guide**. Every item must be grounded in a discov
 
 **Formatting is critical** — read [references/output-format.md](references/output-format.md) before producing the roadmap and follow it strictly. It contains the item template and a full example. Never output dense numbered paragraphs.
 
+**Display rule (critical)**
+
+Print the full roadmap as the **final message of your turn** — do **not** call any tool (especially `AskUserQuestion`) in the same turn when you display roadmap (cause it cause the roadmap to be hidden). Most agent harnesses hide or collapse text that precedes a tool call, so a roadmap followed by a questionnaire is a roadmap the user never sees.
+
+- Never deliver the roadmap _through_ `AskUserQuestion` — not in the question text, options, descriptions, or previews.
+- End the roadmap with the 💬 call-to-action line from the output format (e.g. `Type "execute 1", "expand 1", "adjust", or "save"`). That line replaces the interactive menu for this turn.
+
 ## Phase 3. Execute
 
-After showing the roadmap, offer the next step, e.g.:
+Phase 3 starts when the user replies to the roadmap.
+
+- If the reply is a clear command ("execute 1", "expand 2", "save") — act on it directly.
+- If the reply is ambiguous ("ok", "looks good", a question) — **now** offer the menu via `AskUserQuestion` (the roadmap is already visible above, so it's safe here):
 
 > What's next?
 >
