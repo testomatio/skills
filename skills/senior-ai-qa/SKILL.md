@@ -7,8 +7,6 @@ description: A strategic advisor for QA, quality, testing, and automation proces
 
 **Strategic advisor** for QA, quality, testing, and automation processes. I **interview → assess → prioritize → advise**: gather context first, then tell you the most important thing to do next, and route execution to specialized skills only when you ask. I advise on _what to do, why, and in what order_ — I never dump full detail up front; I expand a step only when you ask.
 
-**Interaction rule:** whenever you need a decision or confirmation from the user — interview answers, summary approval — ask it via the `AskUserQuestion` tool with clear selectable options.
-
 ## Phase 0. Plan mode
 
 **Strictly** recommend user to use/switch to "PLAN" mode in his AI agent.
@@ -73,9 +71,7 @@ Output a **concise step-by-step guide**. Every item must be grounded in a discov
 
 ## Phase 3. Execute
 
-First output the **full roadmap** so it is printed in the terminal and stays in the transcript.
-
-With the roadmap printed, offer the next step, e.g.:
+After showing the roadmap, offer the next step, e.g.:
 
 > What's next?
 >
@@ -85,63 +81,3 @@ With the roadmap printed, offer the next step, e.g.:
 > - 💾 **Save & stop here** — write the roadmap to a file and finish
 
 After the user's approval route to the appropriate skill to execute the chosen item. When an item finishes, confirm the result and offer the next roadmap item the same way — keep the loop going until the user stops.
-
-### Example user flow
-
-```
-User:  I am new QA on the project and want to know from which to start
-
-Agent: Welcome! Let me scan the project so we both see what's already here. [runs scan-automation-project]
-       Found: TypeScript + Playwright, no unit tests, 120 manual cases in TMS.
-       [asks round 1 via AskUserQuestion: tracker/TMS access? handover or known problem areas?
-        what does the team expect first — with selectable options]
-
-User:  [selects] TMS access: yes · Handover: none · Expected first: manual regression
-
-Agent: [asks round 2 via AskUserQuestion, adapted to the answers: release cadence?
-        who triages prod bugs? which flows are highest-risk?]
-
-User:  [answers round 2]
-
-Agent: [shows short context summary, then asks via AskUserQuestion:
-        Yes — build the roadmap / Mostly, with corrections / No — revisit]
-
-User:  [selects] Yes — build the roadmap
-
-Agent: ## Your onboarding roadmap
-
-       ### 1️⃣ Audit the inherited manual suite
-
-       📈 Impact: high · ⏱️ Effort: ~half a day
-
-       - 🔍 **Found:** 120 cases in TMS, no handover — you can't trust what you haven't read.
-       - 🎯 **Goal:** know what's covered, what's stale, and what duplicates.
-       - ▶️ **Action:** import the cases → `sync-test-cases-with-tms` skill, then `detect-duplicate-test-cases`
-
-       ---
-
-       ### 2️⃣ Risk-rank the flows with the team
-
-       📈 Impact: high · ⏱️ Effort: ~1 hour
-
-       - 🔍 **Found:** the team asks for "regression under control", but nothing says what's critical.
-       - 🎯 **Goal:** a prioritized smoke + regression set.
-       - ▶️ **Action:** run a 30-min session ranking the top 5 flows by prod impact (human action)
-
-       ---
-
-       [items 3️⃣ document a lightweight regression process (human action)
-       and 4️⃣ prepare ground for automation → `automate-manual-test-cases` — same format]
-
-       ---
-
-       📆 **Pace:** items 1–2 this week · items 3–4 in your first sprint
-
-       [asks via AskUserQuestion: Execute item 1 (recommended) / Expand an item /
-        Adjust the roadmap / Save & stop here]
-
-User:  [selects] Execute item 1
-
-Agent: [routes to sync-test-cases-with-tms to import the suite, then detect-duplicate-test-cases
-       and improve-test-cases] ... then suggests item 2 as the logical next step.
-```
