@@ -24,7 +24,7 @@ Optimize for **scanning** by eyes: the user should understand each item and what
 | ⏱️     | Effort (rough: ~1 hour / ~1 day / ongoing) |
 | 🔍     | Found — the discovery fact behind the item |
 | 🎯     | Goal — outcome when the item is done       |
-| ▶️     | Action — the concrete first action         |
+| ▶     | Action — the concrete first action         |
 | 💬     | Call to action                             |
 
 ## Item template
@@ -36,7 +36,7 @@ Optimize for **scanning** by eyes: the user should understand each item and what
 
 🔍 **Found:** <one sentence — the scan/interview fact this item is based on>
 🎯 **Goal:** <one sentence — the outcome when done>
-▶️ **Action:** <concrete action (by skill or human)>
+▶ **Action:** <concrete action (by skill or human)>
 
 --------------------------------------------------
 
@@ -53,7 +53,7 @@ Optimize for **scanning** by eyes: the user should understand each item and what
 
   🔍 **Found:** 0 test cases for checkout — your highest-revenue flow.
   🎯 **Goal:** a documented, repeatable checkout regression suite.
-  ▶️ **Action:** generate a checkout checklist + test cases → `qa-write-test-cases` skill
+  ▶ **Action:** generate a checkout checklist + test cases → `qa-write-test-cases` skill
 
 --------------------------------------------------
 
@@ -63,7 +63,7 @@ Optimize for **scanning** by eyes: the user should understand each item and what
 
   🔍 **Found:** Playwright runs in CI but shows only green/red — no history or flakiness data.
   🎯 **Goal:** visibility into runs, history, and flaky tests.
-  ▶️ **Action:** add a reporter to the Playwright project → `qa-e2e-tests-reporting` skill
+  ▶ **Action:** add a reporter to the Playwright project → `qa-e2e-tests-reporting` skill
 
 --------------------------------------------------
 
