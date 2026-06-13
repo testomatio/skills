@@ -1,0 +1,14 @@
+{
+  "name": "qa-process",
+  "version": "1.0.0",
+  "description": "Strategic QA process advisory — assess QA maturity, prioritize a roadmap, think through quality risks, and orchestrate the test lifecycle",
+  "author": {
+    "name": "Testomat.io",
+    "url": "https://testomat.io"
+  },
+  "homepage": "https://docs.testomat.io",
+  "repository": "https://github.com/testomatio/skills",
+  "license": "MIT",
+  "keywords": ["qa", "qa-process", "quality", "strategy", "testing", "testomat"],
+  "skills": "./skills/"
+}
