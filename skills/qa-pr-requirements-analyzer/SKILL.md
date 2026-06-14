@@ -93,7 +93,7 @@ Compare what the PR does against what the ticket asked for, and surface anything
 **Scope Verification** — build three lists:
 - **In scope** — ticket requirements addressed by the PR (description or code, see Step 5).
 - **Out of scope** — ticket requirements with no corresponding PR change. These are the most valuable output of this skill.
-- **Extra / out of ticket** — PR changes not mentioned in the ticket. Flag for review (intentional or accidental?).
+- **Extra (not in ticket)** — PR changes not mentioned in the ticket. Flag for review (intentional or accidental?).
 
 **Ambiguities, Edge Cases & Open Questions** - surface only issues that are supported by the available context. Do not invent new requirements or assume the product should handle a scenario unless the ticket, PR description, comments, or surrounding context suggest it is relevant.
 
