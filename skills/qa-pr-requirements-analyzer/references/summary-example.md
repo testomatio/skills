@@ -16,27 +16,24 @@ A filled-in example of the artifact produced by the `qa-pr-requirements-analyzer
 - Jira/GitHub ticket: resolved (PRJ-789)
 - Most reliable source: PR description + ticket (consistent, no conflicts)
 
-**Changes:** Adds a CSV export action on the user list page that streams all currently filtered users to a downloadable file, with an email notification when exports exceed 10k rows.
-
-**Affected Files:**
-- `src/pages/UserList.tsx` — source
-- `src/services/ExportService.ts` — source
-- `src/api/export.ts` — source
-- `src/components/ExportModal.tsx` — source
-- `i18n/en.json` — config
-- `i18n/de.json` — config
-- `tests/e2e/export.test.ts` — test
-- `docs/features/export.md` — docs
+**Changes Overview:** Adds a CSV export action on the user list page that streams all currently filtered users to a downloadable file, with an email notification when exports exceed 10k rows.
 
 **Impacted Areas:**
 - User list page UI (new "Export" action).
 - User data export pipeline (CSV generation, streaming, email delivery).
 - Permission checks for export (admin-only).
 
+**High Level Key files (up to 5):**
+- `src/pages/UserList.tsx` — source
+- `src/services/ExportService.ts` — source
+- `src/api/export.ts` — source
+- `src/components/ExportModal.tsx` — source
+- `i18n/en.json` — config
+
 **Scope Verification:**
 - ✅ In scope: PRJ-789 AC1 (export button on the user list) — addressed in `src/pages/UserList.tsx` and `src/components/ExportModal.tsx`
 - ✅ In scope: PRJ-789 AC2 (admin-only) — addressed in `ExportService.ts` permission check
-- ⚠️ Out of scope / missing: PRJ-789 AC3 (email notification for >10k exports) — no implementation found
+- ⚠️ Out of scope: PRJ-789 AC3 (email notification for >10k exports) — no implementation found
 - ➕ Extra (not in ticket): i18n strings for German locale (`i18n/de.json`) — ticket only mentioned English
 
 **Ambiguities, Edge Cases & Open Questions:**
