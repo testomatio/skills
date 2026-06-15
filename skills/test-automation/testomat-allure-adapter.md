@@ -4,6 +4,55 @@ description: Configure Testomat.io reporting for Java projects that already use 
 required_action: true
 ---
 
+## Purpose
+
+This skill helps configure Testomat.io reporting for Java projects that currently use Allure.
+
+### Input
+
+The skill expects one or more of the following:
+
+* Maven (`pom.xml`) or Gradle (`build.gradle`) build configuration
+* Java test source files
+* Existing Allure annotations and integrations
+* Existing Testomat.io configuration
+
+### What This Skill Does
+
+The skill analyzes the project and helps the user choose one of two integration approaches:
+
+1. **Keep Allure and report results to Testomat.io**
+
+  * Installs and configures the Testomat Allure adapter.
+  * Preserves existing Allure annotations and reporting configuration.
+
+2. **Migrate from Allure to Testomat.io**
+
+  * Replaces supported Allure annotations with Testomat.io equivalents.
+  * Updates imports and reporting configuration.
+  * Handles unsupported Allure annotations according to user preference.
+  * Configures required Maven Surefire and AspectJ settings.
+
+### Output
+
+Depending on the selected integration mode, the skill produces:
+
+* Updated Maven or Gradle configuration
+* Required Testomat.io dependencies
+* Updated test annotations and imports
+* Updated attachment and step reporting APIs
+* Maven Surefire Plugin configuration updates
+* Migration recommendations and user decisions for unsupported annotations
+
+### Expected Result
+
+After applying this skill, the project should be correctly configured to:
+
+* Send test execution results to Testomat.io
+* Continue using Allure reporting (adapter mode), or
+* Use native Testomat.io annotations and reporting (migration mode)
+
+
 ## Allure Integration Mode
 
 Before configuring the project ask the user which integration approach they want to use:
