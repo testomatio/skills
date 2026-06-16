@@ -246,6 +246,119 @@ import io.testomat.core.annotation.Artifact;
 @Artifact
 ```
 
+#### Replace Allure.step
+
+Before replacing usages of `Allure.step(...)`, analyze all detected step overloads.
+
+Automatic migration is supported for the following overloads:
+
+```java
+Allure.step(String name)
+```
+
+```java
+Allure.step(String name, Status status)
+```
+
+```java
+Allure.step(ThrowableContextRunnableVoid<StepContext> runnable)
+```
+
+```java
+Allure.step(String name, ThrowableContextRunnableVoid<StepContext> runnable)
+```
+
+```java
+Allure.step(String name, ThrowableRunnableVoid runnable)
+```
+
+Automatic migration is NOT supported for overloads that return a value:
+
+```java
+Allure.step(String name, ThrowableRunnable<T> runnable)
+```
+
+```java
+Allure.step(ThrowableContextRunnable<T, StepContext> runnable)
+```
+
+```java
+Allure.step(String name, ThrowableContextRunnable<T, StepContext> runnable)
+```
+
+because `Testomatio.step(String stepDescription, Runnable function)` does not return a value.
+
+If unsupported return-value step overloads are detected, inform the user:
+
+> Some Allure.step(...) usages return a value and cannot be migrated automatically because Testomatio.step(...) does not support return values. How would you like to proceed?
+
+Options:
+
+1. Replace supported Allure.step(...) overloads and keep unsupported overloads unchanged.
+2. Skip Allure.step migration entirely and keep all existing Allure.step(...) usages.
+
+If the user chooses option 1:
+
+- Replace supported overloads.
+- Leave unsupported return-value overloads unchanged.
+- Inform the user which usages require manual migration.
+- Keep Allure dependencies in the project because unsupported Allure.step(...) usages remain.
+- Allure dependencies can be removed only after all remaining Allure.step(...) usages are manually migrated or removed.
+
+If the user chooses option 2:
+
+- Do not replace any Allure.step(...) usages.
+- Keep Allure dependencies in the project.
+
+Supported replacements:
+
+```java
+Allure.step(String name)
+```
+↓
+```java
+Testomatio.step(String name, () -> {})
+```
+
+```java
+Allure.step(String name, Status status)
+```
+↓
+```java
+Testomatio.step(String name, () -> {})
+```
+The original `Status` value cannot be migrated because `Testomatio.step(...)` does not support step status overrides.
+
+```java
+Allure.step(ThrowableContextRunnableVoid<StepContext> runnable)
+```
+↓
+```java
+Testomatio.step("", () -> { /* original runnable body */ })
+```
+
+```java
+Allure.step(String name, ThrowableContextRunnableVoid<StepContext> runnable)
+```
+↓
+```java
+Testomatio.step(String name, () -> { /* original runnable body */ })
+```
+
+```java
+Allure.step(String name, ThrowableRunnableVoid runnable)
+```
+↓
+```java
+Testomatio.step(String name, () -> { /* original runnable body */ })
+```
+
+Preserve the original step name whenever available.
+
+Move the original runnable body into the `Runnable` argument of `Testomatio.step(...)`.
+
+If any `Allure.step(...)` usages remain in the project after migration, Allure dependencies must not be removed.
+
 #### Replace Allure.addAttachment
 
 Replace usages of `Allure.addAttachment`.
