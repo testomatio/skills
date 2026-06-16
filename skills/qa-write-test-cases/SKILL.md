@@ -75,7 +75,7 @@ Generate **checklist** prior to **test cases** generation even if user request s
    Show each role name and short description thus user can make proper decision. Go to step 4 only after approval.
 
 4. **Generate checklist**.
-   **Generate and show a categorized structured checklist**. **Wait for user approval:** ask if the user wants to add/remove/change anything in the checklist or proceed to test cases generation. Go to step 5 only after approval.
+   **Generate a categorized structured checklist**. If a multi-select / checkbox Ask tool is available, present the checklist items as **checkboxes** (recommended items pre-checked) and let the user **select which tests to generate**; otherwise show the markdown checklist and ask the user to add/remove/change anything or proceed. **Wait for the user's selection/approval** before going to step 5.
 
 5. **Generate detailed test cases**.
    Convert approved checklist into detailed test cases.
@@ -289,7 +289,7 @@ Example:
   - Login with invalid password
 ```
 
-**Show generated checklist to user and ask for approval.**
+**Show the checklist to the user and ask for approval.** If a multi-select / checkbox Ask tool is available, present the checklist as **checkboxes** instead — one option per leaf item (prefixed with its category, e.g. `Login: valid email`), with the recommended subset for the chosen scope tier pre-checked. The items the user ticks are the ones generated as test cases in Step 5.
 
 ### Step 4.1: Wait for Approval
 
@@ -397,7 +397,7 @@ When the user provides an existing test cases example and/or asks for "similar" 
 
 ## Example interactions
 
-### Example 1
+### Example 1 — terminal (no checkbox Ask tool)
 
 **User:** "generate test cases for feature X"
 
@@ -416,11 +416,11 @@ When the user provides an existing test cases example and/or asks for "similar" 
 7. On approval, generate detailed test cases for feature X and save to `feature-x.test.md`
 8. Suggest user to upload generated test cases to Testomat.io via `sync-test-cases-with-tms` skill
 
-### Example 2
+### Example 2 — Web UI (checkbox Ask tool)
 
 **User:** "generate checklist for feature X"
 
-**You (AI agent, Claude, Cursor, etc.):**
+**You (AI agent in a UI with a checkbox Ask tool, e.g. Testeiya):**
 
 1. Gather information about feature X
    - analyze all available sources
@@ -430,7 +430,6 @@ When the user provides an existing test cases example and/or asks for "similar" 
 3. Ask for coverage scope (🚀 smoke, ⚖️ balanced, 🧨 exhaustive, or ✏️ other)
 4. Ask for generation role (default, optimist, drama-queen, etc.)
 5. Generate hierarchical structured checklist for feature X
-6. Display checklist in terminal and ask for user approval
-   - ask if user wants to proceed
+6. Present the checklist as **checkboxes** (recommended items pre-checked) and let the user tick which tests to generate
    - ask about amount of cases / level of details (more, less, keep as is)
 7. Suggest user to upload generated checklist to Testomat.io via `sync-test-cases-with-tms` skill
