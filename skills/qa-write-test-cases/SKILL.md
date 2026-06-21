@@ -371,7 +371,7 @@ Checklist should have hierarchical and categorized structure.
 - Use `<!-- suite ... -->` and `<!-- test ... -->` blocks to wrap test cases.
 - If required, put `tags:` and `labels:` inside **each** `<!-- test ... -->` metadata block (see [test metadata](./references/test-case-format.md#test-metadata)). Not only on the suite block.
 - Try to reuse existing tags and labels obtained by MCP or from other test cases. 
-- Variables and placeholders always must be formatted as `${variable}` or `${placeholder}` (use backticks).
+- Use concrete, executable values by default — do NOT introduce `${...}` placeholders in first-pass generation. Only parametrize a value when it is genuinely reused or data-driven; if you do, format it as `${variable}` or `${placeholder}` (use backticks).
 - Do not use labels if you are not aware of any existing ones.
 - If reasonable, add test metadata like priority, preconditions, test data, labels, tags based on analyzed information and context.
 - **IMPORTANT: NEVER GENERATE test or suite IDs of ANY kind**:

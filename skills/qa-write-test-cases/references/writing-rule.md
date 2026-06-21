@@ -105,12 +105,13 @@ Each step must be simple sentences.
 Avoid using commas, sub-sentences.
 Steps are mechanical: click, send, read, assert.
 Each step must include exact instructions
-Prefer placeholder variable names like `${domain}` or `${company-title}` over specific values.
+Prefer concrete, realistic values a tester can act on directly. Do NOT parametrize by default — first-pass test cases should read as executable manual steps, not templates.
+Use a placeholder variable like `${domain}` only when the value is genuinely reused across steps or is data-driven (see the Examples section in the format reference). A plain UI/API acceptance step needs concrete values, not placeholders.
 Do not add as placeholders data which is not specifically related to test. 
 Do not add preconditions as placeholders.
 Prefer using URL paths over full urls If its url path, e.g. `/auth/login`.
 Use specific values when they are important for the scenario (e.g. boundary values, format validation, locale-specific input).
-Avoid vague qualifiers like "small", "known", "around", "e.g.", "like", "(…)"; replace them with concrete placeholders or, when required, literal values.
+Avoid vague qualifiers like "small", "known", "around", "e.g.", "like", "(…)"; replace them with concrete, literal values.
 Avoid general statements in steps. Move general statements to the description.
 Do not chain multiple distinct actions or use unnecessary And / Or combinations in a single sequence.
 All step actions must be clear to perform via PUBLIC API or UI
