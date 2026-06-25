@@ -153,4 +153,4 @@ The review succeeds when:
 
 ## Examples
 
-See `./references/static_requirements_review.md` for a fully worked example with input (flawed draft BRD) and the corresponding review output.
+See `./references/requirements_review.md` for a fully worked example with input (flawed draft BRD) and the corresponding review output.
