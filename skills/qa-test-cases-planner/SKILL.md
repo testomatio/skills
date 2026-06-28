@@ -24,6 +24,11 @@ Trigger this skill when the user:
 - Needs to **structure** testing approach before implementation.outline
 - Wants to **review and select** which scenarios to cover.
 
+### Prerequisites
+
+- You already checked the project structure and identified what is in this folder (source code, e2e tests, test cases) using `/scan-automation-project` skill
+- You pulled existing Testomat.io tests using `/sync-test-cases-with-tms` skill if available
+
 ## Workflow
 
 **This skill follows an iterative approach. Don't omit steps and strictly ask for user approval/feedback before proceeding to the next step.**
@@ -54,6 +59,24 @@ Ask clarifying questions if you have some gaps after analyzing input data:
 - What is the feature/functionality being tested?
 - What are the key user flows?
 - Are there any specific areas of concern?
+
+#### Testomat.io TMS Detection
+
+**Option 1: Using MCP:**
+
+Check if `testomatio` MCP available. If available, gather:
+- `suites_list`, `suites_search` to understand existing structure
+- `tests_search`, `tests_list` to find existing tests and avoid duplicates
+- `tags_list`, `labels_list` to understand project conventions
+
+**Option 2: Using `sync-test-cases-with-tms` skill:**
+
+Use `sync-test-cases-with-tms` skill with `pull` action to download existing tests and analyze:
+- Existing structure and suites
+- Current test cases (to avoid duplicates)
+- Project conventions (tags, labels, priority levels)
+
+Notify user about existing cases which intersect with the feature/functionality being tested.
 
 #### Information Sources
 
