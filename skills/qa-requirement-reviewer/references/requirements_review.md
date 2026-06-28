@@ -94,9 +94,9 @@ As a user, I want to export search results to PDF so I can share them with other
 
 | Requirement | Issue Type   | Finding | Question / Recommendation |
 | ----------- | ------------ | ------- | ------------------------- |
-| US1         | Completeness | No empty-state behavior defined | What should the user see when search returns zero results? |
-| US2         | Completeness | No error-state behavior defined | How are invalid filter values handled? |
-| US3         | Clarity      | Export scope and format not fully specified | Should export include current page or full result set? |
+| US1         | Completeness | 1. No empty-state behavior defined | 1. What should the user see when search returns zero results? |
+| US2         | Completeness | 1. No error-state behavior defined | 1. How are invalid filter values handled? |
+| US3         | Clarity      | 1. Export scope and format not fully specified | 1. Should export include current page or full result set? |
 
 ### Ambiguities & Open Questions
 

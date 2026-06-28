@@ -103,6 +103,8 @@ Use this exact structure:
 | R1          | Completeness | ...     | ...                       |
 | R2          | Clarity      | ...     | ...                       |
 
+(**Consolidation "Key Findings" table rule:** When multiple findings share the same "Issue Type" for one requirement, use numbered lists within Finding and Question/Recommendation columns to match issues by number (e.g., `1. Finding 1 2. Finding 2 | 1. Question 1 2. Question 2`). This avoids duplicate rows and keeps the table compact while preserving 1:1 correspondence)
+
 ### Ambiguities & Open Questions
 
 * ...
