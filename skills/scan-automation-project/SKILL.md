@@ -54,29 +54,30 @@ Where is the source code?
 ```
 [Waits for the user's reply.]
 
-- If user provides `Git repo` or `another folder` variant => clone or symlink it into `.testclaw/code/` (see the rule below). No-op if it's already there.
+- If user provides `Git repo` or `another folder` variant => clone or symlink it into `.testeiya/code/` (see the rule below). No-op if it's already there.
 
-#### Rule for pulled data — `.testclaw/`
+#### Rule for pulled data
 
-Detect if we are inside a git repo, skip this rule if not.
-In this case we must be strict about additional data we need to collect.
-It is highly recommended to pull all required data into `.testclaw/` by any testomatio skill.
+**When you need to pull external data** (manual test cases, app code, e2e tests from another repo) into this project:
 
-1. First, see what's already in the current folder.
-2. If you need data that isn't here — manual test cases, the application code, files for requirements, e2e tests, a repo to clone — pull it into `.testclaw/` (gitignored). **Never** pull it into current workspace folder
-3. If the data is already in the repo, use it where it is — you don't need `.testclaw/` for that.
+| This project has | Store pulled data in | Gitignored? |
+| ------------------ | ---------------------- | ----------- |
+| **Source code** (`src/` folder) or **big project** | `.testeiya/…` | **Yes** |
+| **Only test infrastructure** (e2e dirs like `tests/`, `playwright/`, `cypress/` but no `src/`) | `manual-tests/` or `e2e-tests/` | No |
+| **Empty / manual-only** | `manual-tests/` | No |
 
-| When you run inside…    | What you'd pull in…  | Goes in…                          |
-| ----------------------- | -------------------- | --------------------------------- |
-| a source-code repo      | manual test cases    | `.testclaw/manual-tests/` |
-| a manual-tests repo     | the application code | `.testclaw/code/`         |
-| (e2e tests in own repo) | the e2e tests        | `.testclaw/e2e-tests/`    |
+**Detection logic:**
+1. Has `src/` folder or is a monorepo? → Use `.testeiya/`
+2. Has e2e test dirs (`tests/`, `playwright/`, `cypress/`, `e2e/`)? → Use tracked folder (`manual-tests/`, `e2e-tests/`)
+3. Otherwise → Default to `manual-tests/`
 
-Any skill that creates `.testclaw/...` must also add `.testclaw/` to the project's `.gitignore` — but only if it is not there yet. Never add it twice.
+Any skill that creates `.testeiya/...` must also add `.testeiya/` to the project's `.gitignore` — but only if it is not there yet. Never add it twice.
 
 (The rule is about *pulled* data. Output a skill *produces* and the user wants — a `coverage.*.yml`, new `*.test.md` files — goes in the repo as normal.)
 
-On a source repo with no manual tests, `scan-automation-project` changes no tracked file: it only creates the gitignored `.testclaw/` directory and, if needed, adds one line to `.gitignore`.
+On a source repo with no manual tests, `scan-automation-project` changes no tracked file: it only creates the gitignored `.testeiya/` directory and, if needed, adds one line to `.gitignore`.
+
+**Only touch `.testeiya/` and tracked folders — never pollute repo with cache in wrong location.**
 
 ---
 
@@ -99,8 +100,8 @@ Exclude:
 - Dependencies (e.g. `node_modules/`, `vendor/`, `.venv/`).
 - Build/generated output (e.g. `dist/`, `build/`, `.next/`, `target/`).
 - Coverage, reports, caches, config, lock, and environment files.
-- Ignored paths from `.gitignore` — but **not** `.testclaw/code/`. In a manual-tests repo the app code lives there, so scan it as source even though `.testclaw/` is gitignored.
-- TestClaw internal files (e.g. `session-factory.ts`, `system-prompt.ts`).
+- Ignored paths from `.gitignore` — but **not** `.testeiya/code/`. In a manual-tests repo the app code lives there, so scan it as source even though `.testeiya/` is gitignored.
+- Testeiya internal files (e.g. `session-factory.ts`, `system-prompt.ts`).
 [**If in doubt**, prefer excluding over including non-source files.]
 
 #### 3. Detect Tech Stack
@@ -177,7 +178,7 @@ For each detected framework:
 
 ### Manual Tests
 
-Find all `.test.md` files and parse test titles. `find .` also looks inside `.testclaw/manual-tests/`, so a re-run after a pull finds the cached cases instead of reporting "no manual tests":
+Find all `.test.md` files and parse test titles. `find .` also looks inside `.testeiya/manual-tests/`, so a re-run after a pull finds the cached cases instead of reporting "no manual tests":
 
 ```bash
 find . -name "*.test.md" -exec awk '
@@ -193,7 +194,7 @@ find . -name "*.test.md" -exec awk '
 ' {} +
 ```
 
-If the only `.test.md` files are under `.testclaw/manual-tests/`, say so in the inventory: they came from Testomat.io, not from this repo.
+If the only `.test.md` files are under `.testeiya/manual-tests/`, say so in the inventory: they came from Testomat.io, not from this repo.
 
 ---
 

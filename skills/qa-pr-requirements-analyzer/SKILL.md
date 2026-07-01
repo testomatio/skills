@@ -199,7 +199,7 @@ Stop execution if:
 | Description | File |
 |-------------|------|
 | Filled example of the output summary | [summary-example.md](./references/summary-example.md) |
-| `.testclaw/` directory convention | inherited from `project-scan` (see project-scan SKILL.md) |
+| `.testeiya/` directory convention | inherited from `project-scan` (see project-scan SKILL.md) |
 | Code-focused PR analysis (companion skill) | `../pull-request-diff-analyzer/SKILL.md` |
 | Downstream: generate test cases from requirements | `../qa-write-test-cases/SKILL.md` |
 | Downstream: sync generated cases to Testomat.io | `../sync-cases/SKILL.md` |
