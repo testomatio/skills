@@ -1,7 +1,10 @@
 ---
-name: Test Consolidation
+name: test-consolidation
 description: Detect redundant tests, duplicated test logic, semantic overlaps, and parameterization opportunities across the entire test suite. Present recommendations and request user approval before refactoring.
-required_action: true
+license: MIT
+metadata:
+  author: Testomat.io
+  version: 1.0.0
 ---
 
 ## Objective
