@@ -25,10 +25,10 @@ Trigger this skill when user wants to:
 
 Complete ALL items in order:
 
-1. [ ] **Analyze Project Architecture** => Detect framework (1.1), identify excluded paths (1.2), find reusable components (1.3).
+1. [ ] **Analyze Project Architecture** => Detect framework (1.1), identify excluded paths (1.2), find reusable components (1.3), investigate the live target page (1.4).
 2. [ ] **Understand Manual Test** => Normalize input (2.0), handle ambiguous steps (2.1), detect inconsistencies (2.2).
 3. [ ] **Write Test Code** => Implement using existing POM/patterns (3.1-3.2), add assertions (3.3), output code (3.4).
-4. [ ] **Verify & Heal** => Execute test (4.1), heal if fails - locators → timing → assertions → flow (4.2), max 3 attempts.
+4. [ ] **Verify & Heal** => Execute test (4.1); if the run is **blocked** (missing env/credentials, build/init error) stop and ask the user (4.1); heal real **failures** - locators → timing → assertions → flow (4.2), max 3 attempts.
 5. [ ] **Finalization** => Ensure structure compliance (5.1), manage test data & fixtures (5.2), run related tests and output summary (5.3 & 5.4).
 
 ### Progress
@@ -98,6 +98,15 @@ Scan the project to identify reusable components while excluding irrelevant or d
   `❓ Should any additional folders be excluded from analysis (e.g., legacy or unused code)?`
 
 > **Priority:** Always prioritize user-specified exclusions over auto-detected ones.
+
+#### 1.4 Investigate the Live Target Page
+
+**Never write UI automation from documents and code alone.** Locators invented from a manual test case, a description, or a *different* page are guesses — they will not run. Before writing selectors for a page, open that page and read its real DOM.
+
+- **If a browser tool is available** (Playwright MCP, `playwright-cli`, or the host's browser skill) => open the exact page/feature under test, walk the flow the manual case describes, and read the **real** selectors, texts, and URLs from the live DOM.
+- **Confirm the feature is where you think it is** before targeting it — e.g. a "Defects board" is its own page, not the Analytics page. Open it and verify; do not reuse a neighbouring page's objects by assumption.
+- Prefer selectors the page actually exposes (`data-testid`, roles, stable `aria-*`) taken from the live DOM over anything inferred.
+- **If no browser tool is available** => say so explicitly, base locators strictly on **existing** Page Objects / tests in the repo, and mark every unverified selector with ⚠️ so the user knows it was not confirmed against the running app.
 
 #### Summary (Log) of Step 1
 
@@ -213,6 +222,7 @@ Select the simplest implementation that aligns with the existing project archite
 **Do NOT:**
 - Ignore existing Page Objects.
 - Duplicate selectors or logic.
+- Invent selectors from manual steps, descriptions, or a different page — use the Page Objects or the live DOM you inspected in Step 1.4. Any selector not confirmed against the running app must be marked ⚠️.
 
 #### 3.2 Follow Framework Patterns
 
@@ -256,13 +266,18 @@ Verify the generated test by executing it and fixing issues if needed.
 
 #### 4.1 Execute Test
 
+**You MUST run the test you wrote — writing code is not "done".** A test that was never executed cannot be reported as implemented, working, passing, or complete.
+
+**Preflight — required environment:** before running, check the credentials/env vars the project needs to execute (from Step 1.2: base URLs, auth tokens, `.env` keys). If a required value is missing, do **not** run-and-shrug — go straight to the ⛔ Blocked path below and ask the user.
+
 **Standard execution:**
 - Run **only the generated test**, not the full test suite.
 - Use the project’s **test execution command** (`npx playwright test`, `npx codeceptjs run`, etc.).
 
-**Result:**
-- If test **passes** → proceed to Step 5  
-- If test **fails** → start healing (4.2)  
+**Classify the outcome — three states, not two:**
+- ✅ **Passed** — a scenario actually executed and its assertions held → proceed to Step 5.
+- ❌ **Failed** — the test ran but an assertion or app behaviour broke → start healing (4.2).
+- ⛔ **Blocked** — the run never reached your test (missing env var/credential, build/compile/init error, app unreachable). This is **not** a pass and **not** a locator/timing issue to heal. **STOP and ask the user** for the missing piece (see Error Handling → Blocker), then rerun. Report it as the **headline**, never as a footnote under a "done" summary.
 
 > ⚠️ **Do NOT run all tests**. Limit execution to the generated test to avoid excessive logs and noise.
 
@@ -362,6 +377,10 @@ Output structured summary (see [Final Summary Template](./references/FINAL_SUMMA
 
 ### Blocker
 
+* **Missing credentials / environment required to run** (a needed env var, API token, or secret is not set)
+  - You **cannot** invent or assume a credential — STOP and ask the user for it:
+    `❓ The test can't run because \`<ENV_VAR>\` is missing. Please provide it (or add it to the project env), then I'll rerun the affected scenario.`
+  - Do **not** continue to Step 5, and do **not** claim the test is implemented/working, while the run is blocked. A blocked run is reported as blocked — as the headline, not a footnote.
 * **Test Execution Problems**
   - If no option to execute test after 3 attempt => Stop and catch the error.
 
@@ -388,9 +407,10 @@ or
 
 ### Interaction Principles
 
-- Minimize interruptions — prefer assumptions over questions.
+- Minimize interruptions **for minor ambiguities** — prefer a ⚠️-marked assumption over a question.
+- **Never assume a blocker away.** A missing credential/env var, or anything that stops the test from running, is not something to assume — STOP and ask (see Blocker). You cannot fabricate a secret.
 - Clearly mark assumptions with ⚠️.
-- Continue execution whenever possible.
+- Continue execution whenever possible — **except** when a blocker requires user input.
 
 ---
 
@@ -406,13 +426,11 @@ User: Convert this manual test to Playwright:
 3. Enter password: secret
 4. Click login button"
 
-Agent: Got it! Detected Playwright project.
-Agent: Creating test using existing LoginPage...
-Agent: ✅ Test created: tests/e2e/login.spec.ts
-Agent: Verify test code...
-Agent: ✅ Test passed!
-Agent: Refactoring to match project standards...
-Agent: ✅ All done!
+Agent: Detected Playwright project. Found existing LoginPage.
+Agent: Opening /login in the browser to confirm the real selectors...
+Agent: Writing test with LoginPage + verified selectors → tests/e2e/login.spec.ts
+Agent: Running it: npx playwright test tests/e2e/login.spec.ts
+Agent: ✅ Ran and passed (1 scenario). Summary below.
 ```
 
 ### Basic Conversion by Comments in File
@@ -446,6 +464,19 @@ Agent: Couldn't detect automation framework in your project.
 4. Other (specify)
 ```
 
+### Blocked by a Missing Credential
+
+```
+User: Automate the checkout manual cases.
+
+Agent: Detected CodeceptJS. Opened the checkout page in the browser and confirmed selectors.
+Agent: Wrote 4 scenarios reusing the project's page objects → tests/checkout/checkout.test.ts
+Agent: Running: npx codeceptjs run tests/checkout/checkout.test.ts --steps
+Agent: ⛔ The run stopped before any test executed — a required auth token env var is missing.
+❓ I can't verify these tests until that token is set. Please provide the missing env var
+   (or add it to the project env) and I'll rerun the scenarios. Not reporting this as done yet.
+```
+
 ---
 
 ## Quick Reference
@@ -453,8 +484,11 @@ Agent: Couldn't detect automation framework in your project.
 | Action | Command/Tip |
 |--------|-------------|
 | Ask for clarification | Use ❓ emoji |
+| Before writing selectors | Open the target page live and read the real DOM (Step 1.4) — never invent them |
 | Simple start | Keep draft minimal first |
 | Reuse components | Check for existing POMs |
+| Missing token/env to run | STOP and ask the user — never assume a credential |
+| Blocked run (didn't execute) | Not a pass, not "done" — report it as the headline |
 | Rollback if stuck | Keep working version |
 | Final verification | Run related suite only |
 | Execute single Playwright test | `npx playwright test path/to/spec.ts` |
