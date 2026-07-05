@@ -28,8 +28,10 @@ Complete ALL items in order:
 1. [ ] **Analyze Project Architecture** => Detect framework (1.1), identify excluded paths (1.2), find reusable components (1.3).
 2. [ ] **Understand Manual Test** => Normalize input (2.0), handle ambiguous steps (2.1), detect inconsistencies (2.2).
 3. [ ] **Write Test Code** => Implement using existing POM/patterns (3.1-3.2), add assertions (3.3), output code (3.4).
-4. [ ] **Verify & Heal** => Execute test (4.1), heal if fails - locators → timing → assertions → flow (4.2), max 3 attempts.
+4. [ ] **Verify & Heal** => Check run prerequisites (4.0), execute test (4.1), heal if fails - locators → timing → assertions → flow (4.2), max 3 attempts.
 5. [ ] **Finalization** => Ensure structure compliance (5.1), manage test data & fixtures (5.2), run related tests and output summary (5.3 & 5.4).
+
+> 🚦 **Completion gate:** never report the task **done** — and never present a "generated" or "coverage" summary as complete — unless **every generated test was actually executed and passed**. Code that only compiles or type-checks is **not** done. If a test could not be run (missing env var, credentials, service, or config), the status is **⛔ BLOCKED**, not done: say so at the **top** of your reply, name exactly what is missing, and do not imply the tests work.
 
 ### Progress
 * STEP: 1/5 (Analyze Project Architecture)
@@ -254,6 +256,16 @@ Avoid:
 
 Verify the generated test by executing it and fixing issues if needed.
 
+> ❗ **Execution is mandatory, not optional.** You have not finished this skill until the generated test has actually run. Do not stop at "code written" or "type-checks pass".
+
+#### 4.0 Check Run Prerequisites (before executing)
+
+Confirm the test can actually start in this environment — do this **early** (ideally right after Step 1) so blockers surface before you write a full suite, not after.
+
+- Read `.env.example` / `.env`, `codecept.conf.*` / `playwright.config.*`, and any global setup for the **required env vars, tokens, and credentials**.
+- Confirm the base URL / service the tests hit is reachable.
+- If a required value is missing, that is a **⛔ BLOCKED** prerequisite (see Error Handling) — surface it now with the exact variable name; do not defer it to a footnote.
+
 #### 4.1 Execute Test
 
 **Standard execution:**
@@ -263,6 +275,7 @@ Verify the generated test by executing it and fixing issues if needed.
 **Result:**
 - If test **passes** → proceed to Step 5  
 - If test **fails** → start healing (4.2)  
+- If the framework **cannot start** (missing env var, failed module include, unreachable service) → this is **⛔ BLOCKED**, not a test failure and not done. Do not heal locators/timing — stop and report the blocker (see Error Handling).
 
 > ⚠️ **Do NOT run all tests**. Limit execution to the generated test to avoid excessive logs and noise.
 
@@ -364,6 +377,12 @@ Output structured summary (see [Final Summary Template](./references/FINAL_SUMMA
 
 * **Test Execution Problems**
   - If no option to execute test after 3 attempt => Stop and catch the error.
+
+* **Cannot run at all (environment / prerequisites)**
+  - A missing env var / token / credential, a framework bootstrap failure, or an unreachable service means the test **never executed**.
+  - Report status **⛔ BLOCKED** at the **top** of the summary — not as a footnote after a "done" table.
+  - State the **exact** missing prerequisite (e.g. the env var name) and how to provide it.
+  - Do **not** claim the tests pass, are "implemented", or present completed coverage — they are unverified until they run.
 
 ---
 
