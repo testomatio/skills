@@ -1,6 +1,6 @@
 ---
-name: qa-plan-test-cases
-description: Generate a structured checklist of test case titles for further test case description development. Use this skill when the user wants to plan/structure test cases before writing detailed test case descriptions. This skill analyzes requirements, determines coverage scope, applies testing roles, and produces a categorized checklist of test case titles. The output is used as input for a subsequent test case description generation step.
+name: qa-generate-checklist
+description: Generate a structured checklist of test case titles organized by feature, functionality, user flow, or logical section for further test case description development. Use this skill when the user wants to plan/structure test cases coverage before writing detailed test case descriptions. This skill analyzes requirements, determines coverage scope, applies testing roles, and produces a categorized, hierarchical checklist of test case titles. The output is used as input for a subsequent test case description generation step.
 license: MIT
 metadata:
   author: Testomat.io
@@ -9,20 +9,21 @@ metadata:
 
 # QA-PLAN-TEST-CASES SKILL: What I do
 
-This skill generates a structured **checklist of test case titles** that serves as the planning artifact for subsequent test case description development.
+This skill generates a structured list of test case titles organized by feature, functionality, user flow, or logical section.
 
-**What this skill produces:** A categorized, hierarchical checklist where each leaf item is a test case title separate by tested feature/functionality flow/logical section.
+**Output:** A categorized, hierarchical **test case checklist** for planning test coverage.
 
-**What this skill does NOT produce:** Detailed test case descriptions (steps, preconditions, expected results). That is handled by a separate "generate test case descriptions" step after approving check list.
+**Does not include:** Detailed test case descriptions such as preconditions, test steps, expected results, or test data.
 
 ## When to Use
 
 Trigger this skill when the user:
+- Wants a **checklist** for testing a feature or product.
+- Wants a **test outline** or **test case titles** (not full test cases) for further test planning.
 - Wants to **plan** test cases before writing detailed descriptions.
-- User **Asks** to `plan test cases for feature X` based on the requirememnts, design, feature description, etc.
-- Wants a **checklist** or **test outline** or **test case titles** (not full test cases) for further testing.
-- Needs to **structure** testing approach before implementation.outline
-- Wants to **review and select** which scenarios to cover.
+- User **Asks** to `plan test case list for feature X` based on the requirememnts, design, feature description, etc.
+- Needs to **structure** testing approach before implementation.
+- Wants to get a checklist for **review and select** which scenarios to cover.
 
 ### Prerequisites
 
@@ -33,12 +34,16 @@ Trigger this skill when the user:
 
 **This skill follows an iterative approach. Don't omit steps and strictly ask for user approval/feedback before proceeding to the next step.**
 
+**When available use Ask tool when asking user for input with choices.**
+
+**Ask user for clarification if you are not sure about something, don't suggest.**
+
 ### Workflow Steps
 
-1. **Gather context and goals** — Understand what you're testing and show sources.
-2. **Ask for coverage scope** — 🚀 smoke, ⚖️ balanced, 🧨 exhaustive, or ✏️ other.
-3. **Ask user to choose role** — default, optimist, nerd, psycho, pentest, picasso, lawyer, polyglot, performance.
-4. **Generate checklist** — Create categorized checklist of test case titles.
+1. **Gather context and goals** -Understand what you're testing, what artifacts are provided, what the user wants to achieve.Then **show sources** (briefly, no details) from which you gathered the information. **Ask user** if he wants to add or change anything. Go to step 2 only after approval.
+2. **Ask for coverage scope** — Ask the user how much coverage they want: 🚀 smoke, ⚖️ balanced, 🧨 exhaustive, or ✏️ other. Go to step 3 only after approval.
+3. **Ask user to choose role** - Skipped if user picked "Smoke" in Step 2 (auto-applies ⚙️ default). Otherwise, **ask if user wants to enable a specific role** (refer to [roles](#roles)) or just proceed with the default one. Show each role name and short description thus user can make proper decision. Go to step 4 only after approval.
+4. **Generate checklist** - Generate a categorized structured checklist. If a multi-select / checkbox Ask tool is available, present the checklist items as **checkboxes** (recommended items pre-checked) and let the user **select which tests to generate**; otherwise show the markdown checklist and ask the user to add/remove/change anything or proceed. **Wait for the user's selection/approval** before going to step 5.
 5. **Return checklist** — Output the checklist for the next step (test case description generation).
 
 ---
@@ -76,7 +81,7 @@ Use `sync-test-cases-with-tms` skill with `pull` action to download existing tes
 - Current test cases (to avoid duplicates)
 - Project conventions (tags, labels, priority levels)
 
-Notify user about existing cases which intersect with the feature/functionality being tested.
+> Notify user about existing cases which intersect with the feature/functionality being tested.
 
 #### Information Sources
 
@@ -98,12 +103,14 @@ Gather all information about the feature from **only the sources you have access
 - Search for test-related directories: `manual-tests`, `tests`, `manual`, `qa`, `spec`.
 - Look for Markdown-based test files (`.test.md` or `.md`).
 
-If **unclear** state => ask user to clarify what they want.
-If **not enough information** => ask user to provide more information.
+This information could be available as text files (copy-pasted), via links or via MCP tools. Use MCP when required and reasonable. Ask user for mcp configuration if needed.
+
+If **unclear** state => Ask user to clarify what they want.
+If **not enough information** => Ask user to provide more information.
 
 ### Step 1.1: Show Gathered Context
 
-**Show list of sources** (not full content, just list of sources) and ask user if they want to add/remove/modify anything.
+**Show list of sources, you've gathered information from (not full content, just list of sources), to the user and ask user if he wants to add/remove/modify anything.**
 
 Example:
 
@@ -120,17 +127,19 @@ I've gathered information from the following sources:
 2. ✏️ Type changes
 ```
 
-You must also look for existing test cases to avoid duplicating. Report this to user and suggest expanding them or creating a new suite.
+You must also look for existing test cases to avoid duplicating test cases. If existing test cases found report this to user and suggest expanding them or creating a new suite.
 
 [Wait for user approval before proceeding to Step 2.]
 
 ### Step 2: Ask for Coverage Size
 
-**Ask the user how much coverage they want.** This sets the size of the checklist generated in Step 4.
+**Ask the user how much coverage they want.** This sets the size of the checklist generated in Step 4. The user can still fine-tune up/down in Step 4.1 after seeing the result.
 
 Use exact values: 🚀 **Smoke**, ⚖️ **Balanced**, 🧨 **Exhaustive**, ✏️ **Other**.
 
-**Compute approximate test counts per tier** from your Step 1 analysis. Do not use generic or hardcoded ranges.
+**Compute approximate test counts per tier from your Step 1 analysis**. **Do not use generic or hardcoded ranges** — the numbers shown to the user must reflect the specific feature(s) under test and the context.
+
+Show the question with your computed estimates. Put each option on its own block: the **bold label with the test count on the first line**, and the description indented on the next line. Example (replace `<N>` with your actual estimates for this feature):
 
 ```markdown
 ❓ **How much coverage do you want?**
@@ -148,7 +157,11 @@ Full coverage incl. error states, boundaries, and security/perf/i18n where relev
 Proceed to specific role selection, type a number of tests, or describe scope in your own words
 ```
 
-If user picks **✏️ Other**, accept either a number (e.g. "around 10") or a free-form description.
+Keep each description easy to read and understand.
+
+If you can't reasonably estimate (e.g. feature is too vague or context too thin), say so and either omit the numbers or go back to Step 1 for more info.
+
+If the user picks **✏️ Other**, accept either a number (e.g. "around 10") or a free-form description (e.g. "just the API contract, no UI"), and use it to size the checklist.
 
 [Wait for user approval before proceeding to Step 3.]
 
@@ -157,10 +170,10 @@ If user picks **✏️ Other**, accept either a number (e.g. "around 10") or a f
 Check condition and select next step accordingly:
 
 **If user picked "smoke" scope in Step 2:**
-- **skip this step**, auto-apply "⚙️ default" role and go straight to Step 4
+- **skip this step**, auto-apply the "⚙️ default" role and **go straight to Step 4** without asking for role. A smoke suite is too small to benefit from a specialized role.
 
-**If user picked "balanced", "exhaustive" or "other" scope in Step 2:**
-- **show the roles names and short description as markdown table** and let user choose
+**If the user picked "balanced", "exhaustive" or "other" scope in Step 2:**
+- **show the roles names and short description (as markdown table) and let user choose** the default one or the specific one. And ask user if he wants to select any specific role.
 
 ##### Roles
 
@@ -177,7 +190,16 @@ Check condition and select next step accordingly:
 | **📈 performance** | **performance**, load, stress, etc.      |
 | 🔧 other           | **specify your own role**                |
 
-Ask user to choose a role. If user does not specify, use **⚙️ default**. If user selects "🔧 other", ask them to define a custom role.
+#### Role Selection
+
+Ask the user to choose a testing role:
+
+1. Show the available roles as a table.
+2. Ask the user to select one role:
+  - If the user does not specify, use **⚙️ default**.
+  - If the user selects "🔧 other", ask them to define a custom role.
+
+Better to give user **select options**. Also propose recommended role based on context.
 
 Example:
 
@@ -188,6 +210,8 @@ Example:
 2. ☰ Show all available roles
 3. ✏️ Type role name
 ```
+
+Choose **default** in case user does not specify role.
 
 [Wait for user approval before proceeding to Step 4.]
 
@@ -202,10 +226,12 @@ Example:
 
 ```markdown
 ## Signup Flow
-- Signup with valid email address
-- Signup with valid phone number
-- Signup with existing email (negative)
-- Signup with invalid email format (negative)
+- Signup by email address
+  -- Signup with valid email address
+  -- Signup with existing email (negative)
+  -- Signup with invalid email format (negative)
+- Signup by valid phone number
+- Signup by Google account
 
 ## Login Flow
 - Login with valid email credentials
@@ -225,7 +251,17 @@ Example:
 
 ### Step 4.1: Wait for Approval
 
-**Ask about amount of cases / level of details:**
+**Show the checklist and ask if checklist is good or user wants to modify it.**
+
+**IMPORTANT: Ask about amount of cases / level of details** regarding the result user sees now. **Give user the choice:** 1. Keep as is, 2. More details, 3. Less details.  
+In case user wants more details, enable **nerd role**.
+
+**Wait for user approval**.
+If user modifies checklist => go to step 4.
+If user not satisfied with result => go to step 1 and ask for more details about feature(s) under test or testing type, role, etc.
+If user approves checklist => go to step 5.
+
+Example:
 
 ```
 ❓ Do you want to:
@@ -235,8 +271,6 @@ Example:
 3. ➕ More details
 4. ✏️ Type anything you want to change
 ```
-
-In case user wants more details, enable **nerd role**.
 
 [Wait for user approval.]
 
@@ -253,13 +287,13 @@ Once the checklist is approved, **return the final checklist** in a structured f
 **Role:** [Role Name]
 **Total test cases:** <N>
 
-## Checklist
+# Checklist
 
 <!-- checklist -->
-- Category/Group 1
-  - Test case title 1
-  - Test case title 2
-- Category/Group 2
+## Category/Group 1
+- Test case title 1
+- Test case title 2
+## Category/Group 2
   - Test case title 3
   - Test case title 4
 <!-- /checklist -->
