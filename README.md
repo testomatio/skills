@@ -31,12 +31,14 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 | Skill                  | Description                                                                                          |
 | ---------------------- | ---------------------------------------------------------------------------------------------------- |
 | `qa-write-test-cases`       | Generate test cases and checklists from requirements, tickets, or feature descriptions               |
+| `qa-thinking`          | Analyze a feature from a QA perspective — edge cases, negative flows, abuses, unobvious scenarios — and propose acceptance criteria |
 | `improve-test-cases`   | Analyze and improve existing markdown test cases for clarity                                         |
 | `detect-duplicate-test-cases` | Find duplicate, near-duplicate, and overlapping test cases                                           |
 | `sync-test-cases-with-tms`           | Synchronize Markdown test scenarios between local project and Testomat.io                            |
 | `qa-manual-tests-to-code-coverage`      | Map manual test cases to source files; generate `coverage.manual.yml` for affected-only runs         |
 | `e2e-test-coverage-mapping`  | Map e2e tests to source files; generate `coverage.e2e.yml` to run only the tests affected by a diff  |
-| `senior-qa-testing-workflow`      | Orchestrate complete test case lifecycle: generate, improve, analyze coverage, upload to TMS         |
+| `testing-workflow`      | Tactical orchestrator of the test case lifecycle: generate, improve, analyze coverage, upload to TMS |
+| `qa-lead-strategy-advisor`         | Strategic QA advisor: interview & scan to build context, assess QA maturity, deliver a prioritized roadmap, and delegate execution to `testing-workflow` |
 | `scan-automation-project` | Scan project source code to inventory languages, frameworks, and existing tests |
 
 ### Automation
@@ -92,11 +94,25 @@ testomatio/skills
     ├── test-automation/
     │   └── skills/
     │       └── [symlinks to ../../skills/*]
+    ├── qa-process/
+    │   └── skills/
+    │       └── [symlinks to ../../skills/*]
     ├── explorbot/
     │   └── skills/
     │       └── [symlinks to ../../skills/*]
     └── ...
 ```
+
+## Claude Code Plugins
+
+Skills are also bundled as [Claude Code plugins](https://docs.testomat.io) via the `testomatio-plugins` marketplace:
+
+| Plugin            | Bundled skills                                                       | Use it to                                                                       |
+| ----------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `qa-process`      | `qa-lead-strategy-advisor`, `qa-thinking`, `testing-workflow`        | Assess QA maturity, prioritize a quality roadmap, and orchestrate the test lifecycle |
+| `test-management` | `qa-write-test-cases`, `improve-test-cases`, `sync-test-cases-with-tms`, coverage & more | Manage the test case lifecycle: generate, improve, sync to Testomat.io          |
+| `test-automation` | `automate-manual-test-cases`, `debug-fix-failed-flaky-autotests`     | Create automated tests and heal failing/flaky autotests                         |
+| `explorbot`       | `explorbot-setup`, `explorbot-fundamentals`, `explorbot-plan`        | Install, configure, run, debug and plan Explorbot autonomous AI web tests       |
 
 ## Links
 

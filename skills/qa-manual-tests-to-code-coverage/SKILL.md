@@ -29,7 +29,7 @@ This skill works **only with manual tests in markdown format**.
 
 - **DO NOT** process unit, functional, or e2e test files.
 - **DO NOT** suggest creating new automated tests.
-- **Only touch two files in this repo.** This skill runs inside the user's source-code repo. It may write `coverage.manual.yml` (or the path the user gave) and add one `.testclaw/` line to `.gitignore` if it is missing. Nothing else — never a source file. Cases pulled from Testomat.io go into the gitignored `.testclaw/manual-tests/`, never into a tracked folder (see Step 1).
+- **Only touch two files in this repo.** This skill runs inside the user's source-code repo. It may write `coverage.manual.yml` (or the path the user gave) and add one `.testeiya/` line to `.gitignore` if it is missing. Nothing else — never a source file. Cases pulled from Testomat.io go into the gitignored `.testeiya/manual-tests/`, never into a tracked folder (see Step 1).
 - **Don't write scripts. Never use Python.** Read `.test.md` files with your file tool; pull out IDs and tags with `grep` (Step 2). To check the finished coverage file, pipe it through `js-yaml` into the one tiny bundled helper: `npx js-yaml coverage.manual.yml | node scripts/check-coverage.mjs` (Step 5). If more checks needed use custom script with `npx js-yaml`.
 
 If automated test files (e.g. e2e test, unit, api)  are encountered while exploring, ignore them and continue with the manual markdown set.
@@ -49,7 +49,7 @@ From the `scan-automation-project` result, capture:
 
 If `scan-automation-project` reports **no manual tests** (it checks the cache too, so this means nothing was pulled before):
 - ❓ Ask the user how to proceed:
-  1. Pull cases from Testomat.io — have **`sync-test-cases-with-tms`** pull into the gitignored cache: `npx check-tests pull -d .testclaw/manual-tests`, then add `.testclaw/` to `.gitignore` if missing. Re-run `scan-automation-project` and continue.
+  1. Pull cases from Testomat.io — have **`sync-test-cases-with-tms`** pull into the gitignored cache: `npx check-tests pull -d .testeiya/manual-tests`, then add `.testeiya/` to `.gitignore` if missing. Re-run `scan-automation-project` and continue.
   2. Point to a directory the scan missed (then re-run `scan-automation-project` there).
   3. Stop.
 
@@ -64,7 +64,7 @@ Each manual test markdown file follows the format described in [Classical Tests 
 - **Tags** — `@tag` markers in suite/test titles and `tags:` lines inside the metadata blocks.
 - **Context** — suite title, test titles, steps, and expected results — used to reason about which source files implement each behavior.
 
-**How to extract.** Read the `.test.md` files — the metadata blocks are short. For a quick overview, `grep` instead of a parser. Run these in whichever directory holds the cases (`manual-tests/`, or the cache `.testclaw/manual-tests/`):
+**How to extract.** Read the `.test.md` files — the metadata blocks are short. For a quick overview, `grep` instead of a parser. Run these in whichever directory holds the cases (`manual-tests/`, or the cache `.testeiya/manual-tests/`):
 
 ```bash
 grep -rnE 'id:[[:space:]]*@S' <dir>      # suite IDs (+ which file)
@@ -146,7 +146,7 @@ npx js-yaml coverage.manual.yml | node scripts/check-coverage.mjs
 
 `npx js-yaml` parses the file (and fails loudly if the YAML is malformed, so a broken file never reaches the script). `check-coverage.mjs` then flags any key whose path is missing on disk, any key with no identifiers, and prints every `@S…` / `@T…` / tag it references. Check that list against the IDs you extracted in Step 2 — only you know which are real. Don't re-parse the markdown; use the set you already have. Never use `python`.
 
-> The keys in the coverage file are paths to source files in this repo, never `.testclaw/...` paths. The cache holds the test cases; the coverage file points at the code they cover.
+> The keys in the coverage file are paths to source files in this repo, never `.testeiya/...` paths. The cache holds the test cases; the coverage file points at the code they cover.
 
 Then show the produced YAML to the user.
 
@@ -171,7 +171,7 @@ TESTOMATIO_RUNGROUP="Regression 911" npx @testomatio/reporter run \
 
 Recommend committing `coverage.manual.yml` to the repository so CI and teammates use the same mapping.
 
-If you pulled the cases, tell the user they stay in the gitignored `.testclaw/manual-tests/`. A re-run or a follow-up question reuses them, and nothing was committed. Don't delete the cache or move it into a tracked folder.
+If you pulled the cases, tell the user they stay in the gitignored `.testeiya/manual-tests/`. A re-run or a follow-up question reuses them, and nothing was committed. Don't delete the cache or move it into a tracked folder.
 
 ### Step 7: Suggest follow-ups
 
@@ -179,8 +179,8 @@ Once the file is saved, propose any of:
 
 - Scan the source for **coverage gaps** (features without manual tests). On approval, propose new manual cases (delegate to `qa-write-test-cases`).
 - Scan for **dead tests** (manual tests whose features no longer exist in source).
-- Answer questions like "do we have manual tests for X?" from the cached cases in `.testclaw/manual-tests/`.
-- If the user wants to *edit* cases, they can edit them right in `.testclaw/manual-tests/` and push back with `sync-test-cases-with-tms` — gitignored doesn't mean read-only.
+- Answer questions like "do we have manual tests for X?" from the cached cases in `.testeiya/manual-tests/`.
+- If the user wants to *edit* cases, they can edit them right in `.testeiya/manual-tests/` and push back with `sync-test-cases-with-tms` — gitignored doesn't mean read-only.
 
 ---
 
@@ -207,7 +207,7 @@ It's the only script — everything else is `grep`, your file tool, or `npx js-y
 
 ### Recovery
 
-- **No manual tests found (cache included)** → have `sync-test-cases-with-tms` pull into `.testclaw/manual-tests/`, or ask the user for a directory the scan missed.
+- **No manual tests found (cache included)** → have `sync-test-cases-with-tms` pull into `.testeiya/manual-tests/`, or ask the user for a directory the scan missed.
 - **Markdown files with no `@S`/`@T` IDs** → ask whether to push first via `sync-test-cases-with-tms`, or skip those files.
 - **Ambiguous source layout** → ask the user which directories are application code.
 
@@ -225,7 +225,7 @@ It's the only script — everything else is `grep`, your file tool, or `npx js-y
 ```
 Use qa-manual-tests-to-code-coverage skill to build coverage.manual.yml for our manual cases
 ```
-If there are no local `.test.md` files, it pulls them into the gitignored `.testclaw/manual-tests/` and works from there.
+If there are no local `.test.md` files, it pulls them into the gitignored `.testeiya/manual-tests/` and works from there.
 
 **Cases already local:**
 ```
@@ -238,7 +238,7 @@ Use qa-manual-tests-to-code-coverage skill, output to ops/coverage.qa.yml
 ```
 
 **Full workflow (source repo):**
-1. `qa-manual-tests-to-code-coverage` runs `scan-automation-project`. No local cases, so it has `sync-test-cases-with-tms` pull into `.testclaw/manual-tests/` (gitignored) and re-runs `scan-automation-project`.
+1. `qa-manual-tests-to-code-coverage` runs `scan-automation-project`. No local cases, so it has `sync-test-cases-with-tms` pull into `.testeiya/manual-tests/` (gitignored) and re-runs `scan-automation-project`.
 2. It maps source files to suite/test/tag IDs and writes `coverage.manual.yml`. The only tracked changes are that file and one line in `.gitignore`.
 3. `npx @testomatio/reporter run --kind manual --filter "coverage:file=coverage.manual.yml,diff=main"` creates a pending run with only the affected cases.
 
@@ -248,6 +248,6 @@ Use qa-manual-tests-to-code-coverage skill, output to ops/coverage.qa.yml
 
 | Action                                 | Command                                                                                              |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Pull cases into the gitignored cache  | `npx check-tests pull -d .testclaw/manual-tests`                                            |
+| Pull cases into the gitignored cache  | `npx check-tests pull -d .testeiya/manual-tests`                                            |
 | Create affected manual run             | `npx @testomatio/reporter run --kind manual --filter "coverage:file=coverage.manual.yml,diff=main"`  |
 | Group runs                             | `TESTOMATIO_RUNGROUP="Regression 911" npx @testomatio/reporter run --kind manual --filter "..."`     |
