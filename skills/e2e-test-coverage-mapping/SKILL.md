@@ -30,7 +30,7 @@ This skill works **only with automated e2e tests** (Playwright, Cypress, Webdriv
 - **DO NOT** process unit tests.
 - **DO NOT** process manual markdown test cases (use `qa-manual-tests-to-code-coverage` instead - if already exists).
 - **DO NOT** suggest creating new tests.
-- **Only touch two files in this repo.** It may write `coverage.e2e.yml` (or the path the user gave) and add one `.testclaw/` line to `.gitignore` if it is missing. Nothing else — never a source or test file. If the e2e tests live in another repo, clone it into the gitignored `.testclaw/e2e-tests/`, never into a tracked folder (see Step 1).
+- **Only touch two files in this repo.** It may write `coverage.e2e.yml` (or the path the user gave) and add one `.testeiya/` line to `.gitignore` if it is missing. Nothing else — never a source or test file. If the e2e tests live in another repo, clone it into the gitignored `.testeiya/e2e-tests/`, never into a tracked folder (see Step 1).
 - **Don't write scripts. Never use Python.** Read test files with your file tool; pull out IDs and tags with `grep` (Step 3). To check the finished coverage file, pipe it through `js-yaml` into the one tiny bundled helper (symlinked from `qa-manual-tests-to-code-coverage`): `npx js-yaml coverage.e2e.yml | node scripts/check-coverage.mjs` (Step 6). That's the only script. If you ever need more than a `grep`, a one-line `node -e '…'` is the limit — never `python`, never a parser of your own.
 
 ---
@@ -46,10 +46,10 @@ From the `scan-automation-project` result, capture:
 - **Automated Tests** — the list of e2e test files (the input to Step 3).
 - **Project Overview** — languages, complexity (the framing for Step 5).
 
-If `scan-automation-project` reports **no automated tests** (it checks `.testclaw/e2e-tests/` too, so this means nothing was cloned before), or no e2e framework is detected:
+If `scan-automation-project` reports **no automated tests** (it checks `.testeiya/e2e-tests/` too, so this means nothing was cloned before), or no e2e framework is detected:
 - ❓ Ask the user to either:
   1. Give the path to the e2e tests (then re-run `scan-automation-project` there).
-  2. Give the git URL of the e2e tests repo → `git clone <url> .testclaw/e2e-tests`, add `.testclaw/` to `.gitignore` if missing, and re-run `scan-automation-project` against `.testclaw/e2e-tests`.
+  2. Give the git URL of the e2e tests repo → `git clone <url> .testeiya/e2e-tests`, add `.testeiya/` to `.gitignore` if missing, and re-run `scan-automation-project` against `.testeiya/e2e-tests`.
   3. Stop.
 
 Never clone the tests into a tracked folder in this repo.
@@ -87,7 +87,7 @@ For each test file extract:
 - **Tags** — other `@word` markers (`@smoke`, `@jira-123`, `@regression`).
 - **What is exercised** — page objects imported, routes hit, fixtures used — used to reason about which source files each test covers.
 
-**How to extract.** Read the test files, or `grep` for the IDs and tags in test/suite names. Run these in whichever directory holds the tests (`tests/e2e`, or the cache `.testclaw/e2e-tests`):
+**How to extract.** Read the test files, or `grep` for the IDs and tags in test/suite names. Run these in whichever directory holds the tests (`tests/e2e`, or the cache `.testeiya/e2e-tests`):
 
 ```bash
 grep -rnoE '@[ST][0-9a-f]{8}' <dir>             # suite/test IDs (+ which file/line)
@@ -163,7 +163,7 @@ npx js-yaml coverage.e2e.yml | node scripts/check-coverage.mjs
 
 `npx js-yaml` parses the file (and fails loudly if the YAML is malformed, so a broken file never reaches the script). `check-coverage.mjs` then flags any key whose path is missing on disk, any key with no identifiers, and prints every `@S…` / `@T…` / tag it references. Check that list against the IDs you extracted in Step 3 — only you know which are real. Don't re-parse the test files; use the set you already have. Never use `python`.
 
-> The keys in the coverage file are paths to source files in this repo, never `.testclaw/...` paths. The cache holds the cloned tests; the coverage file points at the code they exercise.
+> The keys in the coverage file are paths to source files in this repo, never `.testeiya/...` paths. The cache holds the cloned tests; the coverage file points at the code they exercise.
 
 Then show the produced YAML to the user.
 
@@ -225,7 +225,7 @@ It's the only script — everything else is `grep`, your file tool, or `npx js-y
 
 ### Recovery
 
-- **No e2e tests found (cache included)** → ask for the path, or a git URL to clone into the gitignored `.testclaw/e2e-tests/`.
+- **No e2e tests found (cache included)** → ask for the path, or a git URL to clone into the gitignored `.testeiya/e2e-tests/`.
 - **Tests have no `@S`/`@T` IDs** → instruct the user to run `npx check-tests <Framework> "<glob>" --update-ids` (cross-link `qa-e2e-tests-reporting`).
 - **Ambiguous source layout** → ask which directories are application code.
 

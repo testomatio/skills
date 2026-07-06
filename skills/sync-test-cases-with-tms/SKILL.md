@@ -76,14 +76,14 @@ Download/Retrieves test scenarios from Testomat.io and saves them as Markdown fi
 - Refactor test cases offline.
 - Export only some specific suites by id.
 
-**Where to pull:** into the gitignored cache `.testclaw/manual-tests/`, and add `.testclaw/` to the project `.gitignore` if it is not there yet. Pulled cases must never land in a tracked folder (`manual-tests/`, etc.) — that pollutes the repo. You can still edit them there and push back; being gitignored doesn't stop that. (If the repo *already* keeps its `*.test.md` files in a tracked folder, you don't need to pull at all — work with them where they are, or pass `-d <that folder>` for an in-place refresh.) This matches `scan-automation-project`, which pulls the *code* into `.testclaw/code/` when it runs inside a manual-tests repo.
+**Where to pull:** into the gitignored cache `.testeiya/manual-tests/`, and add `.testeiya/` to the project `.gitignore` if it is not there yet. Pulled cases must never land in a tracked folder (`manual-tests/`, etc.) — that pollutes the repo. You can still edit them there and push back; being gitignored doesn't stop that. (If the repo *already* keeps its `*.test.md` files in a tracked folder, you don't need to pull at all — work with them where they are, or pass `-d <that folder>` for an in-place refresh.) This matches `scan-automation-project`, which pulls the *code* into `.testeiya/code/` when it runs inside a manual-tests repo.
 
 **Pre-Pull:**
 
-- If `testDir` is specified pull tests into it. Otherwise:
-- If this workspace is empty or is for manual-tests only, test must be pulled to root
-- If this is end-to-end testing project test cases must be generated in `manual-tests` directory
-- In any other case test cases must be pulled to `.testclaw/manual-tests` (ensure `.testclaw` directory exists and git ignored)
+- If `testDir` input is provided or user specifies `-d <path>` in command, use that path instead. Otherwise:
+  - If this workspace is empty or is for manual-tests only, test must be pulled to root
+  - If this is end-to-end testing project test cases must be generated in `manual-tests` directory
+  - In any other case test cases must be pulled to `.testeiya/manual-tests` (ensure `.testeiya/` directory exists and git ignored)
 
 **Command:**
 ```bash
@@ -101,8 +101,8 @@ Optional variant - **pull by specific suite-ids**
 
 **Pull Examples:**
 ```bash
-# Default — pull into the gitignored cache
-npx check-tests pull -d .testclaw/manual-tests
+# Auto-detected location
+npx check-tests pull -d
 
 # Repo that already keeps its test cases tracked — refresh them in place
 npx check-tests pull -d manual-tests
@@ -126,8 +126,12 @@ Uploads/Imports local Markdown tests into Testomat.io:
 
 **Pre-Push File Filtering**
 
-If directory contains manual test cases + something else, move test cases into `.testclaw/manual-tests`
+Before uploading, scan the project and identify only manual test cases:
+- Files matching `*.test.md` (ignore all other Markdown files (such as `README.md`, `CHANGELOG.md`, and project documentation)).
+- Markdown files containing valid `<!-- test ... -->` blocks.
 
+If the project contains manual test cases alongside other files, copy or move the identified test case files into the cache folder: 
+- `.testeiya/manual-tests/`
 
 **Pre-Push Validation:**
 1. Ensure at least one test `*.test.md` file exists.
@@ -164,19 +168,16 @@ npx check-tests push --files "**/*.test.md"
 # Default glob (**/*.test.md) under -d
 npx check-tests push
 
-# Specify directory with manual test cases
-npx check-tests push -d .testclaw/manual-tests
-
-# Specify directory with manual test cases and specific files
-npx check-tests push -d .testclaw/manual-tests --files new_tests.md
+# Testeiya cache folder with manual test cases
+npx check-tests push -d .testeiya/manual-tests
 ```
 
 **Important constraints:**
 - Only use options explicitly documented in this skill or in the "Testomat.io CLI Documentation" ref file.
 - If you are unsure about available CLI options, run `npx check-tests --help` and use only options listed there.
 - Do **not** use an option unless it is mentioned in the documentation or in the `--help` option (e.g., `--pattern`, `--forces`).
-- Ensure you use -d when `.testclaw` or `manual-tests` directories exist. 
-- Ensure you push only the test cases directory (e.g `.testclaw/manual-tests` not `.testclaw`).
+- Ensure you use -d when `.testeiya` or `manual-tests` directories exist. 
+- Ensure you push only the test cases directory (e.g `.testeiya/manual-tests` not `.testeiya/`).
 
 **More examples** you can find in "Push" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
 
@@ -189,7 +190,7 @@ After completing sync operations, output a short log-style summary:
 ```
 Sync Complete:
 - Action: pull/push
-- Directory: .testclaw/manual-tests
+- Directory:  <auto-detected path>
 - Tests synced: 15
 - Status: Success
 ```
@@ -227,7 +228,7 @@ Stop execution if:
 
 ## Examples
 
-**Pull tests** (lands in the gitignored `.testclaw/manual-tests/`):
+**Pull tests:**
 ```
 Use sync-test-cases-with-tms skill to pull tests from Testomat.io
 ```
