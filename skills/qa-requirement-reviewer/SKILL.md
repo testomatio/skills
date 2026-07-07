@@ -7,31 +7,20 @@ metadata:
   version: 1.0.0
 ---
 
-# QA-STATIC-REQUIREMENT-REVIEWER-SKILL: What I do
+# QA Requirement Reviewer
 
-This skill reviews requirements before development begins. It evaluates requirement quality, completeness, consistency, clarity, and readiness for implementation and testing.
+Review requirements as written. Report issues, gaps, risks, and open questions so stakeholders can decide whether the requirements are ready for development and testing.
 
-The primary goal is to identify defects, ambiguities, missing information, contradictions, assumptions, edge cases, and testability risks before development starts. The skill works with any requirement format, including BRDs, user stories, use cases, feature tickets, specifications, acceptance criteria, emails, and free-form text or raw requirements description.
-
-Review requirements as written and identify issues, gaps, risks, and unanswered questions. When useful, suggest improved wording or additional acceptance criteria, but do not make assumptions or silently fill in missing information. Highlight what requires clarification so stakeholders can determine whether the requirements are ready for development, testing, or approval.
-
-## When to Use
-
-Trigger this skill when user wants to:
-- **Review** requirements for quality, completeness, and consistency.
-- **Verify** readiness for development, testing, or approval.
-- **Identify** ambiguities, contradictions, assumptions, gaps, and risks.
-- **Evaluate** requirement text, acceptance criteria and expected behavior.
-- **Validate** whether requirements are testable and implementable.
-- **Find missing** scenarios, edge cases, business rules, or error conditions.
-- **Improve** requirement quality before implementation begins.
-- **Receive** recommendations for clarifying or strengthening requirements.
-
----
+Rules:
+- **Work with the input as-is — do not rewrite it.**
+- **Do not make assumptions or silently fill in missing information.**
+- Suggest improved wording or acceptance criteria where useful.
+- **Suggested improvements must not hide missing information or assumptions.**
+- Accept any format: BRD, user story, use case, feature ticket, specification, acceptance criteria, email, or free-form text.
 
 ## Review Criteria
 
-Evaluate each requirement against the following criteria:
+Evaluate each requirement against:
 
 | Criterion      | What it means             | Failure signals |
 | -------------- | ------------------------- | --------------- |
@@ -41,36 +30,31 @@ Evaluate each requirement against the following criteria:
 | **Consistent** | Does not conflict with related requirements      | Contradictory behavior, terminology, workflows, rules, or constraints                       |
 | **Testable**   | Can be objectively verified                      | No measurable outcome, unclear success criteria, impossible to determine pass or fail       |
 
----
-
-## Workflow: Requirement Review
+## Workflow
 
 ### Step 1: Gather Requirements
 
-Accept requirements in any form:
-- Requirement document or file.
-- Directory, repository, or collection of requirement documents and files.
+Accept requirements as:
+- A document or file.
+- A directory, repository, or collection of documents and files.
 - Raw text provided in the conversation.
 
-> If the requirements are incomplete, inaccessible, or unclear, ask the user for clarification.
+If the requirements are incomplete, inaccessible, or unclear, ask the user for clarification.
 
 ### Step 2: Identify Requirements
 
-Regardless of format:
 - Identify individual requirements, rules, behaviors, and acceptance criteria.
 - Assign identifiers where helpful (`R1`, `R2`, ...), or reuse existing IDs.
-- Separate requirements from background information, rationale, implementation details, and design discussions.
+- Separate requirements from background, rationale, implementation details, and design discussion.
 
-### Step 3: Review Requirements
+### Step 3: Review Each Requirement
 
-Evaluate each requirement against the review criteria.
-
-For each issue found:
-1. **Identify** the affected requirement.
-2. **Explain** the issue and its consequence.
-3. **Classify** the issue (clarity, completeness, consistency, testability, etc.).
-4. **Ask** the clarification question needed to resolve it.
-5. **Optionally** suggest improved wording.
+Evaluate each requirement against the review criteria. For each issue found:
+1. Identify the affected requirement.
+2. Explain the issue and its consequence.
+3. Classify it (clarity, completeness, consistency, testability, etc.).
+4. Ask the clarification question needed to resolve it.
+5. Optionally suggest improved wording.
 
 ### Step 4: Review the Requirement Set
 
@@ -83,8 +67,6 @@ Evaluate the requirements as a whole for:
 
 ### Step 5: Produce the Review Report
 
-Return a structured review that summarizes findings, questions, risks, and recommendations, and clearly indicates whether the requirements appear ready for development and testing.
-
 Use this exact structure:
 
 ```markdown
@@ -94,7 +76,7 @@ Use this exact structure:
 
 **Decision:** ✅ Ready for Development | ⚠️ Needs Clarification | ❌ Not Ready
 
-**Summary:** ... (Brief assessment of overall requirement quality and readiness. 1-3 sentences verdict)
+**Summary:** ... (Brief assessment of overall requirement quality and readiness. 1-3 sentence verdict)
 
 ### Key Findings
 
@@ -139,20 +121,6 @@ Use this exact structure:
 
 ```
 
----
-
-## Success Criteria
-
-The review succeeds when:
-- Significant ambiguities, gaps, contradictions, and testability issues are identified.
-- Every finding is tied to a specific requirement whenever possible.
-- Open questions are clear and actionable.
-- Risks and consequences of unresolved issues are explicit.
-- The final decision provides a clear readiness assessment.
-- Suggested improvements do not hide missing information or assumptions.
-
----
-
 ## Examples
 
-See `./references/requirements_review.md` for a fully worked example with input (flawed draft BRD) and the corresponding review output.
+See `references/requirements_reviewer_examples.md` for two worked examples: a flawed draft BRD and a set of user stories, each with input and review output.

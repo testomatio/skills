@@ -11,131 +11,62 @@ metadata:
   version: 1.0.0
 ---
 
-# SYNC-CASES SKILL: What I do
+# Sync Test Cases with TMS
 
-This skill enables synchronization of Markdown test scenarios between your local project and Testomat.io Test Management System.
+Sync Markdown test cases (`*.test.md`) between the local project and Testomat.io.
 
-Test Cases Sync Jornay: 
-- Export test cases from Testomat.io.
-- Bulk editing manual tests or refactoring test cases.
-- Further push back test cases to the Testomat.io.
+Use when the user wants to:
+- Pull/export/download tests from Testomat.io to local Markdown files.
+- Push/upload/import local Markdown tests to Testomat.io.
+- Bulk edit: pull cases -> edit locally -> push back to TMS.
 
-## When to Use
+## Setup
 
-Trigger this skill when user wants to:
-- **Pull/Export/Download** tests from Testomat.io to local Markdown files.
-- **Push/Upload/Import** local Markdown tests to Testomat.io.
-- Bulk edit manual tests or refactor test cases in local files and upload to TMS.
-- Synchronize test cases between local `*.test.md` files and TMS (Testomat.io).
-- **Sync** test cases with the remote version in TMS (Testomat.io).
-- Cover user bulk edit workflow: pull cases -> edit test cases -> push cases to TMS.
+- Check for the `TESTOMATIO` token: skill input -> `.env` in project root -> ask the user.
+- Save the token to `.env`: `TESTOMATIO=tstmt_xxxxx`.
+- If the user has no key: get it in Testomat.io under **Settings → Project → Project Reporting API key** (`https://app.testomat.io/projects/<project-id>/settings/project`).
 
----
+## Running the CLI
 
-## Workflow: Sync Test Cases
+- Run `check-tests` via `npx`. Do not install it as a project dependency.
+- **The first `check-tests` call in the session must be `npx check-tests@latest …`** to resolve the latest version. All later calls in the same session use plain `npx check-tests …`.
+- **Use only options documented here, in [TESTOMATIO_CLI.md](./references/TESTOMATIO_CLI.md), or listed by `npx check-tests --help`. Do not invent options** (e.g. `--pattern`, `--force`).
 
-### Step 1: Environment Setup
+## Pull
 
-#### Check Testomat.io Token
+Downloads test scenarios from Testomat.io and saves them as local Markdown files.
 
-Check if "TESTOMATIO" token was provided as input:
-- If not provided, check for `.env` file in project root.
-  - If still not found => ❓ ask user for token.
+Directory selection — if the `testDir` input is provided or the user passes `-d <path>`, use that path. Otherwise:
+- Workspace is empty or for manual tests only: pull to root.
+- End-to-end testing project: pull to the `manual-tests` directory.
+- Any other case: pull to `.testeiya/manual-tests` (ensure `.testeiya/` exists and is gitignored).
 
-#### Save Credentials to .env File
+Cache-folder rules:
+- Default pull target is the gitignored cache `.testeiya/manual-tests/`. Add `.testeiya/` to the project `.gitignore` if it is not there yet.
+- **Pulled cases must never land in a tracked folder** (`manual-tests/`, etc.) — that pollutes the repo.
+- Being gitignored does not block editing the files or pushing them back.
+- If the repo already keeps its `*.test.md` files in a tracked folder, don't pull — work with them in place, or pass `-d <that folder>` for an in-place refresh.
+- This matches `scan-automation-project`, which pulls the *code* into `.testeiya/code/` when it runs inside a manual-tests repo.
 
-Best Practice to save credentials into `.env` file:
-
-```env
-TESTOMATIO=tstmt_xxxxx
-...
-```
-
-#### Get API Key (if user doesn't have it)
-
-Ask the user to obtain it from Testomat.io project:
-- Navigate to **Settings → Project → Project Reporting API key**
-_( Project path example by "project-id": `https://app.testomat.io/projects/<project-id>/settings/project` )_
-
-### Step 2: Pull or Push Operations
-
-#### Always use latest version of check-tests
-
-Use `npx` to invoke `check-tests` so users automatically pick up the newest version from npm.
-- Do **not** install `check-tests` as a project dependency.
-- **The very first `check-tests` call in the current agent session must be invoked as `npx check-tests@latest …`** to force npx to resolve and install the latest version from the registry.
-- **All subsequent calls** in the same session use the plain form (`npx check-tests …`) shown in the examples below — npx reuses the just-cached version, so no extra registry round-trip.
-
-#### Pull Changes
-
-Download/Retrieves test scenarios from Testomat.io and saves them as Markdown files locally.
-
-**Use Cases:**
-- Export tests from TMS to markdown for bulk editing in IDE.
-- Backup test cases locally.
-- Refactor test cases offline.
-- Export only some specific suites by id.
-
-**Where to pull:** into the gitignored cache `.testeiya/manual-tests/`, and add `.testeiya/` to the project `.gitignore` if it is not there yet. Pulled cases must never land in a tracked folder (`manual-tests/`, etc.) — that pollutes the repo. You can still edit them there and push back; being gitignored doesn't stop that. (If the repo *already* keeps its `*.test.md` files in a tracked folder, you don't need to pull at all — work with them where they are, or pass `-d <that folder>` for an in-place refresh.) This matches `scan-automation-project`, which pulls the *code* into `.testeiya/code/` when it runs inside a manual-tests repo.
-
-**Pre-Pull:**
-
-- If `testDir` input is provided or user specifies `-d <path>` in command, use that path instead. Otherwise:
-  - If this workspace is empty or is for manual-tests only, test must be pulled to root
-  - If this is end-to-end testing project test cases must be generated in `manual-tests` directory
-  - In any other case test cases must be pulled to `.testeiya/manual-tests` (ensure `.testeiya/` directory exists and git ignored)
-
-**Command:**
 ```bash
-npx check-tests pull -d <directory>
+npx check-tests pull -d .testeiya/manual-tests
 ```
 
-Optional variant - **pull by specific suite-ids**
+- To pull only specific suites (user names a suite or gives suite IDs): `npx check-tests pull --suite-ids "@S12345678,@S87654321"`.
+- More pull options: [TESTOMATIO_CLI.md](./references/TESTOMATIO_CLI.md).
 
-**When to use `--suite-ids`:**
-- User wants to pull only specific suites (not the entire project).
-- Initial request mentions a specific suite name or suite ID.
-- Need to export one or several specific suites without triggering a full project sync.
+## Push
 
-> **Options to use:** `--suite-ids <ids>` for comma-separated suite IDs to pull (e.g. `@S12345678, @S87654321`)
+Uploads local Markdown tests to Testomat.io.
 
-**Pull Examples:**
-```bash
-# Auto-detected location
-npx check-tests pull -d
+Pre-push file filtering — push only test case files, never project docs or requirements:
+- Include files matching `*.test.md`, or Markdown files with valid `<!-- test ... -->` blocks.
+- Ignore all other Markdown (`README.md`, `CHANGELOG.md`, documentation).
+- If test cases live alongside other files, copy or move the test files into `.testeiya/manual-tests/` first.
 
-# Repo that already keeps its test cases tracked — refresh them in place
-npx check-tests pull -d manual-tests
-
-# Pull specific suites by IDs
-npx check-tests pull --suite-ids "@S12345678,@S87654321"
-```
-
-**More examples** you can find in "Pull" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
-
-#### Push Changes
-
-Uploads/Imports local Markdown tests into Testomat.io:
-- Upload only test case files.
-- Avoid uploading any project documentation/requirements files in `.md` format.
-
-**Use Cases:**
-- Mass create test cases in Testomat.io from markdown files.
-- Import bulk-edited tests back to TMS.
-- Sync refactored test cases to Testomat.io.
-
-**Pre-Push File Filtering**
-
-Before uploading, scan the project and identify only manual test cases:
-- Files matching `*.test.md` (ignore all other Markdown files (such as `README.md`, `CHANGELOG.md`, and project documentation)).
-- Markdown files containing valid `<!-- test ... -->` blocks.
-
-If the project contains manual test cases alongside other files, copy or move the identified test case files into the cache folder: 
-- `.testeiya/manual-tests/`
-
-**Pre-Push Validation:**
-1. Ensure at least one test `*.test.md` file exists.
-2. Ensure file contains valid test blocks:
+Pre-push validation:
+1. At least one `*.test.md` file exists.
+2. Each file contains a valid test block:
 
 ```md
 <!-- test
@@ -147,109 +78,30 @@ labels: ...
 # ... (test case title)
 
 ... (test case description)
-
 ```
 
-**Command:**
-```bash
-npx check-tests push [-d <directory>] [--files <files...>]
-```
-
-**IMPORTANT:** When the files to push are known (e.g. just produced by `qa-write-test-cases` / `improve-test-cases`), pass them explicitly via `--files` (alias `-f`). Without `--files` the CLI falls back to the default glob `**/*.test.md`, which may pick up unrelated files. Quote glob patterns. Paths resolve relative to `--dir`.
-
-**Examples:**
 ```bash
 # Specific files (preferred when known)
 npx check-tests push --files login.test.md checkout.test.md
 
-# Custom glob
-npx check-tests push --files "**/*.test.md"
-
-# Default glob (**/*.test.md) under -d
-npx check-tests push
-
-# Testeiya cache folder with manual test cases
+# Testeiya cache folder
 npx check-tests push -d .testeiya/manual-tests
 ```
 
-**Important constraints:**
-- Only use options explicitly documented in this skill or in the "Testomat.io CLI Documentation" ref file.
-- If you are unsure about available CLI options, run `npx check-tests --help` and use only options listed there.
-- Do **not** use an option unless it is mentioned in the documentation or in the `--help` option (e.g., `--pattern`, `--forces`).
-- Ensure you use -d when `.testeiya` or `manual-tests` directories exist. 
-- Ensure you push only the test cases directory (e.g `.testeiya/manual-tests` not `.testeiya/`).
+- **When the files to push are known** (e.g. just produced by `qa-write-test-cases` / `improve-test-cases`), **pass them explicitly via `--files`** (alias `-f`). Without `--files` the CLI falls back to the default glob `**/*.test.md`, which may pick up unrelated files.
+- Quote glob patterns. Paths resolve relative to `--dir`.
+- Use `-d` when `.testeiya` or `manual-tests` directories exist.
+- **Push only the test cases directory** (e.g. `.testeiya/manual-tests`, not `.testeiya/`).
+- More push options and examples: [TESTOMATIO_CLI.md](./references/TESTOMATIO_CLI.md).
 
-**More examples** you can find in "Push" section [Testomat.io CLI Documentation](./references/TESTOMATIO_CLI.md)
+## Summary Output
 
----
-
-## Final Summary Example
-
-After completing sync operations, output a short log-style summary:
+After syncing, print a short log-style summary:
 
 ```
 Sync Complete:
 - Action: pull/push
-- Directory:  <auto-detected path>
+- Directory: <path>
 - Tests synced: 15
 - Status: Success
 ```
-
----
-
-## Error Handling
-
-### Recovery
-
-Attempt recovery before failing when:
-- **Missing `TESTOMATIO` token**
-  - Ask the user to provide it
-  - Show where to find it in Testomat.io
-
-- **No markdown files found**
-  - Confirm directory or ask user to specify another cases path
-
-### Hard Fail (Stop immediately)
-
-Stop execution if:
-- Cannot create `.env` file by system.
-- Directory creation fails.
-- CLI sync command fails (network/auth/401/403).
-
----
-
-## References
-
-| Description                  | File                                |
-| ---------------------------- | ----------------------------------- |
-| Testomat.io CLI Commands     | ./references/TESTOMATIO_CLI.md      |
-
----
-
-## Examples
-
-**Pull tests:**
-```
-Use sync-test-cases-with-tms skill to pull tests from Testomat.io
-```
-
-**Push tests:**
-```
-Use sync-test-cases-with-tms to push tests to Testomat.io
-```
-
-**Bulk test case edit workflow:**
-1. Use sync-test-cases-with-tms to pull tests from Testomat.io
-2. Edit tests in IDE
-3. Use sync-test-cases-with-tms to push the updated tests back to Testomat.io
-
----
-
-## Quick Commands
-
-| Action          | Command                                                              |
-| --------------- | -------------------------------------------------------------------- |
-| Pull            | `npx check-tests pull -d manual-tests` (the default; gitignored) |
-| Push (files)    | `npx check-tests push --files <file1.test.md> <file2.test.md>`       |
-| Push (glob)     | `npx check-tests push --files "<dir>/**/*.test.md"`                  |
-| Push (default)  | `npx check-tests push -d <directory>` (glob: `**/*.test.md`)         |

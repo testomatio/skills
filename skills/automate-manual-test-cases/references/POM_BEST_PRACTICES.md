@@ -26,9 +26,8 @@
 - Rely on framework auto-waiting where available.
 - Do not duplicate waiting logic unnecessarily.
 
-**Avoid Hard Waits**
 ```typescript
-// Bad
+// Bad: hard wait
 await page.waitForTimeout(5000)
 ```
 

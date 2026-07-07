@@ -120,7 +120,7 @@ If the test has no assignee but the suite does, the suite assignee is used.
 
 ### 7. Attachments
 
-- All attached items as links: `https://app.testomat.io/attachments/{uid}.{ext})`
+- All attached items as links: `https://app.testomat.io/attachments/{uid}.{ext}`
 
 ### 8. Description
 

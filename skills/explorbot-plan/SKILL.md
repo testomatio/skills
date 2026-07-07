@@ -7,15 +7,13 @@ metadata:
   version: 0.0.1
 ---
 
-# EXPLORBOT-PLAN SKILL: What I do
+# Writing Explorbot Test Plans
 
 Write an Explorbot **test plan** by hand in Explorbot's exact markdown format, from a feature
-description / requirements / docs and a starting URL. No browser or live exploration needed —
-this skill is the format contract.
+description / requirements / docs and a starting URL. No browser or live exploration needed.
 
-**Explorbot does not need to be installed to use this skill** — authoring a plan is just
-writing a markdown file. Installation is only required later to *run* the plan (via the
-`explorbot-fundamentals` skill: `explorbot test <planfile>`).
+**Explorbot does not need to be installed to author a plan** — it is just a markdown file.
+Installation is only required later to *run* the plan (see Output).
 
 ## Inputs to gather
 

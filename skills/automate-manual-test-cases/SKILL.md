@@ -1,129 +1,89 @@
 ---
 name: automate-manual-test-cases
-description: This skill converts manual test cases into production-ready automated test scripts. It analyzes the existing automation framework, interprets manual test steps, and generates maintainable tests following automation best practices. Use this skill whenever the user want to automate manual test cases, expand test coverage, or create end-to-end automated flows from existing test documentation.
+description: This skill converts manual test cases into production-ready automated test scripts. It analyzes the existing automation framework, interprets manual test steps, and generates maintainable tests following automation best practices. Use this skill whenever the user wants to automate manual test cases, expand test coverage, or create end-to-end automated flows from existing test documentation.
 license: MIT
 metadata:
   author: Testomat.io
   version: 1.0.0
 ---
 
-# AUTOMATE-TEST-CASES SKILL: What I do
+# Automate Manual Test Cases
 
-This skill helps generate production-ready automated test scripts from manual test cases. It analyzes the existing automation framework, interprets manual test steps, and produces maintainable, scalable tests following automation best practices and patterns.
+Generate production-ready automated test scripts from manual test cases, reusing the project's existing framework, patterns, and components.
 
-## When to Use
+## Checklist
 
-Trigger this skill when user wants to:
-- Convert manual test cases to automated scripts.
-- Cover a full end-to-end flow with automation testing.
-- Expand existing test suite with new test coverage.
-- User ask to: "automate manual cases", "write automation script from manual flow", etc.
+Complete all steps in order:
 
----
-
-## Skill Checklist
-
-Complete ALL items in order:
-
-1. [ ] **Analyze Project Architecture** => Detect framework (1.1), identify excluded paths (1.2), find reusable components (1.3).
-2. [ ] **Understand Manual Test** => Normalize input (2.0), handle ambiguous steps (2.1), detect inconsistencies (2.2).
-3. [ ] **Write Test Code** => Implement using existing POM/patterns (3.1-3.2), add assertions (3.3), output code (3.4).
-4. [ ] **Verify & Heal** => Execute test (4.1), heal if fails - locators → timing → assertions → flow (4.2), max 3 attempts.
-5. [ ] **Finalization** => Ensure structure compliance (5.1), manage test data & fixtures (5.2), run related tests and output summary (5.3 & 5.4).
+1. [ ] Analyze project architecture => detect framework (1.1), analyze conventions (1.2), find reusable components (1.3).
+2. [ ] Understand manual test => normalize input (2.1), handle ambiguous steps (2.2), detect inconsistencies (2.3).
+3. [ ] Write test code => implement using existing POM/patterns (3.1-3.2), add assertions (3.3), output code (3.4).
+4. [ ] Verify & heal => execute test (4.1), heal if fails: locators → timing → assertions → flow (4.2), **max 3 attempts**.
+5. [ ] Finalization => save test (5.1), manage test data & fixtures (5.2), run related tests and output summary (5.3).
 
 ### Progress
+
 * STEP: 1/5 (Analyze Project Architecture)
-* Previous: ⏳ (none)
-* Next ➡️ Step 2: Understand Manual Test Cases Task.
+* Previous: (none)
+* Next ➡️ Step 2: Understand Manual Test.
 
----
+Update this block after completing each step (see CLAUDE.md).
 
-## Available Sub-Skills
+## Step 1: Analyze Project Architecture
 
-The skill orchestrates these specialized capabilities:
+### 1.1 Detect Automation Framework
 
-| Skill                               | Purpose                                             |
-| ----------------------------------- | --------------------------------------------------- |
-| **debug-fix-failed-flaky-autotests**          | Step-by-step debug instruction to fix failed steps in test |
+- If the user specifies a framework (e.g., "use CodeceptJS") => trust it.
+- Otherwise inspect the project:
+  - `package.json` dependencies and scripts.
+  - Config files (`playwright.config.js`, `codecept.conf.js`, `cypress.json`, etc.).
+- If detection fails, ask with numbered options:
 
----
+  ```
+  ❓ Which framework should I use?
+  1. Playwright
+  2. CodeceptJS
+  3. Cypress
+  4. Other (specify)
+  ```
 
-## Workflow: Convert Manual Tests to Automation
+After detection, apply the matching reference:
+- [CodeceptJS Best Practices](./references/CODECEPTJS_BEST_PRACTICES.md)
+- [Playwright Best Practices](./references/PLAYWRIGHT_BEST_PRACTICES.md)
 
-### Step 1: Analyze Project Architecture
+### 1.2 Analyze Project Conventions
 
-#### 1.1 Detect Automation Framework
+- Test structure and naming: folders (`tests/`, `e2e/`) and file patterns (`*.spec.js`, etc.).
+- Execution: `package.json` scripts and test commands.
+- Configuration: base URLs, env variables, global setup.
+- Assertion style: libraries and patterns used in existing tests.
 
-- **If user specifies framework** (e.g., "use CodeceptJS" or "Playwright project") => Trust user's choice.
-- **If no framework is detected** => Inspect the project to determine the test framework:
-  - Analyze `package.json` dependencies and scripts.
-  - Check configuration files (`playwright.config.js`, `codecept.conf.js`, `cypress.json`, etc.).
+### 1.3 Identify Reusable Components
 
-> For Playwright/CodeceptJS => apply corresponding best practices from references
+Scan for:
+- Page Objects: existing locators and methods (`src/pages`, `pages/`, `page-objects/`, etc.).
+- Fixtures/hooks: setup and teardown patterns.
+- Test data: constants, CSV, JSON (`test-data`, `src/testData`, etc.).
+- Utils/helpers (`utils/`, `helpers/`, etc.).
 
-**Framework references** (apply after Step 1.1 detection):
-> See [CODECEPTJS Best Practices](./references/CODECEPTJS_BEST_PRACTICES.md)
-> See [PLAYWRIGHT Best Practices](./references/PLAYWRIGHT_BEST_PRACTICES.md)
+Exclude from analysis:
+- Dependency folders (`node_modules/`).
+- Build artifacts (`dist/`, `build/`, `out/`).
+- Hidden/system folders (`.git/`, `.cache/`).
+- Deprecated code: `deprecated/`, `legacy/`, `old/`, `backup/`, `__backup__/`, `archive/`, `temp/`, files marked `outdated`, older versioned folders (`v1/`, `v2/`) when newer versions exist.
+- Do not auto-exclude folders with unclear purpose.
+- **User-specified exclusions always override auto-detected ones.**
 
-#### 1.2 Analyze Project Conventions
+## Step 2: Understand Manual Test
 
-Analyze how the test project is organized and executed:
-- **Test structure & naming conventions** - detect folders (`tests/`, `e2e/`) and file patterns (`*.spec.js`, etc).
-- **Execution patterns** - analyze `package.json` scripts and test commands.
-- **Configuration & environment** - identify base URLs, env variables, and global setup.
-- **Assertion style** - detect assertion libraries and patterns used in existing tests.
+Input may be plain text, markdown steps, or comment blocks in source files (`//`, `/* */`).
 
-#### 1.3 Identify Reusable Components
+### 2.1 Normalize Input Structure
 
-Scan the project to identify reusable components while excluding irrelevant or deprecated code.
-
-**Identify reusable components:**
-- **Page Objects**: Find existing locators and methods that can be reused (like `src/pages`, `pages/`, `page-objects/`, etc).
-- **Fixtures/Hooks**: Identify setup/teardown patterns.
-- **Test Data**: Check for existing data management (constants, CSV, JSON from `test-data`, `src/testData`, etc).
-- **Utils/Helpers Functions**: Look for helper functions that can be reused (like `utils/`, `helpers/`, etc).
-
-**Automatically exclude from analysis:**
-- Dependency folders (`node_modules/`)  
-- Build artifacts (`dist/`, `build/`, `out/`)  
-- Hidden/system folders (`.git/`, `.cache/`)  
-- Clearly deprecated or legacy folders:
-  - `deprecated/`, `legacy/`, `old/`, `backup/`, `__backup__/`, `archive/`, `temp/`  
-  - files/folders marked as `outdated`  
-  - older versioned folders (`v1/`, `v2/`) when newer versions exist  
-
-**Handling ambiguous cases:**
-- Do not exclude folders with unclear purpose automatically.  
-- If needed, ask the user:  
-  `❓ Should any additional folders be excluded from analysis (e.g., legacy or unused code)?`
-
-> **Priority:** Always prioritize user-specified exclusions over auto-detected ones.
-
-#### Summary (Log) of Step 1
-
-After analysis, output a short overview:
-- Detected framework (or user-specified).
-- Reusable components found (Page Objects, fixtures, utils).
-- Excluded/Legacy files (if any).
-- Next ➡️ Step 2: Understand Manual Test Cases Task.
-
----
-
-### Step 2: Understand Manual Test Cases Task
-
-Receive manual test case input from user **or from extracted comment blocks in source files (see "2.0 Normalize Input Structure")**.
-
-Supported input formats:
-- Plain text manual test cases.
-- Markdown-formatted steps.
-- Comment-based test description extracted from code files (e.g., `//`, `/* */`).
-
-#### 2.0 Normalize Input Structure
-
-**Convert input into a consistent structure:**
+Convert input into:
 - `summary` (or scenario title).
 - `preconditions` (optional).
-- `steps` (required) - ordered actions with expected results.
+- `steps` (required) — ordered actions with expected results.
 
 For comment-based inputs:
 - Treat comment markers (`//`, `*`, `-`) as structural hints.
@@ -131,7 +91,7 @@ For comment-based inputs:
 - Bind `_Expected:_` or `Expected Results` blocks to the preceding step.
 - Merge multiline expected results into a single logical expectation.
 
-Example normalization:
+Example:
 
 ```md
 * Navigate to page  
@@ -140,322 +100,143 @@ Example normalization:
   _Expected_: List includes "manual" option.
 ```
 
-**Preserve Original Comments with user e2e steps/results (MANDATORY):** DO NOT delete or rewrite original manual test comments.
-Instead:
+**Do not delete or rewrite original manual test comments.**
 - Keep them as-is in the file.
 - Generate automation code below or alongside them.
-- Add a marker: `// === AUTO-GENERATED TEST (based on steps above) ===` to separate a new automation code.
+- Separate with a marker: `// === AUTO-GENERATED TEST (based on steps above) ===`
 
-#### 2.1 Handle Ambiguous Steps
+### 2.2 Handle Ambiguous Steps
 
-For each step, classify clarity level:
-- **Clear** => proceed normally.
-- **Partially clear** => make a reasonable assumption and continue.
-- **Unclear** (blocking) => Mark with ❓ and ask the user: `❓ Can you clarify what this step means?`.
+Classify each step:
+- Clear => proceed.
+- Partially clear => make a reasonable assumption, mark it with ⚠️ in output (e.g., "⚠️ Assuming 'Submit' button triggers form submission"), continue.
+- Unclear and blocking => ask the user, with numbered options when there are alternatives:
 
-Guidelines:
-- Use context from previous steps.
-- Apply common UI patterns (click, input, navigation). 
-- Do not stop the flow for minor ambiguities.
+  ```
+  ❓ Do you want to:
+  1. Use existing LoginPage
+  2. Create new LoginPage
+  3. Skip login step
+  ```
 
-Mark assumptions in output using ⚠️:
-- Example: "⚠️ Assuming 'Submit' button triggers form submission".
+Use context from previous steps and common UI patterns (click, input, navigation).
+**Do not block the whole flow on one unclear step — continue with the rest.**
 
-**Avoid blocking the entire flow if only one step is unclear**.
-**Continue processing other steps where possible**.
+### 2.3 Detect Inconsistencies
 
-#### 2.3 Detect Potential Inconsistencies
+If step actions, expected results, and known UI patterns disagree:
+- Proceed with best-effort interpretation.
+- Flag with ⚠️ in output.
 
-While parsing steps, check for inconsistencies between:
-- Step actions.
-- Expected results.
-- Known UI patterns.
+## Step 3: Write Test Code
 
-If steps or expected results seem inconsistent:
-- Proceed with best-effort interpretation  
-- Flag with ⚠️ in output 
+### 3.1 Choose Implementation Strategy
 
-#### Summary (Log) of Step 2
+- Reusable components exist (Page Objects, helpers, fixtures) => reuse them; follow project patterns and naming.
+- Partial structure exists => extend existing components; keep consistency with current design.
+- No structure => simple readable locators, minimal implementation, no unnecessary abstractions.
 
-After processing the manual test cases, output:
+Priorities: consistency with the project, then readability, then maintainability.
 
-- Normalized test structure (summary, steps, expected results).
-- Total steps detected.
-- Assumptions made (⚠️), if any.
-- Blocking questions (❓), if any.
-- Next ➡️ Step 3: Write Test Code.
+**Do not ignore existing Page Objects or duplicate selectors/logic.**
 
----
+### 3.2 Follow Framework Patterns
 
-### Step 3: Write Test Code
+- One test, one flow — each test validates a single scenario.
+- Separation of concerns: tests => assertions and flow control; Page Objects => UI interactions; utils => reusable logic.
+- Extend, don't modify — add to existing components without changing stable code.
+- Use fixtures for setup, authentication, and shared state.
 
-#### 3.1 Choose Implementation Strategy
+See [POM Best Practices](./references/POM_BEST_PRACTICES.md).
 
-Select the simplest implementation that aligns with the existing project architecture:
-* **If reusable components exist (Page Objects, helpers, fixtures):**
-  - **Reuse them**.
-  - Follow established project patterns and naming conventions.
+### 3.3 Generate Assertions
 
-* **If partial structure exists:**
-  - Extend existing components where needed.
-  - Keep consistency with current design.
+- Base assertions on expected results from manual steps.
+- Validate UI state (visibility, text, attributes), data correctness, navigation outcomes.
+- Avoid weak assertions (only checking page load) and over-asserting irrelevant details.
 
-* **If no structure exists:**
-  - Use simple, readable locators.
-  - Keep implementation minimal and organized.
-  - Avoid over-engineering (no unnecessary abstractions).
+### 3.4 Output Test Code
 
-**Priorities:**
-1. Consistency with the project.
-2. Readability.
-3. Maintainability.
-
-**Do NOT:**
-- Ignore existing Page Objects.
-- Duplicate selectors or logic.
-
-#### 3.2 Follow Framework Patterns
-
-Apply these principles when writing tests:
-- **One test, one flow** - Each test validates a single scenario.
-- **Separation of concerns:**
-  - Tests => assertions and flow control.
-  - Page Objects => UI interactions.
-  - Utils => reusable logic.
-- **Extend, don't modify** - Add to existing components without changing stable code.
-- **Use fixtures** for setup, authentication, and shared state.
-
-> See [POM Best Practices](./references/POM_BEST_PRACTICES.md) for detailed patterns
-
-#### 3.3 Generate Assertions
-
-- Add assertions based on expected results from manual steps.
-- Prefer explicit, meaningful checks.
-
-Validate:
-  - UI state (visibility, text, attributes).
-  - Data correctness.
-  - Navigation outcomes.
-
-Avoid:
-- Weak assertions (e.g., only checking page load).
-- Over-asserting irrelevant details.
-
-#### 3.4 Generate Test Code Output
-
-- Generate complete, runnable test code.
-- Ensure it integrates with the existing framework.
+- Generate complete, runnable code that integrates with the existing framework.
 - Follow project formatting and style conventions.
-- Place code in the appropriate test file or suggest file location.
+- Place code in the appropriate test file or suggest a location.
 
----
+## Step 4: Verify & Heal
 
-### Step 4: Verify & Heal Test
+### 4.1 Execute Test
 
-Verify the generated test by executing it and fixing issues if needed.
+**Run only the generated test, never the full suite:**
+- Playwright: `npx playwright test path/to/spec.ts`
+- CodeceptJS: `npx codeceptjs run path/to/test.js`
 
-#### 4.1 Execute Test
+If it passes => go to Step 5. If it fails => heal (4.2).
 
-**Standard execution:**
-- Run **only the generated test**, not the full test suite.
-- Use the project’s **test execution command** (`npx playwright test`, `npx codeceptjs run`, etc.).
+### 4.2 Heal Failed Tests
 
-**Result:**
-- If test **passes** → proceed to Step 5  
-- If test **fails** → start healing (4.2)  
+Fix one issue at a time, in priority order:
+1. Locators — prefer stable selectors (`data-testid`, `aria-label`), avoid deeply nested XPath.
+2. Timing — use framework-native waits, avoid hard sleeps.
+3. Assertions — match actual app behavior, not assumptions.
+4. Flow — verify navigation, preconditions, missing steps.
 
-> ⚠️ **Do NOT run all tests**. Limit execution to the generated test to avoid excessive logs and noise.
+Process: identify a single failure => apply one fix => re-run => repeat.
+Keep the last working version to roll back to if stuck.
 
-#### 4.2 Heal Failed Tests
+**Max 3 healing attempts. If still failing, stop and report the issues.**
 
-Fix failures iteratively, one issue at a time.
+When the root cause is unclear, use the debug-fix-failed-flaky-autotests skill for structured step-by-step diagnosis.
 
-**Healing priorities:**
-1. **Locators** - Prefer stable selectors (`data-testid`, `aria-label`), avoid deeply nested XPath.
-2. **Timing** - Use framework-native waits, avoid hard sleeps.
-3. **Assertions** - Match actual app behavior, not assumptions.
-4. **Flow** - Verify navigation, preconditions, missing steps.
-
-**Process:**
-- Identify a single failure.
-- Apply one fix.
-- Re-run the test. 
-- Repeat.
-
-**Limits:**
-- Max **3 healing attempts**  
-- If still failing => stop and report issues
-
-> When the root cause of a failure remains unclear or requires deeper investigation, consider using the **debug-fix-failed-flaky-autotests** skill for structured, step-by-step diagnosis and fixes.
-
-#### Optional: Advanced Debugging (MCP)
-
-Use advanced debugging tools and MCPs **when available** to improve diagnosis efficiency.
-
-**If MCP/debug tools are available:**
+If MCP/debug tools are available:
 - Inspect DOM (`document.querySelector(...).outerHTML`).
 - Use step-by-step execution.
-- Capture logs, screenshots, or traces during debug.
+- Capture logs, screenshots, or traces.
 
-#### 4.3 Stability Criteria & Save
+### 4.3 Stability Criteria
 
-A test is considered stable when:
-- Passes 1-2 consecutive executes.
-- No hard waits.
-- Resilient locators.
+A test is stable when it:
+- Passes 1-2 consecutive runs.
+- Has no hard waits.
+- Uses resilient locators.
 
----
+## Step 5: Finalization
 
-### Step 5: Finalization
-
-#### 5.1 Save Final Test Code
+### 5.1 Save Final Test Code
 
 - Save the working test to the appropriate project location.
-- Follow naming conventions and structure.
-- Ensure consistency with existing tests.
+- Follow naming conventions and stay consistent with existing tests.
 
-#### 5.2 Test Data & Fixtures
+### 5.2 Test Data & Fixtures
 
-Maximum reuse existing "test-data" variables and fixtures if exist:
-- Use centralized test data if project has it (JSON/CSV/constants).
-- Reuse authentication/setup fixtures.
-- Don't duplicate setup inside tests.
+- Use centralized test data if the project has it (JSON/CSV/constants).
+- Reuse authentication/setup fixtures; don't duplicate setup inside tests.
 
-#### 5.3 Final Run & Mapping Table
+See [Test Data Management](./references/TEST_DATA_MANAGEMENT.md).
 
-Execute 1-2 related tests to confirm integration.
+### 5.3 Final Run & Summary
 
-**Show Spec-to-Code Mapping:**
+- Execute 1-2 related tests to confirm integration (related tests only, not the full suite).
+- Exit condition: test passes 2 consecutive runs.
+- Show a spec-to-code mapping:
 
-| Manual Step | Automation Action |
-|-------------|-------------------|
-| Navigate to Settings | `basePage.clickOnNavigationMenuButton("Settings")` |
+  | Manual Step | Automation Action |
+  |-------------|-------------------|
+  | Navigate to Settings | `basePage.clickOnNavigationMenuButton("Settings")` |
 
-**Exit condition:** Test passes 2 consecutive runs.
+- Output the final summary using [Final Summary Template](./references/FINAL_SUMMARY_TEMPLATE.md).
 
-### Skill Summary
-
-Output structured summary (see [Final Summary Template](./references/FINAL_SUMMARY_TEMPLATE.md))
-
----
-
-## References
-
-| Description | File |
-|-------------|------|
-| Final Summary Template | ./references/FINAL_SUMMARY_TEMPLATE.md |
-| POM Best Practices | ./references/POM_BEST_PRACTICES.md |
-| Playwright Best Practices | ./references/PLAYWRIGHT_BEST_PRACTICES.md |
-| CodeceptJS Best Practices | ./references/CODECEPTJS_BEST_PRACTICES.md |
-| Test Data Management | ./references/TEST_DATA_MANAGEMENT.md |
-
----
-
-## Error Handling
-
-### Recovery
-
-* **Manual test case is unclear, incomplete, or partially invalid**
-  - Proceed with best-effort interpretation.
-  - Mark assumptions with ⚠️.
-  - Ask the user ❓ only if a step is blocking execution.
-
-### Blocker
-
-* **Test Execution Problems**
-  - If no option to execute test after 3 attempt => Stop and catch the error.
-
----
-
-## User Interaction Guidelines
-
-### Asking Questions
-
-Use ❓ only when necessary (blocking or critical ambiguity):
+## Example: Comment-Based Request
 
 ```
-❓ Can you clarify this step?
-```
-
-or
-
-```
-❓ Do you want to:
-1. Use existing LoginPage
-2. Create new LoginPage
-3. Skip login step
-```
-
-### Interaction Principles
-
-- Minimize interruptions — prefer assumptions over questions.
-- Clearly mark assumptions with ⚠️.
-- Continue execution whenever possible.
-
----
-
-## Examples
-
-### Basic Conversion by Use Case Text
-
-```
-User: Convert this manual test to Playwright:
-"Login with valid credentials:
-1. Navigate to /login
-2. Enter username: admin
-3. Enter password: secret
-4. Click login button"
-
-Agent: Got it! Detected Playwright project.
-Agent: Creating test using existing LoginPage...
-Agent: ✅ Test created: tests/e2e/login.spec.ts
-Agent: Verify test code...
-Agent: ✅ Test passed!
-Agent: Refactoring to match project standards...
-Agent: ✅ All done!
-```
-
-### Basic Conversion by Comments in File
-
-**User Request:**
-
-```
-Use automate-manual-test-cases skill for CodeceptJS framework to write automation 
-script "tests/plan-for-guest.test.ts" based on manual steps below in this file as comments (leaving comments in the file for further analysis). Set a specific "smoke" tag for this test.  
-Use as reference for an extra proper examples: 
+Use automate-manual-test-cases skill for CodeceptJS framework to write automation
+script "tests/plan-for-guest.test.ts" based on manual steps below in this file as
+comments (leaving comments in the file for further analysis). Set a specific "smoke"
+tag for this test.
+Use as reference for extra proper examples:
 * `tests/payment-methods.test.ts` - Canonical test file with team approved format.
-* `src/pages/paymentMethods.page.ts`- Good described payment page object.
+* `src/pages/paymentMethods.page.ts` - Good described payment page object.
 Avoid mistakes from legacy code examples:
-* `src/pages/paymentOutdated.page.ts` - Outdated example with an old patterns.
+* `src/pages/paymentOutdated.page.ts` - Outdated example with old patterns.
 
-Finally, verify that the generated test is passed on - `BASE_URL = 'https://test.com/'` and provide final review for user.
-
-Agent: Got it! Detected Playwright project.
-...
-Agent: ✅ All done! See Summary report above...
+Finally, verify that the generated test is passed on - `BASE_URL = 'https://test.com/'`
+and provide final review for user.
 ```
-
-### Framework Not Detected
-
-```
-Agent: Couldn't detect automation framework in your project.
-❓ Which framework should I use?
-1. Playwright
-2. CodeceptJS
-3. Cypress
-4. Other (specify)
-```
-
----
-
-## Quick Reference
-
-| Action | Command/Tip |
-|--------|-------------|
-| Ask for clarification | Use ❓ emoji |
-| Simple start | Keep draft minimal first |
-| Reuse components | Check for existing POMs |
-| Rollback if stuck | Keep working version |
-| Final verification | Run related suite only |
-| Execute single Playwright test | `npx playwright test path/to/spec.ts` |
-| Execute single CodeceptJS test | `npx codeceptjs run path/to/test.js` |

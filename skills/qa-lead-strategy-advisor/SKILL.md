@@ -1,6 +1,6 @@
 ---
 name: qa-lead-strategy-advisor
-description: A strategic advisor for QA, quality, testing, and automation processes. Acts as a senior QA lead. First interviews the user and scans the project to build rich context, then identifies the highest-impact gaps and delivers a prioritized step-by-step roadmap, routing execution to specialized skills. Trigger this skill when the user wants to set up QA from scratch, improve an existing process, set up test automation, decide where to start with testing, or run a QA maturity review — e.g. "set up QA for this project", "improve our QA/testing/automation process", "where should we start with testing", "we have no tests, help", "review our quality process". Trigger thins skill also when user specifies problem like "low/poor quality", "missing/a log of bugs", "no testing".
+description: A strategic advisor for QA, quality, testing, and automation processes. Acts as a senior QA lead. First interviews the user and scans the project to build rich context, then identifies the highest-impact gaps and delivers a prioritized step-by-step roadmap, routing execution to specialized skills. Trigger this skill when the user wants to set up QA from scratch, improve an existing process, set up test automation, decide where to start with testing, or run a QA maturity review — e.g. "set up QA for this project", "improve our QA/testing/automation process", "where should we start with testing", "we have no tests, help", "review our quality process". Also trigger this skill when the user describes problems like "low/poor quality", "missing/a lot of bugs", "no testing".
 ---
 
 # QA Strategy Advisor
@@ -9,7 +9,7 @@ description: A strategic advisor for QA, quality, testing, and automation proces
 
 ## Phase 0. Plan mode
 
-**Strictly** recommend user to use/switch to "PLAN" mode in his AI agent.
+**Strictly** recommend user to use/switch to "PLAN" mode in their AI agent.
 
 ## Phase 1 — Discovery (gather context before advising)
 
@@ -20,7 +20,7 @@ Run `scan-automation-project` to detect languages, frameworks, and existing manu
 2. **Interview** the user — interactively, in rounds.
 
 **This step is crucial**. Don't rely just on scanned code. You should know the current product, processes, team, problems. They will not be defined in the codebase.
-Don't shy to ask questions, clarify, argue. QA processes is pretty wide and complex area, the more you know about how it is going – the better you can advise.
+Don't be shy to ask questions, clarify, argue. QA is a wide and complex area — the more you know about how it is going, the better you can advise.
 
 **This is a dialogue, not a questionnaire.** Never dump all interview questions as one plain-text list — that ends the conversation instead of starting it. Instead:
 
@@ -45,7 +45,7 @@ Topics to cover across the rounds:
 
 Store gathered context to markdown file `.testeiya/TESTING.md` and check if this file exists. If it exists, append to it. If it does not exist, create it.
 
-3. **Summarize** and take an approval from user.
+3. **Summarize** and get approval from the user.
 
 Show gathered context to user (in a well structured, formatted and readable way). Keep it scannable — short bullets, not paragraphs.
 
@@ -54,7 +54,7 @@ Then ask for approval (use `AskUserQuestion` tool if available):
 > Did I get the picture right?
 >
 > - ✅ **Yes — build the roadmap** (recommended)
-> - ✏️ **Lets adjust** — I'll tell you what to fix
+> - ✏️ **Let's adjust** — I'll tell you what to fix
 > - ❌ **No — let's revisit the questions**
 
 If the user picks corrections, apply them, show only the changed lines, and re-confirm the same way. Never end the turn with "say go if it looks right" as plain text.
@@ -63,11 +63,11 @@ If the user picks corrections, apply them, show only the changed lines, and re-c
 
 Map findings to QA pillars: **quality assurance and testing processes · test design · test coverage · automation, CI · reporting/metrics · TMS integration**. Find the gaps, rank by **impact first, then effort**, and present an ordered list (starting with the most important).
 
-**Formatting is critical** — read [references/output-format.md](references/output-format.md) before producing the roadmap and follow it strictly. It contains the item template and a full example. Never output dense numbered paragraphs. Strictly follow the output format.
+**Formatting is critical** — read [references/output-format.md](references/output-format.md) before producing the roadmap and follow it strictly. It contains the item template and a full example. Never output dense numbered paragraphs.
 
 **Display rule (critical)**
 
-- Print the full roadmap as the **final message of your turn**, do **not** call `AskUserQuestion` in the same turn when you display roadmap (cause it cause the roadmap to be hidden).
+- Print the full roadmap as the **final message of your turn**, do **not** call `AskUserQuestion` in the same turn when you display the roadmap (it causes the roadmap to be hidden).
 - End the roadmap with the 💬 call-to-action line from the output format (e.g. `Type "execute 1", "expand 1", "adjust", or "save"`). That line replaces the interactive menu for this turn.
 
 Store roadmap to `.testeiya/TESTING.md`.
