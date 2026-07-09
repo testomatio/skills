@@ -111,8 +111,8 @@ npx check-tests mocha "test/**/*_test.js"
 npx check-tests codeceptjs "tests/**_test.js"
 ```
 
-Example by using "TESTOMAT" token in exec cmd:
+Example using the `TESTOMATIO` token in the exec command:
 ```bash
-# NO recommended but for testing can be used
+# Not recommended, but can be used for testing
 TESTOMATIO=tstmt_xxx npx check-tests playwright "tests/**/*.spec.js"
 ```

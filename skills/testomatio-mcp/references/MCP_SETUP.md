@@ -8,7 +8,7 @@ Short reference extracted from the Testomat.io MCP server documentation.
 npm install -g @testomatio/mcp@latest
 ```
 
-For enterprise subscriptions, install `@testomatio/mcp-enterprise@latest` instead (includes analytics)
+For enterprise subscriptions, install `@testomatio/mcp-enterprise@latest` instead (includes analytics).
 
 ## Server Startup
 

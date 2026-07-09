@@ -7,190 +7,108 @@ metadata:
   version: 1.0.0
 ---
 
-# TEST-CASE-IMPROVER SKILL: What I do
+# Improve Test Cases
 
-Analyze and improve existing markdown manual test cases to make them clearer and more understandable for QA team:
+Analyze and improve existing markdown manual test cases to make them clearer for the QA team:
 - Improve test titles for clarity.
 - Enhance test descriptions.
-- Fix broken formatting and markdown syntax issues.
+- Fix broken formatting and markdown syntax.
 - Standardize test structure to Test Management Tool format.
 - Ensure consistent terminology and language.
 - Update tags and labels.
 
-**CRITICAL - DO NOT CHANGE:**
+**DO NOT CHANGE:**
 - Original test/suite IDs.
 - Original test intent.
-- Original language (fix only clarity/grammar/typo).
+- Original language (fix only clarity, grammar, typos).
 
----
+## Step 1: Locate Test Files
 
-## When to Use
+- Find markdown test files (`.test.md` or `.md`) in common locations: `./manual-tests`, `./tests/manual`, `./docs/tests`.
+- If none found, scan the whole project for `.md` files with test case content.
+- If still none, ask the user for the test directory path.
 
-Trigger this skill when user wants to:
-- Improve clarity and readability of manual test cases.
-- Standardize test format to TMS markdown format.
-- Fix broken markdown or formatting issues.
-- Enhance test descriptions and steps.
-- Improve specific test files or folders.
-- User possible phrases: "improve test cases", "rewrite test cases", "fix markdown formatting".
+## Step 2: Analyze Test Quality
 
----
+Read each test and flag issues:
 
-## Workflow: Improve Manual Cases
-
-### Step 1: Locate Test Files
-
-Find existing markdown test files (`.test.md` or `.md`) in the project:
-- Common locations: `./manual-tests`, `./tests/manual`, `./docs/tests`, etc.
-- Look for `.md` files with test case content.
-
-> If no test files found in common locations, ask user to specify test directory path.
-
-### Step 2: Analyze Test Quality
-
-Read test cases and analyze current format, quality, and identify issues:
-
-**Title Clarity:**
+Titles:
 - Unclear or vague test title.
 - Missing action-object format.
 - Not specific enough to understand what is being tested.
 
-**Description Issues:**
+Descriptions:
 - Vague or unclear test purpose.
 - Missing or incomplete description.
-- Ambiguous language.
 
-**Step Issues & Expected Results:**
-- Missing Expected Results.
+Steps and expected results:
+- Missing expected results.
 - Inconsistent step format.
 - Unclear actions.
 - Steps not ordered logically.
 - Expected results not relevant to the steps.
 - Missing pass/fail criteria.
 
-**Formatting Issues:**
+Formatting:
 - Broken markdown syntax.
 - Missing sections.
 - Inconsistent header hierarchy.
 
-**Unambiguity:**
+Ambiguity:
 - Generic or subjective terms ("should work", "might fail").
 - Vague language that could be interpreted multiple ways.
 - Steps that cannot be verified objectively.
 - Missing specific values, data, or conditions.
 
-### Step 3: Show Summary to User
+## Step 3: Show Summary to User
 
-Present a summary of what can be improved:
-- List of issues found per test.
-- Specific recommendations for improvements.
-- Ask user to confirm before proceeding.
+- List issues found per test.
+- Give specific recommendations for improvements.
+- **Ask the user to confirm before proceeding.**
+- If the user does not confirm, do not change anything.
 
-> If user does not confirm, do not proceed with changes.
+## Step 4: Improve Tests
 
-### Step 4: Improve Tests
-
-Apply improvements to each test:
-
-**Title Improvements:**
+Titles:
 - Make clear and specific.
 - Use action-result format: "Verify [action] results in [expected]".
-- Ensure title reflects actual test purpose.
+- Ensure the title reflects the actual test purpose.
 
-**Description Improvements:**
+Descriptions:
 - Make purpose clear and concise.
-- Include context from parent suite when relevant.
+- Include context from the parent suite when relevant.
 - Fix grammar and spelling only.
 
-**Step Improvements:**
-- Ensure each step has explicit expected result:
-  - Use nested format: "- Step action..." with indented "_Expected_: ..."
-- Make actions specific and reproducible
-- Add measurable pass/fail criteria
-- Ensure results are directly relevant to the step action
-- Make results measurable and verifiable
-- Avoid vague terms - use specific values/conditions
+Steps:
+- Give each step an explicit expected result.
+  - Nested format: "- Step action..." with indented "_Expected_: ...".
+- Make actions specific and reproducible.
+- Add measurable pass/fail criteria.
+- Ensure results are directly relevant to the step action.
+- Make results measurable and verifiable.
+- Avoid vague terms; use specific values and conditions.
 
-**Unambiguity Improvements:**
+Ambiguity:
 - Replace generic terms with specific, testable language.
 - Avoid subjective terms ("should work", "might fail").
 - Ensure steps can be verified objectively.
-- Mention proper test metadata fields:
-  - Include type: `manual` in test metadata.
-  - Use proper priority values: `low`, `normal`, `important`, `high`, `critical`.
 
-### Step 5: Save Changes
+Metadata:
+- Set `type: manual` in test metadata.
+- Use only these priority values: `low`, `normal`, `important`, `high`, `critical`.
 
-Overwrite original files with improved versions:
-- Keep same file names and directory structure.
-- Preserve all original test/suite IDs.
+## Step 5: Save Changes
 
-### Step 6: Show Final Summary
+- Overwrite the original files.
+- Keep the same file names and directory structure.
+- **Preserve all original test/suite IDs.**
 
-Output a summary of what was improved:
+## Step 6: Show Final Summary
+
 - Number of files modified.
 - Number of tests improved.
 - Key improvements made.
-- Next steps for the user.
 
----
+## Reference
 
-## References
-
-| Description | File |
-|-------------|------|
-| Test Management Tool Format Reference | ./references/TESTOMAT_MARKDOWN_EXAMPLE.md |
-
----
-
-## Error Handling
-
-### Recoverable Situations
-
-* **No test files found in common locations**
-  - Ask user to specify test directory path
-  - Or scan entire project for .md files containing test content
-
-* **Unclear test intent**
-  - Ask user to clarify what the test is supposed to verify
-  - Do not guess or assume test purpose
-
-* **Ambiguous improvements**
-  - Present options to user
-  - Ask for clarification before making changes
-
-### Blocking Issues
-
-* **Missing test content**
-  - Stop and inform user that no valid test cases found
-  - Ask user to provide test files
-
----
-
-## Examples
-
-**Improve all test cases:**
-```
-Use test-case-improver to enhance my test descriptions
-```
-
-**Standardize test format:**
-```
-Use test-case-improver to standardize all test cases to Testomat.io format
-```
-
-**Improve specific file:**
-```
-Use test-case-improver to improve test cases from the "./manual-test/home-page.test.md" file
-```
-
----
-
-## Quick Actions
-
-| Action | Description |
-|--------|-------------|
-| Analyze | Scan test files and identify issues |
-| Summary | Show user what can be improved |
-| Improve | Apply fixes to test cases |
-| Save | Write improved versions to disk |
+TMS markdown format example: [references/TESTOMAT_MARKDOWN_EXAMPLE.md](references/TESTOMAT_MARKDOWN_EXAMPLE.md)

@@ -1,49 +1,22 @@
 ---
 name: scan-automation-project
-description: Scan project source code to inventory languages, frameworks, and existing tests (manual `*.test.md` and automated test files). Use this skill whenever analyzing codebase for test planning, detecting test frameworks, or preparing for test automation. Specifically, when user mentions "scan project", "what tests exist", "analyze codebase", "detect frameworks", "test matrix", or needs codebase inventory before QA workflow.
+description: Scan project source code to inventory languages, frameworks, and existing tests (manual `*.test.md` and automated test files). Use this skill whenever analyzing a codebase for test planning, detecting test frameworks, or preparing for test automation. Specifically, when the user mentions "scan project", "what tests exist", "analyze codebase", "detect frameworks", "test matrix", or needs a codebase inventory before a QA workflow.
 license: MIT
 metadata:
   author: Testomat.io
   version: 1.0.0
 ---
 
-# PROJECT-SCAN SKILL: What I do
+# Scan Automation Project
 
-This skill scans project source code to produce a QA-focused inventory: languages, frameworks, and existing tests.
+Scan project source code and return a QA-focused inventory: languages, frameworks, and existing tests.
 
-Test Scanner Journey:
-- Analyze source code structure in project root.
-- Detect programming languages used.
-- Identify test frameworks (automated tests).
-  * Avoid deep parsing unit test and integration system files.
-- Inventory manual test cases from `.test.md` files.
+**Shallow scan only.** No full import resolution, no line-by-line parsing, no reading full test implementations. High-level structure only.
 
-**CONSTRAINT (large projects):**
-- Do not perform deep analysis: no full import resolution, no line-by-line parsing, no inference of complex code relationships.
+## Step 1: Locate Source Code
 
-**Focus only on high-level structure**.
-
-## When to Use
-
-Trigger this skill when user wants to:
-- **Scan/Analyze/Discovery** project source code for QA planning.
-- **Detect** what frameworks are used.
-- **Find** existing automated and manual tests in `.test.md` format.
-- **Inventory** codebase before testing procedures.
-
----
-
-## Workflow: Scan Project (QA-Focused)
-
-### Step 1: Understand Project Context
-
-Scan root dir to understand which files we will analyze in the future:
-
-**Option-1**
-- If folder includes non-empty source code folders or files => Go to "Step 2".
-
-**Option-2**
-- If **no source** files are found in any of the listed directories, stop scanning and ask the user:
+- If the project root has non-empty source folders or files, go to Step 2.
+- If **no source** files are found, stop and ask the user:
 
 ```
 ❓ No application source code detected (folder may be empty or missing).
@@ -52,11 +25,11 @@ Where is the source code?
 2. Clone from Git repo
 3. I don't know yet (stop here)
 ```
-[Waits for the user's reply.]
 
-- If user provides `Git repo` or `another folder` variant => clone or symlink it into `.testeiya/code/` (see the rule below). No-op if it's already there.
+- Wait for the user's reply.
+- If the user gives a Git repo or another folder, clone or symlink it into `.testeiya/code/`. No-op if it is already there.
 
-#### Rule for pulled data
+### Rule for pulled data
 
 **When you need to pull external data** (manual test cases, app code, e2e tests from another repo) into this project:
 
@@ -66,59 +39,34 @@ Where is the source code?
 | **Only test infrastructure** (e2e dirs like `tests/`, `playwright/`, `cypress/` but no `src/`) | `manual-tests/` or `e2e-tests/` | No |
 | **Empty / manual-only** | `manual-tests/` | No |
 
-**Detection logic:**
+Detection logic:
 1. Has `src/` folder or is a monorepo? → Use `.testeiya/`
 2. Has e2e test dirs (`tests/`, `playwright/`, `cypress/`, `e2e/`)? → Use tracked folder (`manual-tests/`, `e2e-tests/`)
 3. Otherwise → Default to `manual-tests/`
 
-Any skill that creates `.testeiya/...` must also add `.testeiya/` to the project's `.gitignore` — but only if it is not there yet. Never add it twice.
+- Any skill that creates `.testeiya/...` must also add `.testeiya/` to the project's `.gitignore` — but only if it is not there yet. Never add it twice.
+- The rule covers *pulled* data only. Output a skill *produces* and the user wants — a `coverage.*.yml`, new `*.test.md` files — goes in the repo as normal.
+- On a source repo with no manual tests, this skill changes no tracked file: it only creates the gitignored `.testeiya/` directory and, if needed, adds one line to `.gitignore`.
+- **Only touch `.testeiya/` and tracked folders — never pollute the repo with cache in a wrong location.**
 
-(The rule is about *pulled* data. Output a skill *produces* and the user wants — a `coverage.*.yml`, new `*.test.md` files — goes in the repo as normal.)
+## Step 2: Project Analysis
 
-On a source repo with no manual tests, `scan-automation-project` changes no tracked file: it only creates the gitignored `.testeiya/` directory and, if needed, adds one line to `.gitignore`.
-
-**Only touch `.testeiya/` and tracked folders — never pollute repo with cache in wrong location.**
-
----
-
-### Step 2: Project Analysis (Simplified)
-
-Scan the project and collect a list of **source code files only**.
-
-#### 1. Discover Files
-
-- Traverse the project directory.
-- Collect file paths only (**Do NOT read file contents at this point**).
-
-#### 2. Filter to Source Code
+Collect source file paths only. **Do NOT read file contents.**
 
 Include:
-- Application source files (e.g. `.js`, `.ts`, `.py`, `.java`, `.go`, etc.).
-- View/template files — they are application source: `.html`/`.htm`, `.vue`, `.svelte`, `.hbs`/`.handlebars`, `.ejs`, `.pug`/`.jade`, `.mustache`, `.liquid`, `.erb`, `.haml`, `.slim`, `.blade.php`, `.twig`, `.j2`/`.jinja`/`.jinja2`, `.cshtml`/`.razor`, `.jsp`. Do not exclude these as "non-source"; coverage skills map UI changes through them.
+- Application source files.
+- View/template files: `.html`/`.htm`, `.vue`, `.svelte`, `.hbs`/`.handlebars`, `.ejs`, `.pug`/`.jade`, `.mustache`, `.liquid`, `.erb`, `.haml`, `.slim`, `.blade.php`, `.twig`, `.j2`/`.jinja`/`.jinja2`, `.cshtml`/`.razor`, `.jsp`. They are application source — coverage skills map UI changes through them.
 
 Exclude:
-- Dependencies (e.g. `node_modules/`, `vendor/`, `.venv/`).
-- Build/generated output (e.g. `dist/`, `build/`, `.next/`, `target/`).
-- Coverage, reports, caches, config, lock, and environment files.
-- Ignored paths from `.gitignore` — but **not** `.testeiya/code/`. In a manual-tests repo the app code lives there, so scan it as source even though `.testeiya/` is gitignored.
+- Dependencies, build output, coverage, reports, caches, config, lock, and environment files.
+- Paths ignored by `.gitignore` — but **not** `.testeiya/code/`. In a manual-tests repo the app code lives there; scan it as source.
 - Testeiya internal files (e.g. `session-factory.ts`, `system-prompt.ts`).
-[**If in doubt**, prefer excluding over including non-source files.]
+- **If in doubt**, exclude.
 
-#### 3. Detect Tech Stack
-
-Infer program languages and frameworks from file extensions, structure, and config files. The result is a **single array** `frameworks` containing ALL observed application and testing frameworks.
-
-#### 4. Extract Project Name
-
-- Use, in priority order:
-  1. Project config files (e.g. `package.json`, `Cargo.toml`, `pom.xml`).
-  2. Root directory name.
-
-#### 5. Estimate Project Complexity
-
-Based on total number of source files, choose one variant.
-
-**Calculate complexity table:**
+From the file list:
+- Detect languages and frameworks. Collect one `frameworks` list with ALL application and testing frameworks.
+- Extract the project name from a project config file (`package.json`, `Cargo.toml`, `pom.xml`, ...); fall back to the root directory name.
+- Rate complexity by source file count:
 
 | File Count | Complexity   |
 |------------|--------------|
@@ -127,58 +75,16 @@ Based on total number of source files, choose one variant.
 | 151-500    | `large`      |
 | 500+       | `very-large` |
 
-#### Output (Structured Result)
+## Step 3: Test Inventory (optional)
 
-Produce and return a single structured markdown result directly. 
-**Do NOT save to a file.** 
+Detect existing tests, automated and manual. Stay shallow.
 
-Use the following markdown format:
+Automated tests:
+- Detect frameworks via config files (`jest.config.*`, `playwright.config.*`, `vitest.config.*`, `pytest.ini`, `pom.xml`, ...), project dependencies, and test file patterns (`*.test.*`, `*.spec.*`, `*_test.*`).
+- For each framework: identify its test file pattern and count matching files.
 
-```markdown
-# Project Overview
-
-- **Project Name:** ...
-- **Description:** ...
-- **Languages:** TypeScript, SQL
-- **Frameworks:** React, Express, Jest, Playwright
-- **Complexity:** small (12 files)
-```
-
-[Field notes:
-* **Project Name** - Project root folder name or repo name.
-* **Description** - 1-2 sentence summary based ONLY on: detected source code and folder structure (including domain area if that make sense for current project).
-* **Languages** - Detected programming languages.
-* **Frameworks** - Application frameworks, Testing tools, etc.
-* **Complexity** - One of: `small` | `moderate` | `large` | `very-large`, based on file count + structure.]
-
-**Important:**
-- Do NOT guess or infer missing data.
-- Do NOT add fields not defined in the schema.
-- All values must come from observable files.
-
-**Show a summary** based on scan results.
-
----
-
-### Step 3: Tests Inventory (optional)
-
-Detect existing tests (automated and manual).
-This step is **shallow** - **Do NOT read full test implementations**.
-
-### Automated Tests
-
-Detect test automation frameworks using:
-- Config files (e.g. `jest.config.*`, `playwright.config.*`, `vitest.config.*`, `pytest.ini`, `pom.xml`, etc.).
-- Dependencies in project configs.
-- Common test file patterns (e.g. `*.test.*`, `*.spec.*`, `*_test.*`).
-
-For each detected framework:
-- Identify test file patterns.
-- Count matching test files.
-
-### Manual Tests
-
-Find all `.test.md` files and parse test titles. `find .` also looks inside `.testeiya/manual-tests/`, so a re-run after a pull finds the cached cases instead of reporting "no manual tests":
+Manual tests:
+- Find all `.test.md` files and parse test titles. `find .` also looks inside `.testeiya/manual-tests/`, so a re-run after a pull finds the cached cases instead of reporting "no manual tests":
 
 ```bash
 find . -name "*.test.md" -exec awk '
@@ -194,24 +100,17 @@ find . -name "*.test.md" -exec awk '
 ' {} +
 ```
 
-If the only `.test.md` files are under `.testeiya/manual-tests/`, say so in the inventory: they came from Testomat.io, not from this repo.
+- If the only `.test.md` files are under `.testeiya/manual-tests/`, say so in the inventory: they came from Testomat.io, not from this repo.
 
----
+## Step 4: Output
 
-### Step 5: Final Output
-
-Merge all results into the structured markdown format.
-
-- If **no tests are found**, return a note that the current version of the project does not contain any tests. The user may still use the `## Project Overview` section above for next steps.
-- If **tests were inventoried**, append a `## Test Inventory` section.
-
-**Full example:**
+Return one structured markdown result directly. **Do NOT save to a file.**
 
 ```markdown
 # Project Overview
 
-- **Project Name:** ...
-- **Description:** ...
+- **Project Name:** acme-web-app
+- **Description:** A React-based customer dashboard with an Express API.
 - **Languages:** TypeScript, SQL
 - **Frameworks:** React, Express, Jest, Playwright
 - **Complexity:** small (12 files)
@@ -221,104 +120,6 @@ Merge all results into the structured markdown format.
 - **Automated Tests:** 10 files
 - **Manual Tests:** 37 cases
 
-### Manual Tests (25 of 37 shown)
-
-- SUITE: Authentication
-  |- User can login
-  |- User can reset password
-- SUITE: Billing
-  |- User can view invoice
-  ...and 9 more
-
-### Automated Tests (10 of 10 shown)
-
-- home.page.spec.ts
-...
-```
-
-[Extra Field Notes:
-* **Manual Tests** — Preserve hierarchy as plain strings. Render SUITE items as parent bullets and test titles (`|-`) as nested children.]
-* **Automated Tests** — List of identified test files.
-
-**Report a summary to the user:**
-* Provide a concise overview of the scan results (see example below).
-* Do not include full test listings.
-
-**Test listing constraint:**
-If manual / automated tests are included in output:
-- Limit displayed items to the first 20 entries.
-- Keep original file order.
-- Indicate truncation if more exist (e.g., `...and N more`).
-
----
-
-## Error Handling
-
-### Recovery
-
-Attempt recovery before failing:
-
-- **Symlink exists** => skip, use existing path.
-- **No source found** => wait for user response.
-- **Scanner fails** => fallback to simple file listing.
-
-### Hard Fail
-
-Stop if:
-- Cannot create context directory
-- Cannot access source path
-- No read permissions
-
----
-
-## Examples
-
-### Example: Scan Project
-
-User Prompt: `Use scan-automation-project to analyze this project codebase`
-Skill Output:
-
-```markdown
-# Project Overview
-
-- **Project Name:** acme-web-app
-- **Description:** A React-based customer dashboard. Uses TypeScript for the frontend and Express for the API.
-- **Languages:** TypeScript, JavaScript
-- **Frameworks:** React, Express, Jest
-- **Complexity:** moderate (87 files)
-
-## Test Inventory
-
-- **Automated Tests:** 24 files
-- **Manual Tests:** 0 cases
-
-> No manual tests (`.test.md`) found in the project.
-
-### Automated Tests (20 of 24 shown)
-
-- home.page.spec.ts
-...
-```
-
-### Example: Get Test Inventory
-
-User Prompt: `List all automated and manual tests in this project`
-Skill Output:
-
-```markdown
-# Project Overview
-
-- **Project Name:** acme-web-app
-- **Description:** A React-based customer dashboard.
-- **Languages:** TypeScript
-- **Frameworks:** React, Playwright, Jest
-- **Complexity:** moderate (87 files)
-
-## Test Inventory
-
-- **Automated Tests:** 0 files
-- **Manual Tests:** 37 cases
-
 ### Manual Tests (20 of 37 shown)
 
 - SUITE: Authentication
@@ -326,7 +127,26 @@ Skill Output:
   |- User can reset password
 - SUITE: Billing
   |- User can view invoice
-  ...and 34 more
+  ...and 17 more
 
-> No automation tests found in the project.
+### Automated Tests (10 of 10 shown)
+
+- home.page.spec.ts
+...
 ```
+
+Field rules:
+- **Description:** 1-2 sentences based only on detected source code and folder structure (include the domain area if that makes sense).
+- **Complexity:** one of `small` | `moderate` | `large` | `very-large`, plus the file count.
+- **Manual Tests:** preserve hierarchy as plain strings — SUITE items as parent bullets, test titles (`|-`) as nested children.
+- **Automated Tests:** list of detected test files.
+- All values must come from observable files. Do NOT guess missing data or add fields not shown above.
+
+Sections:
+- If Step 3 was skipped or found no tests, omit `## Test Inventory` and note that the project contains no tests; the `# Project Overview` section is still useful for next steps.
+- If one test type is absent, note it with a blockquote, e.g. ``> No manual tests (`.test.md`) found in the project.``
+
+Test listing truncation:
+- Show at most the first 20 entries per list, in original file order.
+- Mark truncation in the heading (`(20 of 37 shown)`) and with `...and N more`.
+- Do not print full test listings beyond that.
