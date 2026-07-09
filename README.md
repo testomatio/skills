@@ -5,7 +5,7 @@ AI skills for test management workflows with [Testomat.io](https://testomat.io).
 ## Quick Start
 
 ```bash
-npx skills add testomatio/skills`
+npx skills add testomatio/skills
 ```
 
 ## Install
