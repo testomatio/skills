@@ -1,5 +1,5 @@
 ---
-name: test-consolidation
+name: qa-automation-test-consolidation
 description: Detect redundant tests, duplicated test logic, semantic overlaps, and parameterization opportunities across the entire test suite. Present recommendations and request user approval before refactoring.
 license: MIT
 metadata:
