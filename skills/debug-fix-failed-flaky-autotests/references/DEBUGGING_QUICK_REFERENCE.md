@@ -1,31 +1,25 @@
 # Debugging Quick Reference
 
-**Priority:** 
-1. Fix Locators First
-2. Timing
-3. Assertions
-4. Flow
+Fix in priority order: locators → timing → assertions → flow.
 
 ---
 
 ## Locator Fixes
 
-### Common Locator Issues
-
-|     Problem     | Avoid | Prefer |
-|-----------------|-------|--------|
-| Deep nesting    | `.parent .child .grandchild` | `[data-testid="target"]` |
-| Index-based     | `button:nth-child(2)` | `getByRole('button', { name: 'Submit' })` |
-| Partial text    | `button:contains("Save")` | `getByText('Save', { exact: true })` |
+| Problem | Avoid | Prefer |
+|---------|-------|--------|
+| Deep nesting | `.parent .child .grandchild` | `[data-testid="target"]` |
+| Index-based | `button:nth-child(2)` | `getByRole('button', { name: 'Submit' })` |
+| Partial text | `button:contains("Save")` | `getByText('Save', { exact: true })` |
 | Dynamic classes | `.btn-primary-123` | `[data-testid="save-btn"]` |
 
-### Element State Issues
+Element state issues:
 
-- Not found => Wait for element before action
-- Not visible => Scroll into view
-- Not clickable => Wait for enabled state; check overlays
-- Stale element => Re-fetch element before action
-- Multiple matches => Filter or use `.first()`
+- Not found => wait for element before action.
+- Not visible => scroll into view.
+- Not clickable => wait for enabled state; check overlays.
+- Stale element => re-fetch element before action.
+- Multiple matches => filter or use `.first()`.
 
 ---
 
@@ -33,7 +27,9 @@
 
 Use framework-native waits instead of hard sleeps.
 
-### Use Explicit Waits
+- Avoid hard sleeps (`sleep(5000)`, `wait(2)`) => flaky.
+- Avoid implicit short waits => unreliable.
+- Works locally, fails in CI => CI is slower; increase timeouts and add explicit waits.
 
 **Playwright:**
 ```typescript
@@ -50,8 +46,8 @@ I.waitForResponse(response => response.status() === 200);
 
 ### Fix Race Conditions
 
-**Goal:** Ensure assertions happen after dynamic content updates.
-**Strategy:** Use `expect` with Playwright’s built-in waiting, or `locator.waitFor()` only if needed.
+Ensure assertions happen after dynamic content updates.
+Use `expect` with Playwright's built-in waiting, or `locator.waitFor()` only if needed.
 
 ```typescript
 // Click triggers dynamic update
@@ -61,20 +57,14 @@ await page.getByRole('button', { name: 'Submit' }).click();
 await expect(page.getByTestId('result')).toHaveText('Success'); // automatically waits
 ```
 
-**What to Avoid:**
-- Hard sleeps (sleep(5000), wait(2)) → flaky.
-- Implicit short waits → unreliable.
-
 ---
 
 ## Assertion Fixes
 
-### Common Assertion Issues
-
-- Exact match too strict => Use `toContain()` or regex.
-- Wrong expected value => Verify against test spec.
-- Timing issues => Wait before assertion.
-- Multiple elements => Use `.first()` or `.nth(0)`.
+- Exact match too strict => use `toContain()` or regex.
+- Wrong expected value => verify against test spec.
+- Timing issues => wait before assertion.
+- Multiple elements => use `.first()` or `.nth(0)`.
 
 Examples:
 
@@ -83,7 +73,7 @@ Examples:
 expect(await page.locator('.title').textContent()).toBe('Hello World');
 
 // After: contains check
-expect(page.locator('.title')).toContainText('Hello');
+await expect(page.locator('.title')).toContainText('Hello');
 
 // Better: trim if exact needed
 const text = (await page.locator('.title').textContent()).trim();
@@ -94,18 +84,17 @@ expect(text).toBe('Hello World');
 
 ## Flow Fixes
 
-**Missing Preconditions:** Ensure login, proper navigation, and required test data.
-**Test Isolation Issues:** 
-  - Fails on 2nd run => Add cleanup hooks.
-  - Depends on order => Use `beforeEach` for fresh state.
-  - Shared state => Isolate per test worker.
+- Missing preconditions => ensure login, proper navigation, and required test data.
+- Fails on 2nd run => add cleanup hooks.
+- Depends on order => use `beforeEach` for fresh state.
+- Shared state => isolate per test worker.
 
 ---
 
 ## Framework-Specific Commands
 
 **Playwright:**
-- Show trace: `npx playwright show trace.zip`
+- Show trace: `npx playwright show-trace trace.zip`
 - Run single file: `npx playwright test path/to/test.spec.ts`
 
 **CodeceptJS:**
@@ -115,41 +104,10 @@ expect(text).toBe('Hello World');
 
 ---
 
-## Quick Decision Tree
-
-```
-Test Failed
-    │
-    ▼
-What type of failure?
-    │
-    ├─► Locator (not found, not visible)
-    │       │
-    │       ▼
-    │   Fix selector → use data-testid/aria-role
-    │
-    ├─► Timing (timeout)
-    │       │
-    │       ▼
-    │   Add explicit wait
-    │
-    ├─► Assertion (expected ≠ actual)
-    │       │
-    │       ▼
-    │   Check expected value vs test spec
-    │
-    └─► Flow (navigation, state)
-            │
-            ▼
-        Check preconditions
-```
-
----
-
 ## Max 3 Healing Attempts
 
-1. **Attempt 1**: Apply fix based on initial diagnosis
-2. **Attempt 2**: If still fails, re-diagnose with new info
-3. **Attempt 3**: Last try with alternative approach
+1. Attempt 1: apply fix based on initial diagnosis.
+2. Attempt 2: if still fails, re-diagnose with new info.
+3. Attempt 3: last try with an alternative approach.
 
-> If still failing => STOP, document issues, ask user for guidance
+If still failing => STOP, document what was tried, ask the user for guidance.

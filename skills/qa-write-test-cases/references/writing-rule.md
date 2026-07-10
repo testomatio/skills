@@ -1,42 +1,41 @@
-## Test Suite Writing Rules
+# Test Writing Rules
 
-Important: Refer to user provided test cases first, then use these rules.
+If the user provided example test cases, follow their style first; then apply these rules.
 
-Formulas, business rules, edge-case reasoning, and feature context live in the suite/test description.
-Prerequisites which are common to all test cases must be written as bullet points in the suite description.
-Formulas, diagrams, relavant to all test cases can be included as codeblocks in the suite description.
+## Test Suites
 
-## Test Case Writing Rules
+- Formulas, business rules, edge-case reasoning, and feature context live in the suite/test description.
+- Prerequisites common to all test cases go as bullet points in the suite description.
+- Formulas and diagrams relevant to all test cases can be included as code blocks in the suite description.
 
-Test case consist of description and steps.
-Add the intent of the test case to the description if title is not fully enough to explain the intent.
-Description must be clear and concise.
-Focus on black-box testing, thus each operation and observable results must be obtained via public apis or UI (unless user specifies otherwise).
-Prefer using UI over public apis when possible.
-**If this is a web app** ask user to discover it
-- by looking its frontend source code
-- by accessing it on non-production environment via browser (URLs and credentials)
-- by looking at screenshots of related pages
-  Understand UI pages and components or API endpoints from source code or design or requirements.
-  Add system checks only if it not clear how to test via public apis or UI.
-  It is not a unit test, usually no direct server or code access is allowed.
+## Test Cases
 
-Golden rule: "Why" in description, "what" in steps.
-
-Put preparations into **preconditions**/**description** section, not as steps.
+- A test case consists of a description and steps.
+- Golden rule: "why" in the description, "what" in the steps.
+- Add the intent to the description if the title is not enough to explain it.
+- Keep the description clear and concise.
+- Put preparations into preconditions/description, not into steps.
+- Focus on black-box testing: every action and observable result goes through public APIs or UI (unless the user specifies otherwise).
+- Prefer UI over public APIs when possible.
+- Add system checks only when it is not clear how to test via public APIs or UI. This is not a unit test; usually no direct server or code access is allowed.
+- Understand UI pages, components, or API endpoints from source code, design, or requirements.
+- If this is a web app, ask the user to help discover it:
+  - by looking at its frontend source code
+  - by accessing it on a non-production environment via browser (URLs and credentials)
+  - by looking at screenshots of related pages
 
 ## Title
 
 Title states the behavior under test from the user's perspective.
 
-Title structure: "<role> <action> <object> <qualifier>"
+Title structure: `<role> <action> <object> <qualifier>`
 
 Examples:
 
 - Editor can change description of a blogpost in admin panel
 - User can report a bug using widget on a web page
-- Blocked user must not be able to log in into app workspace
-- Admin can invite up to 10 user to a project via Settings Page
+- Blocked user must not be able to log in to app workspace
+- Admin can invite up to 10 users to a project via Settings Page
 - User can not edit a comment it doesn't own
 - User can retry operation when NetworkError occurs
 - User can not retry operation when network connection is disabled
@@ -58,27 +57,26 @@ Good vs bad:
 
 ## Preconditions
 
-Add preconditions for actions which do not belong to actions, but are required for the test to run.
-Do not include preconditions like "service is running" if it's not explicitly mentioned by user or is not actually what the test is about.
-Define the pre-conditions and initial state of the system as bullet points.
-Avoid if not needed or is the same as the suite description.
-If relevant, include the user role.
+- Add preconditions for setup that is required for the test to run but is not part of the test actions.
+- Define the preconditions and initial state of the system as bullet points.
+- If relevant, include the user role.
+- Skip preconditions that are not needed or repeat the suite description.
+- Do not include preconditions like "service is running" unless the user explicitly mentioned them or the test is about them.
 
 ## Steps
 
-````suggestion
-Step should consist of **action** (with optional test data) and **expected result**.
+A step consists of an action (with optional test data) and an expected result.
 
 Test steps use the `## Steps` header section with a nested markdown list format:
 
 ```markdown
 ## Steps
 
-* (Step Action)
+- (Step Action)
   *Expected*: ... (Observable behavior)
-* ...
+- ...
   *Expected*: ...
-````
+```
 
 e.g.
 
@@ -95,36 +93,31 @@ e.g.
 
 Step format rules:
 
-Steps must be under a `## Steps` heading
-Use nested markdown lists (bulleted * or numbered 1.)
-Top-level items describe the action to perform
-Nested items with *Expected* (or *Expected*:, *Expected result\*) describe the observable behavior
-Expected results should be specific and verifiable
+- Steps must be under a `## Steps` heading.
+- Use nested markdown lists (bulleted `-`/`*` or numbered `1.`).
+- Top-level items describe the action to perform.
+- Nested items with `*Expected*` (or `*Expected*:`, `*Expected result*`) describe the observable behavior.
+- Expected results should be specific and verifiable.
 
-Each step must be simple sentences.
-Avoid using commas, sub-sentences.
-Steps are mechanical: click, send, read, assert.
-Each step must include exact instructions
-Prefer concrete, realistic values a tester can act on directly. Do NOT parametrize by default — first-pass test cases should read as executable manual steps, not templates.
-Use a placeholder variable like `${domain}` only when the value is genuinely reused across steps or is data-driven (see the Examples section in the format reference). A plain UI/API acceptance step needs concrete values, not placeholders.
-Do not add as placeholders data which is not specifically related to test. 
-Do not add preconditions as placeholders.
-Prefer using URL paths over full urls If its url path, e.g. `/auth/login`.
-Use specific values when they are important for the scenario (e.g. boundary values, format validation, locale-specific input).
-Avoid vague qualifiers like "small", "known", "around", "e.g.", "like", "(…)"; replace them with concrete, literal values.
-Avoid general statements in steps. Move general statements to the description.
-Do not chain multiple distinct actions or use unnecessary And / Or combinations in a single sequence.
-All step actions must be clear to perform via PUBLIC API or UI
-All checks/verifications/assertions should be in **expected result**, not as step **action**.
-You may add a codeblock after a step if needed to:
+Step content rules:
 
-- write API request
-- write SQL
-- write shell command
-- to illustrate the point using pseudocode
-- etc
+- Each step is a simple sentence. Avoid commas and sub-sentences.
+- Steps are mechanical: click, send, read, assert.
+- Each step includes exact instructions with concrete, realistic values a tester can act on directly.
+- Do NOT parametrize by default — first-pass test cases should read as executable manual steps, not templates.
+- Use a placeholder variable like `${domain}` only when the value is genuinely reused across steps or is data-driven (see the Examples section in the format reference). A plain UI/API acceptance step needs concrete values, not placeholders.
+- Do not turn data unrelated to the test into placeholders.
+- Do not add preconditions as placeholders.
+- Prefer URL paths over full URLs, e.g. `/auth/login`.
+- Use specific values when they are important for the scenario (boundary values, format validation, locale-specific input).
+- Avoid vague qualifiers like "small", "known", "around", "e.g.", "like", "(…)"; replace them with concrete, literal values.
+- Avoid general statements in steps. Move them to the description.
+- Do not chain multiple distinct actions or use unnecessary And / Or combinations in a single step.
+- All step actions must be clear to perform via public API or UI.
+- All checks/verifications/assertions belong in the expected result, not in the step action.
+- A code block may follow a step when needed: API request, SQL, shell command, pseudocode, etc.
 
-If expected result has multiple conditions split them into separate lines:
+If an expected result has multiple conditions, split them into separate lines.
 
 Instead of:
 

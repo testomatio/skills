@@ -1,11 +1,10 @@
 # automate-manual-test-cases Skill
 
-## Overview
 Converts manual test cases into automation test scripts following POM pattern.
 
 ## Step Tracking
 
-**Current step is tracked in SKILL.md header.** After completing each step, UPDATE the "### Progress" step:
+Progress is tracked in the `### Progress` block of SKILL.md. After completing each step, update it:
 
 ```markdown
 ### Progress
@@ -14,30 +13,27 @@ Converts manual test cases into automation test scripts following POM pattern.
 * Next ➡️ Step 3: Write Test Code.
 ```
 
-**Step Flow:**
-1. **Step 1:** Analyze Project Architecture (detect framework, find reusable components)
-2. **Step 2:** Understand Manual Test (normalize input, handle ambiguous steps)
-3. **Step 3:** Write Test Code (implement, add assertions)
-4. **Step 4:** Verify & Heal (execute, fix if fails - max 3 attempts)
-5. **Step 5:** Finalization (align, run, summary)
+Step flow:
+1. Analyze Project Architecture (detect framework, find reusable components)
+2. Understand Manual Test (normalize input, handle ambiguous steps)
+3. Write Test Code (implement, add assertions)
+4. Verify & Heal (execute, fix if fails — max 3 attempts)
+5. Finalization (align, run, summary)
 
-**Important:**
-- NEVER skip steps - complete each before moving to next
-- If healing loop (Step 4.2) runs 3 times without success → STOP and ask user
-- After Step 4 passes → update header to Step 5
-- After Step 5 complete → update to "COMPLETED" and run postHook
+Rules:
+- **Never skip steps** — complete each before moving to the next.
+- If the healing loop (Step 4.2) runs 3 times without success => stop and ask the user.
+- After Step 5 completes => update Progress to "COMPLETED" and run the PostHook.
 
 ## When Starting Fresh
 
-1. Read SKILL.md header to see current step
-2. If "ACTIVE STEP: 1/5" → start from beginning
-3. If already in progress → continue from that step
+1. Read the `### Progress` block in SKILL.md to see the current step.
+2. If "STEP: 1/5" => start from the beginning.
+3. If already in progress => continue from that step.
 
 ## PostHook
 
-After skill completes, run the generated `$TEST_FILE` using the project's test framework:
-
-**Example:**
+After the skill completes, run the generated `$TEST_FILE` with the project's test framework and confirm it passes:
 
 ```bash
 # Playwright case
@@ -51,8 +47,6 @@ npx codeceptjs run "$TEST_FILE"
 # Cypress case
 npx cypress run --spec "$TEST_FILE"
 ```
-
-Confirm test passes before finishing.
 
 ## Files
 
