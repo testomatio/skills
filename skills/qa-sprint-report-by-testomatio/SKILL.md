@@ -167,22 +167,34 @@ Write the filled report to:
 
 If no path specified, save to current working directory.
 
-### Step 6: Offer HTML Export (optional)
+### Step 6: Offer Export
 
-After writing the corresponding sprint info to `.md` file, 
-ASK the user:
+After writing the `.md` file, ask the user if they want to export the report and where to save it:
 
 ```
-❓ Would you like to export this report as a `.html` file? 
-(This format is ready to share with the team members).
-```
+❓ The report has been saved to `{path}`.
+Would you like to export it as a `.html` file to share with the team?
 
-If the user confirms:
-1. Read the html template file.
-2. Map the `.md` content into the corresponding template sections.
-3. Save as `QA_Sprint_Progress_Report_{SprintName}_{YYYY-MM-DD}.html` in the same directory.
+1. 📂 Yes, export to project root (default)
+2. ✏️ Yes, but let me specify a different location
+3. 👍 No, keep the `.md` only
+```
 
 > **Note:** HTML export requires the template file to be present at `./references/qa-sprint-report-template.html`. If the template is missing, notify the user and offer to save the `.md` only.
+
+**If user picks option 1 (project root):**
+1. Read the HTML template from `./references/qa-sprint-report-template.html`.
+2. Map the `.md` content into the corresponding template sections.
+3. Save as `QA_Sprint_Progress_Report_{SprintName}_{YYYY-MM-DD}.html` in the project root.
+
+**If user picks option 2 (custom location):**
+1. Ask for the target directory path.
+2. Read the HTML template.
+3. Map the `.md` content into the corresponding template sections.
+4. Save as `QA_Sprint_Progress_Report_{SprintName}_{YYYY-MM-DD}.html` in the specified directory.
+
+**If user picks option 3:**
+- Confirm the `.md` path and end the workflow.
 
 ## Quick Commands
 
