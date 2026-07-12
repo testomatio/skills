@@ -17,7 +17,7 @@ Folder (top-level)
     └── Test {title} (@T{id}) → has tags (e.g. @smoke), labels, priority (e.g. high)
 ```
 
-## Priority values: critical, high, normal, low
+Priority values: `critical`, `high`, `normal`, `low`.
 
 ## Key MCP Tools
 

@@ -2,7 +2,9 @@
 
 A small, deliberately flawed draft — the kind of thing that lands in review — turned into a requirements review. The input has loose structure and mixed quality; the review works with it as-is and does not rewrite it.
 
-## Input (draft BRD excerpt)
+## Example 1: Draft BRD
+
+### Input (draft BRD excerpt)
 
 ```
 Search Feature — Business Requirements (draft)
@@ -13,7 +15,7 @@ Search Feature — Business Requirements (draft)
 4. Search results are stored for reporting.
 ```
 
-## Output
+### Output
 
 ```markdown
 ## Requirements Review
@@ -67,9 +69,7 @@ No acceptance criteria found. Suggest:
 Resolve all open questions before approval. Add measurable acceptance criteria to each requirement. Split compound requirement R2 into atomic requirements.
 ```
 
----
-
-## Another Example: User Stories
+## Example 2: User Stories
 
 ### Input (user stories)
 

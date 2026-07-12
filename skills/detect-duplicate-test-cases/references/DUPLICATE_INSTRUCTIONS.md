@@ -1,6 +1,6 @@
 # Duplicate Detection Guide
 
-Quick reference for identifying and scoring duplicate test cases.
+Reference for scoring and classifying duplicate test cases.
 
 ## Detection Levels
 
@@ -13,7 +13,7 @@ Quick reference for identifying and scoring duplicate test cases.
 
 ## Similarity Scoring
 
-Compare test pairs on: **Title** -> **Steps** -> **Expected results** -> **Preconditions** -> **Tags**
+Compare test pairs on: title -> steps -> expected results -> preconditions -> tags.
 
 | Score | Category |
 |-------|----------|
@@ -21,6 +21,16 @@ Compare test pairs on: **Title** -> **Steps** -> **Expected results** -> **Preco
 | 80-99% | Semantic duplicate |
 | 50-79% | Overlapping |
 | <50% | Different tests |
+
+For automated tests, also consider code-level duplicates in assertions and shared setup/teardown.
+
+## Actions
+
+| Action | When to Use |
+|--------|-------------|
+| Merge | Tests duplicate the same intent — combine into one canonical test |
+| Remove | One test is redundant — keep the more complete one |
+| Keep | Tests serve different purposes (different environments, data, coverage) |
 
 ## Report Template
 
@@ -42,19 +52,3 @@ Compare test pairs on: **Title** -> **Steps** -> **Expected results** -> **Preco
 **Similarity:** {X}%
 **Recommendation:** {Keep / Merge / Remove}
 ```
-
-## Actions
-
-| Action | When to Use |
-|--------|-------------|
-| **Merge** | Tests duplicate the same intent — combine into one canonical test |
-| **Remove** | One test is redundant — keep the more complete one |
-| **Keep** | Tests serve different purposes (different environments, data, coverage) |
-
-## Manual & Automated
-
-Handles both:
-- **Manual**: `*.md` in `/tests/`, `*.feature` files
-- **Automated**: `*.spec.ts`, `*.test.js`, `*.cy.js`, etc.
-
-For automated tests, also consider code-level duplicates in assertions and shared setup/teardown.

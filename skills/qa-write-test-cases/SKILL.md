@@ -1,39 +1,32 @@
 ---
 name: qa-write-test-cases
-description: Generate test cases and checklists for software testing. Use this skill whenever the user asks to create test cases, test scenarios, test plans, checklists, QA documentation, or mentions testing activities like "write tests for feature", "create a test checklist", "generate test scenarios from requirements", or similar. This skill works better if user provides documentation, requirements etc or it can create test cases based on the user prompt without any additional context.
+description: Generate test cases and checklists for software testing. Use this skill whenever the user asks to create test cases, test scenarios, test plans, checklists, QA documentation, or mentions testing activities like "write tests for feature", "create a test checklist", "generate test scenarios from requirements", or similar. This skill works better if user provides documentation, requirements, etc., or it can create test cases based on the user prompt without any additional context.
 ---
 
 # Test Case & Checklist Generator
 
-This skill helps you to generate comprehensive test cases and checklists for software testing. It adapts to the context provided by the user and generates appropriate testing artifacts.
+Generates test cases and checklists for software testing from the context the user provides.
 
-**References:**
+References:
 
-- [Testomat.io TMS Guide](./references/testomat-tms-guide.md) - Complete guide for Testomat.io compatibility
-- [Test Case Format](./references/test-case-format.md) - Test cases markdown format reference (testomatio-friendly)
-- [Writing Rules](./references/writing-rule.md) - Rules for writing test suites, test cases, preconditions, and steps (incl. AI writing patterns to avoid)
+- [Test Case Format](./references/test-case-format.md) — markdown format for suites, tests, and steps (Testomat.io-friendly)
+- [Writing Rules](./references/writing-rule.md) — rules for suites, tests, preconditions, steps, and AI writing patterns to avoid
+- [Testomat.io TMS Guide](./references/testomat-tms-guide.md) — Testomat.io conventions and MCP tools
 
-## When to Use
+## Prerequisites
 
-Trigger this skill when the user:
+- Project structure checked (source code, e2e tests, test cases) via the /scan-automation-project skill.
+- Existing Testomat.io tests pulled via the /sync-test-cases-with-tms skill.
+- PLAN mode enabled, if available, for the interview steps.
 
-- Asks to create test cases, test scenarios, or test plans
-- Wants a checklist for testing a feature or product
-- Provides requirements, user stories, or acceptance criteria
-- Shares designs (Figma, Miro, screenshots, etc.) and wants test coverage
-- Mentions QA activities or testing documentation needs
+## User interaction
 
-### Prerequisites
-
-- You already checked the project structure and identified what is the in this folder (source code, e2e tests, test cases) using /scan-automation-project skill
-- You pulled existing Testomat.io tests using /sync-test-cases-with-tms skill
-- You have switched to PLAN MODE if availble to start interview section
-
-### User interaction
-
-- Strictly recommend user to use "PLAN" mode. Switch to "Edit" mode only on last step – writing test cases to md files.
-
-- When user interaction required, good to highlight it with question mark emoji ❓. Example:
+- **Always generate a checklist before test cases**, even if the user asks for test cases directly.
+- **Do not skip steps. Get user approval at each gate before moving to the next step.**
+- Strictly recommend PLAN mode. Switch to Edit mode only on the last step — writing test cases to md files.
+- Use the Ask tool for choices when available.
+- Fill input fields with suggestions when asking the user for input.
+- Mark questions with ❓ and numbered options:
 
 ```
 ❓ Do you want to:
@@ -43,119 +36,65 @@ Trigger this skill when the user:
 3. type something else
 ```
 
-- Use emojis sometimes to make the output more readable and UI friendly.
+## Workflow
 
-- Use non-formal language to attract user attention. Try to be liked by the user.
+1. Gather context and show sources — approval gate
+2. Ask for coverage scope — approval gate
+3. Ask for role — approval gate; skipped for smoke
+4. Generate checklist — approval gate
+5. Generate detailed test cases
+6. Show summary
 
-- Fill input fields with suggestions when asking user to provide input.
+### Step 1: Gather context
 
-- **Keep terminal/chat output to the user short, concise, well-structured and formatted.** Avoid long paragraphs, walls of text, redundant restatements, or verbose status updates. Prefer bullet lists, short headings, tables and emoji markers over prose. Show only what the user needs to make the next decision — details on request.
+Understand:
 
-## Workflow (IMPORTANT: how AI tool (Claude, Cursor etc) should work with user)
+- the feature/functionality under test and its business goals
+- main testing flows and user journeys
+- specific areas of concern
 
-This skill follows an **iterative approach**.
-**Don't omit steps and strictly ask for user approval/feedback before proceeding to the next step**.
-Generate **checklist** prior to **test cases** generation even if user request sounds like "generate test cases".
-
-**When available use Ask tool when asking user for input with choices.**
-
-**Ask user for clarification if you are not sure about something, don't suggest.**
-
-### Workflow Steps
-
-1. **Gather context and goals**
-   Understand what you're testing, what artifacts are provided, what the user wants to achieve.
-   Then **show sources** (briefly, no details) from which you gathered the information. **Ask user** if he wants to add or change anything. Go to step 2 only after approval.
-
-2. **Ask for coverage scope**.
-   **Ask the user how much coverage they want** (🚀 smoke, ⚖️ balanced, 🧨 exhaustive, or ✏️ other). Go to step 3 only after approval.
-
-3. **Ask user to choose role**.
-   Skipped if user picked "Smoke" in Step 2 (auto-applies ⚙️ default). Otherwise, **ask if user wants to enable a specific role** (refer to [roles](#roles)) or just proceed with the default one.  
-   Show each role name and short description thus user can make proper decision. Go to step 4 only after approval.
-
-4. **Generate checklist**.
-   **Generate a categorized structured checklist**. If a multi-select / checkbox Ask tool is available, present the checklist items as **checkboxes** (recommended items pre-checked) and let the user **select which tests to generate**; otherwise show the markdown checklist and ask the user to add/remove/change anything or proceed. **Wait for the user's selection/approval** before going to step 5.
-
-5. **Generate detailed test cases**.
-   Convert approved checklist into detailed test cases.
-
----
-
-## Workflow in details:
-
-### Step 1: Gather Context
-
-First, understand what you're testing.
-
-- Test suite/check-list/test-cases purpose and business goals.
-- Main testing flows and user journeys.
-
-Ask clarifying questions if needed:
-
-- What is the feature/functionality being tested?
-- What are the key user flows?
-- Are there any specific areas of concern?
-
-#### Testomat.io TMS Detection
-
-Detect if this is a Testomat.io project:
-
-**Option 1: Using MCP:**
-
-Check if `testomatio` MCP available
-If available, gather Testomat.io context:
-
-- `suites_list`, `suites_search` to understand existing structure
-- `tests_search`, `tests_list` to find existing tests and avoid duplicates
-- `steps_list`, `steps_search` to find reusable shared steps
-- `tags_list`, `labels_list` to understand project conventions
-
-**Option 2: Using `sync-test-cases-with-tms` skill (with `check-tests` lib):**
-
-1. Use `sync-test-cases-with-tms` skill with `pull` action to download existing tests from Testomat.io:
-
-2. Analyze the downloaded test files to understand:
-   - Existing structure and suites
-   - Current test cases (to avoid duplicates)
-   - Project conventions (tags, labels, priority levels)
-
-Notify user about existing cases which intersect with the feature/functionality being tested.
-
-#### Information Sources
-
-Gather all information about the feature/functionality being tested from:
+Information sources:
 
 - User prompt
-- Task Tracking systems (Jira, etc.)
+- Task tracking systems (Jira, etc.)
 - Requirements documents (Confluence, etc.)
 - Design mockups (Figma, Miro, etc.)
-- Existing test cases (Test Management tools like TestRail, Testomat, etc.)
-- Testomat.io TMS (if available via MCP or `sync-test-cases-with-tms` skill)
+- Existing test cases (TestRail, Testomat.io, etc.)
+- Source code:
+  - manual test files: `.test.md` or `.md` in folders like `manual-tests`, `tests`, `manual`, `qa`, `spec`
+  - automated test files (spec, test, cy files, etc.)
+  - project structure
 
-- **Source code**
-  - Existing manual test files in the project.
-  - Automated test files (spec, test, cy files, etc).
-  - Project structure.
-  - Search for test-related directories such as: `manual-tests`, `tests`, `manual`, `qa`, `spec` or similarly named folders.
-  - Within those directories, look specifically for Markdown-based test files, especially files ending with `.test.md` or `.md`
+Sources may come as pasted text, links, or MCP tools. Ask the user for MCP configuration if needed.
 
-This information could be available as text files (copy-pasted), via links or via MCP tools. Use MCP when required and reasonable. Ask user for mcp configuration if needed.
+Analyzing source code:
 
-**Analyzing the source code**
-Note: in most cases user will run this skill from automation project and usually such projects do not contain the application code. Thus, you should check if this is just automation project or application+automation project. If automation only – scan source code briefly, pay attention to test files mostly; if application code is present too – scan it thoroughly, but do not dive into unit testing unless user explicitly asks for it.
+- Usually this skill runs from an automation project without application code. Check which case this is.
+- Automation-only project: scan briefly, focus on test files.
+- Application + automation project: scan the application code thoroughly; skip unit-test depth unless the user asks.
 
-If any **unclear** state => ask user to clarify what he want. Ask to connect to relevant MCP tools if needed or provide more information.
+#### Testomat.io TMS detection
 
-If **not enough information** => ask user to provide more information.
+Detect if this is a Testomat.io project. Two options:
 
-[Wait for user confirmation about sources before proceeding to Step 2.]
+Option 1 — MCP. If the `testomatio` MCP is available, gather context:
 
-### Step 1.1: Show gathered context to user (briefly) and ask for approval
+- `suites_list`, `suites_search` — existing structure
+- `tests_search`, `tests_list` — existing tests, avoid duplicates
+- `steps_list`, `steps_search` — reusable shared steps
+- `tags_list`, `labels_list` — project conventions
 
-**Show list of sources, you've gathered information from (not full content, just list of sources), to the user and ask user if he wants to add/remove/modify anything.**
+Option 2 — `sync-test-cases-with-tms` skill (with `check-tests` lib). Run it with the `pull` action, then analyze the downloaded files for:
 
-Example:
+- existing structure and suites
+- current test cases (to avoid duplicates)
+- project conventions (tags, labels, priority levels)
+
+If existing test cases intersect with the feature under test, report them to the user and suggest expanding them or creating a new suite.
+
+#### Approval gate
+
+Show the list of sources (names only, no content) and ask:
 
 ```markdown
 I've gathered information from the following sources:
@@ -170,18 +109,15 @@ I've gathered information from the following sources:
 2. ✏️ Type changes
 ```
 
-You must also look for existing test cases to avoid duplicating test cases. If existing test cases found report this to user and suggest expanding them or creating a new suite.
+### Step 2: Ask for coverage scope
 
-[Wait for user approval before proceeding to Step 2.]
+The scope sets the initial checklist size; the user can still fine-tune it in Step 4.
 
-### Step 2: Ask for coverage size
+- **Compute approximate test counts per tier from your Step 1 analysis. Do not use generic or hardcoded ranges** — the numbers must reflect the specific feature under test.
+- If you can't reasonably estimate (feature too vague, context too thin), say so and either omit the numbers or go back to Step 1.
+- If the user picks ✏️ Other, accept a number ("around 10") or a free-form description ("just the API contract, no UI") and size the checklist from it.
 
-**Ask the user how much coverage they want.** This sets the _initial_ size of the checklist generated in Step 4 — the user can still fine-tune up/down in Step 4.1 after seeing the result.
-Use exact values: 🚀 **Smoke**, ⚖️ **Balanced**, 🧨 **Exhaustive**, ✏️ **Other**.
-
-**Compute approximate test counts per tier from your Step 1 analysis**. **Do not use generic or hardcoded ranges** — the numbers shown to the user must reflect the specific feature(s) under test and the context.
-
-Show the question with your computed estimates. Put each option on its own block: the **bold label with the test count on the first line**, and the description indented on the next line. Example (replace `<N>` with your actual estimates for this feature):
+Show each option as a block: bold label with test count on the first line, description on the next. Replace `<N>` with your estimates:
 
 ```markdown
 ❓ **How much coverage do you want?**
@@ -199,27 +135,23 @@ Full coverage incl. error states, boundaries, and security/perf/i18n where relev
 Proceed to specific role selection, type a number of tests, or describe scope in your own words
 ```
 
-Keep each description easy to read and understand.
+### Step 3: Ask for role
 
-If you can't reasonably estimate (e.g. feature is too vague or context too thin), say so and either omit the numbers or go back to Step 1 for more info.
+- If the user picked 🚀 Smoke in Step 2: **skip this step** — auto-apply ⚙️ default and go straight to Step 4. A smoke suite is too small to benefit from a specialized role.
+- Otherwise show the roles (markdown table with name and short description) and ask the user to pick one. Recommend a role based on context.
+- Use ⚙️ default if the user does not specify a role.
+- If the user selects 🔧 other, ask them to define a custom role.
+- If you show only some roles, add a "Show all available roles" option:
 
-If the user picks **✏️ Other**, accept either a number (e.g. "around 10") or a free-form description (e.g. "just the API contract, no UI"), and use it to size the checklist.
+```
+❓ Choose role:
 
-[Wait for user approval before proceeding to Step 3.]
+1. default (or recommended role based on context)
+2. ☰ Show all available roles
+3. ✏️ Type role name
+```
 
-### Step 3: Ask for specific role
-
-Check condition and select next step accordingly:
-
-**If the user picked "smoke" scope in Step 2:**
-
-- **skip this step**, auto-apply the "⚙️ default" role and **go straight to Step 4** without asking for role. A smoke suite is too small to benefit from a specialized role.
-
-**If the user picked "balanced", "exhaustive" or "other" scope in Step 2:**
-
-- **show the roles names and short description (as markdown table) and let user choose** the default one or the specific one. And ask user if he wants to select any specific role.
-
-##### Roles
+#### Roles
 
 | Role               | Description                              |
 | ------------------ | ---------------------------------------- |
@@ -234,47 +166,16 @@ Check condition and select next step accordingly:
 | **📈 performance** | **performance**, load, stress, etc.      |
 | 🔧 other           | **specify your own role**                |
 
-#### Role Selection
+### Step 4: Generate checklist
 
-Ask the user to choose a testing role:
+Create a hierarchical, categorized checklist from the gathered context.
 
-1. Show the available roles as a table.
-2. Ask the user to select one role:
-   - If the user does not specify, use **⚙️ default**.
-   - If the user selects "🔧 other", ask them to define a custom role.
+Size it to the Step 2 tier:
 
-Better to give user **select options**. Also propose recommended role based on context.
-
-Example:
-
-```
-❓ Choose role:
-
-1. default (or propose recommended based on context)
-2. ✏️ Type role name
-```
-
-**If you show not all roles to the user, add "_Show all available roles_" option.**
-
-Example:
-
-```
-❓ Choose role:
-
-1. default (or propose recommended based on context)
-2. ☰ Show all available roles
-3. ✏️ Type role name
-```
-
-Choose **default** in case user does not specify role.
-
-[Wait for user approval before proceeding to Step 4.]
-
-### Step 4: Generate Checklist
-
-Create a **hierarchical, categorized, well-structured checklist** based on the gathered information and user choices.
-
-**Size the checklist to match the scope tier chosen in Step 2** (🚀 smoke → only critical paths; ⚖️ balanced → happy + key negative + common edge cases; 🧨 exhaustive → full coverage). For ✏️ other, follow what the user described.
+- 🚀 smoke — only critical paths
+- ⚖️ balanced — happy path, key negative, common edge cases
+- 🧨 exhaustive — full coverage
+- ✏️ other — follow what the user described
 
 Example:
 
@@ -289,21 +190,12 @@ Example:
   - Login with invalid password
 ```
 
-**Show the checklist to the user and ask for approval.** If a multi-select / checkbox Ask tool is available, present the checklist as **checkboxes** instead — one option per leaf item (prefixed with its category, e.g. `Login: valid email`), with the recommended subset for the chosen scope tier pre-checked. The items the user ticks are the ones generated as test cases in Step 5.
+#### Approval gate
 
-### Step 4.1: Wait for Approval
+- If a multi-select/checkbox Ask tool is available: present leaf items as checkboxes, prefixed with their category (e.g. `Login: valid email`), with the recommended subset for the chosen tier pre-checked. The ticked items become the test cases in Step 5.
+- Otherwise: show the markdown checklist and ask the user to add/remove/change items.
 
-**Show the checklist and ask if checklist is good or user wants to modify it.**
-
-**IMPORTANT: Ask about amount of cases / level of details** regarding the result user sees now. **Give user the choice:** 1. Keep as is, 2. More details, 3. Less details.  
-In case user wants more details, enable **nerd role**.
-
-**Wait for user approval**.
-If user modifies checklist => go to step 4.
-If user not satisfied with result => go to step 1 and ask for more details about feature(s) under test or testing type, role, etc.
-If user approves checklist => go to step 5.
-
-Example:
+Always ask about the amount of cases / level of detail:
 
 ```
 ❓ Do you want to:
@@ -314,122 +206,62 @@ Example:
 4. ✏️ Type anything you want to change
 ```
 
-### Step 5: Generate Detailed Test Cases
+- More details → enable the 🤓 nerd role.
+- User modifies the checklist → regenerate (Step 4).
+- User not satisfied → go back to Step 1 for more context.
+- Approved → Step 5.
 
-Where to store test cases?
+### Step 5: Generate detailed test cases
 
-- If this workspace is empty or is for manual-tests only, test cases must be generated in root
-- If this is end-to-end testing project test cases must be generated in `manual-tests` directory
-- In any other case test cases must be generated in `.testeiya/manual-tests` (ensure `.testeiya/` directory exists and git ignored)
+If the user originally asked only for a checklist, first ask: "Do you want to generate test cases for this checklist?"
 
-**Proceed with this step only after user approval of checklist.**
+Where to store test cases:
 
-If user prompted checklist generation only (not test cases), ask user if he wants to generate test cases (e.g. **"Do you want to generate test cases for this checklist?"**) or proceed to test case generation.
+- Empty or manual-tests-only workspace → project root
+- End-to-end testing project → `manual-tests/` directory
+- Any other case → `.testeiya/manual-tests/` (ensure `.testeiya/` exists and is git-ignored)
 
-- If multiple features to test or whole product => put generated test cases of each feature in separate file.
-- - **Be thorough but practical**. Cover important scenarios without overwhelming detail (unless user asks for it or select appropriate role e.g. "nerd").
-- If user provides **existing test cases**, follow their **style**.
-- **Consider the user**. Focus on user-facing functionality first.
-- **Be adaptable**. Adjust depth, detail, testing type and other parameters based on user feedback.
-- **Keep scope**. Test only the functionality under test but not the related entities. If feature linked to other features, don't test them if user didn't ask for it explicitly.
+Generation rules:
 
-**Follow test case writing rules**:
+- Name files `feature-name.test.md` (always the `.test.md` extension).
+- Multiple features or whole product → one file per feature.
+- **Don't change the user's source code. Only generate `*.test.md` files.**
+- **Keep scope**: test only the functionality under test; don't test linked features unless the user explicitly asks.
 
-- Format: `./references/test-case-format.md`
-- Content/style rules (suites, tests, preconditions, steps, anti-patterns): `./references/writing-rule.md`
+Format rules:
 
-Always use provided Test case format and writing rules.
-
-**Don't change the user's source code. Only generate `*.test.md` files with test cases.**
-
-### Step 6: Show summary results
-
-Show summary results to user terminal. Include any relevant information you think is important. E.g. amount of test cases generated, amount of test suites, etc. Better to use markdown table. It should be concise and easy to read.
-
-Show the generated files list and destination folder.
-
-Ask user to review generated files and ask if he want to change something to achieve the satisfactory result.
-
-Suggest user to upload generated test cases to Testomat.io via `sync-test-cases-with-tms` skill.
-
-## Output formats
-
-### Checklist format (displayed in terminal)
-
-Checklist should have hierarchical and categorized structure.
-
-### Test cases format (saved to .md file(s))
-
-- Strictly follow the `./references/test-case-format.md` format. Exception: user specify format in the prompt. In this case, follow the user's format.
-
-- Strictly follow the writing rules from `./references/writing-rule.md` (suite/test descriptions, preconditions, step structure, expected results, anti-patterns).
-
-- Follow [Testomat.io TMS Guide](./references/testomat-tms-guide.md) for format and conventions (priority levels, tags, labels, etc.) (especially when using testomatio mcp)
-
-- Files naming: `feature-name.test.md` (always use the `.test.md` extension).
-- **IMPORTANT:** **Strictly follow the `./references/test-case-format.md` format** for **suites**, **tests** and **steps**.
-- Use `<!-- suite ... -->` and `<!-- test ... -->` blocks to wrap test cases.
-- If required, put `tags:` and `labels:` inside **each** `<!-- test ... -->` metadata block (see [test metadata](./references/test-case-format.md#test-metadata)). Not only on the suite block.
-- Try to reuse existing tags and labels obtained by MCP or from other test cases. 
-- Use concrete, executable values by default — do NOT introduce `${...}` placeholders in first-pass generation. Only parametrize a value when it is genuinely reused or data-driven; if you do, format it as `${variable}` or `${placeholder}` (use backticks).
+- Strictly follow [Test Case Format](./references/test-case-format.md) for suites, tests, and steps. Only exception: the user specifies their own format in the prompt.
+- Strictly follow [Writing Rules](./references/writing-rule.md) for suite/test descriptions, preconditions, steps, expected results, and anti-patterns.
+- Follow the [Testomat.io TMS Guide](./references/testomat-tms-guide.md) for conventions (priority levels, tags, labels), especially when using the testomatio MCP.
+- Wrap test cases in `<!-- suite ... -->` and `<!-- test ... -->` blocks.
+- If required, put `tags:` and `labels:` inside each `<!-- test ... -->` metadata block (see [test metadata](./references/test-case-format.md#test-metadata)), not only on the suite block.
+- Reuse existing tags and labels obtained via MCP or from other test cases.
 - Do not use labels if you are not aware of any existing ones.
-- If reasonable, add test metadata like priority, preconditions, test data, labels, tags based on analyzed information and context.
-- **IMPORTANT: NEVER GENERATE test or suite IDs of ANY kind**:
+- If reasonable, add test metadata (priority, preconditions, test data, labels, tags) based on the analyzed context.
+- Use concrete, executable values. **Do NOT introduce `${...}` placeholders in first-pass generation.** Parametrize only genuinely reused or data-driven values; format them as `${variable}` in backticks.
+- **NEVER generate test or suite IDs of any kind:**
   - Do NOT include Testomat.io IDs (`id: @T*`, `id: @S*`, e.g. `@T12345678`, `@S380c64db`).
-  - Do NOT include any custom/random IDs (e.g. `TC-001`, `TC-R001`, `SUITE-01`) in `id:` fields, titles, or anywhere else.
-  - Testomat.io IDs are server-generated and will be assigned automatically when the user runs `check-tests push` with the `--update-ids` option (or via the `sync-test-cases-with-tms` skill). No need to add IDs at test cases generation time.
+  - Do NOT include custom/random IDs (e.g. `TC-001`, `TC-R001`, `SUITE-01`) in `id:` fields, titles, or anywhere else.
+  - Testomat.io IDs are server-generated and assigned when the user runs `check-tests push` with `--update-ids` (or via the `sync-test-cases-with-tms` skill). Never add IDs at generation time.
 
-### Matching Existing Test Case Formats
+#### Matching existing test case formats
 
-When the user provides an existing test cases example and/or asks for "similar" test cases:
+When the user provides an existing test case example or asks for "similar" test cases:
 
-**DO match:**
+DO match:
 
-- Writing style and level of detail
-- Field structure (Priority, Preconditions, Type, Test Data, etc.)
-- Additional fields like labels, tags etc
-- Original case language
+- writing style and level of detail
+- field structure (Priority, Preconditions, Type, Test Data, etc.)
+- additional fields like labels and tags
+- original case language
 
-**DON'T copy:**
+DON'T copy:
 
-- Any IDs from the example — neither Testomat.io IDs (`@T...`, `@S...`) nor custom prefixes (e.g. `TC-R001`, `TC-001`). IDs are never generated by this skill.
-- Original test case intent
+- any IDs from the example — neither Testomat.io IDs (`@T...`, `@S...`) nor custom prefixes (e.g. `TC-R001`, `TC-001`)
+- original test case intent
 
-## Example interactions
+### Step 6: Show summary
 
-### Example 1 — terminal (no checkbox Ask tool)
-
-**User:** "generate test cases for feature X"
-
-**You (AI agent, Claude, Cursor, etc.):**
-
-1. Gather information about feature X
-   - analyze all available sources
-   - interact with user
-2. Show gathered information to user and ask for approval or changes
-   - ask if user wants to add/remove/modify anything
-3. Ask for coverage scope (🚀 smoke, ⚖️ balanced, 🧨 exhaustive, or ✏️ other)
-4. Ask for role (default, optimist, drama-queen, etc.)
-5. Generate hierarchical structured checklist for feature X
-6. Display checklist in terminal and ask for user approval
-   - ask about amount of cases / level of details (more, less, keep as is)
-7. On approval, generate detailed test cases for feature X and save to `feature-x.test.md`
-8. Suggest user to upload generated test cases to Testomat.io via `sync-test-cases-with-tms` skill
-
-### Example 2 — Web UI (checkbox Ask tool)
-
-**User:** "generate checklist for feature X"
-
-**You (AI agent in a UI with a checkbox Ask tool, e.g. Testeiya):**
-
-1. Gather information about feature X
-   - analyze all available sources
-   - interact with user
-2. Show gathered information to user and ask for approval or changes
-   - ask if user wants to add/remove/modify anything
-3. Ask for coverage scope (🚀 smoke, ⚖️ balanced, 🧨 exhaustive, or ✏️ other)
-4. Ask for generation role (default, optimist, drama-queen, etc.)
-5. Generate hierarchical structured checklist for feature X
-6. Present the checklist as **checkboxes** (recommended items pre-checked) and let the user tick which tests to generate
-   - ask about amount of cases / level of details (more, less, keep as is)
-7. Suggest user to upload generated checklist to Testomat.io via `sync-test-cases-with-tms` skill
+- Show a concise summary (markdown table works well): number of test cases and suites, generated files, destination folder.
+- Ask the user to review the files and request changes if needed.
+- Suggest uploading the test cases to Testomat.io via the `sync-test-cases-with-tms` skill.

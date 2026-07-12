@@ -11,7 +11,7 @@ metadata:
 
 Explorbot is an autonomous AI web-testing CLI. It drives its own browser (CodeceptJS → Playwright) and works in cycles of **research → plan → test**.
 
-This skill is intentionally short. **The installed CLI and the installed package's `docs/` tree are the source of truth — do not paraphrase them from memory.** Discover commands and read docs at the moment of use.
+**The installed CLI and the installed package's `docs/` tree are the source of truth — do not paraphrase them from memory.** Discover commands and read docs at the moment of use.
 
 ## Where the docs actually live
 
@@ -59,7 +59,7 @@ Pick the file that matches the topic *when the question comes up* — do not pre
 | API testing | `api-testing.md` |
 | Doc collector | `doc-collector.md` |
 
-If the topic isn't in this table, `ls node_modules/explorbot/docs/` and pick the matching file by name. Cite the file in your reply so the user can verify (e.g. "from `node_modules/explorbot/docs/knowledge.md`").
+If the topic isn't in this table, `ls node_modules/explorbot/docs/` and pick the matching file by name.
 
 ## Rule 3 — CLI only; never drive the TUI
 
@@ -83,9 +83,6 @@ An agent can run only the non-interactive CLI (`explorbot explore`, `explorbot t
 
 ## Anti-patterns
 
-- ❌ Listing commands or flags from memory → run `npx explorbot --help`.
 - ❌ Pasting big config snippets without opening `node_modules/explorbot/docs/configuration.md` first.
-- ❌ Looking for `docs/` in the skill's folder, in the user's project root, or on the web — they live in `node_modules/explorbot/docs/`.
 - ❌ Inventing a command that "should exist" — if `--help` doesn't show it, it doesn't exist.
-- ❌ Attempting to launch or "type into" `explorbot start` — you cannot drive the TUI.
 - ❌ Telling the user to use explorbot for a landing page / blog / CMS — `node_modules/explorbot/docs/prerequisites.md` says it's for CRUD-heavy apps.

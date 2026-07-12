@@ -8,7 +8,6 @@ tags: smoke, regression
 Verify that a guest user can view all critical UI elements on the Home page.
 
 ## PREREQUISITES & SETUP
---------------------
 1. Browser Requirements:
    - Latest version of Chrome, Firefox, or Safari
 
@@ -50,7 +49,7 @@ priority: normal
 tags: smoke
 labels: Manual
 -->
-# Verify footer copyright text & links visibility 
+# Verify footer copyright text & links visibility
 
 ## Description:
 Navigate to application base URL. Verify that the footer has correct copyright text and active links.

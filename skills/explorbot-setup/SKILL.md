@@ -15,7 +15,7 @@ Install Explorbot, write a working config, give it the bare minimum knowledge to
 
 **Do the work — don't narrate it.** Run installs, run `explorbot init`, edit `explorbot.config.js`, run `curl`, run `explorbot navigate`, run `explorbot learn` yourself. The user is only asked for the things only they know:
 
-1. AI provider + API key (OpenRouter / OpenAI / Anthropic / Groq / Cerebras / Azure / Google)
+1. AI provider + API key
 2. App URL (the value of `web.url`)
 3. The page to verify against
 4. Login credentials (only if `navigate` fails on an auth wall)
@@ -236,7 +236,7 @@ Run the AI Navigator against the target page. It handles redirects, login walls,
 npx explorbot navigate <path> --session
 ```
 
-`--session` captures cookies/localStorage into `output/session.json` so the next setup attempts reuse the auth. For other flags, check `npx explorbot navigate --help` on the spot.
+`--session` captures cookies/localStorage into `output/session.json` so subsequent setup attempts reuse the auth. For other flags, check `npx explorbot navigate --help` on the spot.
 
 Interpret the exit code:
 
@@ -264,7 +264,7 @@ If nothing relevant is there, continue to C.2.
 
 #### C.2 — Write knowledge with env-var placeholders (no real secrets yet)
 
-Pick env var names you'll ask the user to populate next — `APP_USER` / `APP_PASSWORD` are sensible defaults; reuse what existing knowledge already uses if any. Then run `explorbot learn` with a **simple** body that names the credentials and references the env vars. Do not invent field selectors, CSS, or DOM hints — the Navigator figures those out on its own; over-specifying makes the knowledge brittle.
+Pick env var names you'll ask the user to populate next — `APP_USER` / `APP_PASSWORD` are sensible defaults; if existing knowledge already references env vars, reuse those names. Then run `explorbot learn` with a **simple** body that names the credentials and references the env vars. Do not invent field selectors, CSS, or DOM hints — the Navigator figures those out on its own; over-specifying makes the knowledge brittle.
 
 ```bash
 npx explorbot learn "<auth-page-path>" "Sign in with \${env.APP_USER} / \${env.APP_PASSWORD}."
@@ -326,22 +326,9 @@ When `explorbot navigate <path> --session` exits `0`, setup is complete. Give th
 >
 > The `explorbot-fundamentals` skill walks through all of that and is what you'll want for everything beyond setup. Want me to hand off there?"
 
-Do not run `explore`, `plan`, `test`, or `freesail` from this skill — that's fundamentals' job.
-
 ## Anti-patterns
 
-- ❌ Printing the commands and waiting for the user to run them — this skill **does** the install and the ladder itself. Only the four user-only inputs (provider, app URL, page, credentials) are deferred to the user.
 - ❌ Asking for target page / subpages / feature focus / max-tests upfront — none of that is needed for setup; only ask which page to verify, at step 4.
-- ❌ Pasting config snippets or provider imports from memory — work from the template `explorbot init` just generated, or (only if unclear) `node_modules/explorbot/docs/providers.md`.
 - ❌ Referring to `docs/` ambiguously — once Explorbot is installed, docs live at `node_modules/explorbot/docs/`. Never look in the skill's own folder or in a project-relative `docs/`.
 - ❌ Hardcoding credentials in knowledge markdown or in `explorbot.config.js` — always write secrets into `.env`, reference via `${env.X}`.
-- ❌ Skipping `curl` — it's the cheapest way to catch a DNS / VPN / wrong-host issue and saves an Explorbot run.
-- ❌ Seeing a `3xx` / `401` / `403` from `curl` and running `explorbot navigate` anyway "to see what happens" — follow the redirect with `curl -sIL` (step A.5), and if it lands on a login / sign-in / auth / SSO URL, gather credentials *before* invoking navigate. Don't burn an AI run to discover what HTTP already told you.
-- ❌ Writing the credentials to `.env` first and the knowledge file later — that races the user. Write knowledge via `npx explorbot learn` (with env-var placeholders) *before* asking the user to populate `.env`, otherwise navigate runs against a config with no auth knowledge and fails for the second time.
-- ❌ Skipping `npx explorbot knows <path>` before writing knowledge — there may already be a sign-in entry from a prior attempt or from the user's own work. Read it first; don't duplicate it.
-- ❌ Padding the auth knowledge body with CSS selectors / field IDs / DOM hints — `Sign in with ${env.APP_USER} / ${env.APP_PASSWORD}.` is enough. The Navigator figures out the form; over-specifying makes knowledge brittle and breaks the moment the app changes a class name.
-- ❌ Running `explore`, `plan`, `test`, or `freesail` to "verify" — they're expensive and out of scope. `navigate` exit `0` is the verification.
 - ❌ Trying to drive `explorbot start` (the TUI) — agents cannot operate a TUI; if the user wants interactive mode, tell them to run it themselves.
-- ❌ Bootstrapping the project with `npm init -y` and leaving it CommonJS — explorbot's config uses `import …` and needs `"type": "module"` (or write the config as `.mjs`).
-- ❌ Pre-filling URL options with "common defaults" or anything from the skill metadata (e.g. `app.testomat.io`). The URL is the user's app — derive it from project evidence (`package.json` scripts, `.env`, framework config, listening ports) or ask in plain text. Never guess.
-- ❌ Asking the user to paste the API key into chat as the default path, or framing "paste here" and "edit `.env` yourself" as equally-weighted multiple-choice options. The editor route is the **recommended** one (the key never enters chat / transcripts / logs); pasting is the less-secure alternative; skipping stops setup. Make the recommendation explicit.
