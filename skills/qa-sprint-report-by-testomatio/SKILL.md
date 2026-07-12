@@ -175,17 +175,17 @@ After writing the `.md` file, ask the user if they want to export the report and
 ❓ The report has been saved to `{path}`.
 Would you like to export it as a `.html` file to share with the team?
 
-1. 📂 Yes, export to project root (default)
+1. 📂 Yes, export to cache folder (default)
 2. ✏️ Yes, but let me specify a different location
 3. 👍 No, keep the `.md` only
 ```
 
 > **Note:** HTML export requires the template file to be present at `./references/qa-sprint-report-template.html`. If the template is missing, notify the user and offer to save the `.md` only.
 
-**If user picks option 1 (project root):**
+**If user picks option 1 (cache folder):**
 1. Read the HTML template from `./references/qa-sprint-report-template.html`.
 2. Map the `.md` content into the corresponding template sections.
-3. Save as `QA_Sprint_Progress_Report_{SprintName}_{YYYY-MM-DD}.html` in the project root.
+3. Save as `QA_Sprint_Progress_Report_{SprintName}_{YYYY-MM-DD}.html` in the cache folder `.testeiya/`.
 
 **If user picks option 2 (custom location):**
 1. Ask for the target directory path.
