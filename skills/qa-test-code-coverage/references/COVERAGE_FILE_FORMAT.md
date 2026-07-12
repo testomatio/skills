@@ -1,6 +1,6 @@
 # Coverage File Format
 
-`coverage.manual.yml` and `coverage.e2e.yml` share the same grammar. Both are read by `@testomatio/reporter run --filter "coverage:file=<path>,diff=<branch>"`.
+`coverage.tests.yml` (any path works) maps source files to manual and automated test identifiers — one grammar for both kinds. It is read by `@testomatio/reporter run --filter "coverage:file=<path>,diff=<branch>"`.
 
 ## Top-level shape
 
@@ -62,20 +62,27 @@ app/models/user.rb:
 
 ## Reporter usage
 
-The runner command **must** be the first positional argument — `--filter` generates a `--grep` that the runner consumes.
+For automated tests the runner command **must** be the first positional argument — `--filter` generates a `--grep` that the runner consumes.
 
 ```bash
 # Playwright
 npx @testomatio/reporter run "npx playwright test" \
-  --filter "coverage:file=coverage.e2e.yml,diff=main"
+  --filter "coverage:file=coverage.tests.yml,diff=main"
 
 # Cypress
 npx @testomatio/reporter run "npx cypress run" \
-  --filter "coverage:file=coverage.e2e.yml,diff=main"
+  --filter "coverage:file=coverage.tests.yml,diff=main"
 
 # WebdriverIO / Mocha / Jest / CodeceptJS — pass the corresponding runner command
 npx @testomatio/reporter run "npx codeceptjs run" \
-  --filter "coverage:file=coverage.e2e.yml,diff=main"
+  --filter "coverage:file=coverage.tests.yml,diff=main"
+```
+
+For manual tests pass `--kind manual` instead of a runner — the reporter creates a pending run in Testomat.io with only the affected cases:
+
+```bash
+npx @testomatio/reporter run --kind manual \
+  --filter "coverage:file=coverage.tests.yml,diff=main"
 ```
 
 The `diff` value must be a stable branch (`main`, `origin/main`) the reporter can run `git diff` against.
@@ -104,7 +111,7 @@ jobs:
           TESTOMATIO: ${{ secrets.TESTOMATIO }}
         run: |
           npx @testomatio/reporter run "npx playwright test" \
-            --filter "coverage:file=coverage.e2e.yml,diff=origin/main"
+            --filter "coverage:file=coverage.tests.yml,diff=origin/main"
 ```
 
 ## Checking the coverage file
@@ -112,10 +119,10 @@ jobs:
 One command, run from the project root — no parser of your own:
 
 ```bash
-npx js-yaml coverage.manual.yml | node scripts/check-coverage.mjs   # or coverage.e2e.yml
+npx js-yaml coverage.tests.yml | node scripts/check-coverage.mjs
 ```
 
-`npx js-yaml` parses the YAML (it fails loudly on a malformed file, so a broken one never reaches the script). `scripts/check-coverage.mjs` (~25 lines, zero deps; ships with both `qa-manual-tests-to-code-coverage` and `e2e-test-coverage-mapping`, the latter as a symlink) reads that parsed map on stdin, flags any key whose path is missing on disk, flags any key with no identifiers, lists every `@S…` / `@T…` / tag the file references, and exits non-zero on a problem.
+`npx js-yaml` parses the YAML (it fails loudly on a malformed file, so a broken one never reaches the script). `scripts/check-coverage.mjs` (~25 lines, zero deps; ships with `qa-test-code-coverage`) reads that parsed map on stdin, flags any key whose path is missing on disk, flags any key with no identifiers, lists every `@S…` / `@T…` / tag the file references, and exits non-zero on a problem.
 
 The script can't tell which identifiers are real — check the listed ones against the set you extracted earlier in the workflow. Don't re-parse the test set, don't write your own YAML parser, and never use `python`.
 

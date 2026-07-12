@@ -57,9 +57,9 @@ npx check-tests@latest CodeceptJS "**/*_test.js" --update-ids
 npx check-tests@latest WebdriverIO "**/*.{test,e2e}.js" --update-ids
 ```
 
-`check-tests` rewrites the test files in place, inserting the IDs assigned by Testomat.io. Commit the changes before running `e2e-test-coverage-mapping`.
+`check-tests` rewrites the test files in place, inserting the IDs assigned by Testomat.io. Commit the changes before running `qa-test-code-coverage`.
 
 ## Related skills
 
 - `qa-e2e-tests-reporting` — install `@testomatio/reporter` and import tests via `check-tests`.
-- `sync-test-cases-with-tms` — pull/push manual cases (the qa-manual-tests-to-code-coverage counterpart). See its [Testomat.io CLI reference](../../sync-test-cases-with-tms/references/TESTOMATIO_CLI.md) for the full `check-tests` command set, including `--update-ids`.
+- `sync-test-cases-with-tms` — pull/push manual cases. See its [Testomat.io CLI reference](../../sync-test-cases-with-tms/references/TESTOMATIO_CLI.md) for the full `check-tests` command set, including `--update-ids`.
