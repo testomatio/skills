@@ -2,6 +2,8 @@
 
 `coverage.tests.yml` (any path works) maps source files to manual and automated test identifiers — one grammar for both kinds. It is read by `@testomatio/reporter run --filter "coverage:file=<path>,diff=<branch>"`.
 
+Every path and identifier in this document is a placeholder showing the shape. Real file keys come from the project's source tree; real IDs come from its test inventory. Never copy a value from here into a coverage file.
+
 ## Top-level shape
 
 A YAML map. Keys are file paths or globs relative to the repository root. Values are lists of identifiers — Suite IDs, Test IDs, or tags.
@@ -15,17 +17,17 @@ A YAML map. Keys are file paths or globs relative to the repository root. Values
 
 ## Identifier types
 
-| Identifier | Format       | Example       | Meaning                                  |
+| Identifier | Format       | Shape         | Meaning                                  |
 | ---------- | ------------ | ------------- | ---------------------------------------- |
-| Suite ID   | `@S` + 8 hex | `@S92321384`  | All tests inside the suite are selected. |
-| Test ID    | `@T` + 8 hex | `@Ta011dfa3`  | Only this specific test is selected.     |
+| Suite ID   | `@S` + 8 hex | `@S1a2b3c4d`  | All tests inside the suite are selected. |
+| Test ID    | `@T` + 8 hex | `@T5e6f7a8b`  | Only this specific test is selected.     |
 | Tag        | `@<word>`    | `@smoke`      | All tests tagged with the label.         |
 
 For automated tests, IDs live in describe / it / test names:
 
 ```javascript
-describe('user settings @S92321384', () => {
-  it('updates avatar @Ta011dfa3', () => { ... });
+describe('<suite title> @S1a2b3c4d', () => {
+  it('<test title> @T5e6f7a8b', () => { ... });
 });
 ```
 
@@ -37,17 +39,17 @@ Either an exact path or a glob:
 
 ```yaml
 # Exact file
-app/models/user.rb:
-  - "@S92321384"
+<path/to/file>:
+  - "@S1a2b3c4d"
 
 # Glob — any file under the directory
-app/services/jira/**:
-  - "@jira"
+<path/to/dir>/**:
+  - "@<tag>"
 
 # Multiple identifiers per file
-app/controllers/users_controller.rb:
-  - "@S92321384"
-  - "@Tb022dfa4"
+<path/to/file>:
+  - "@S1a2b3c4d"
+  - "@T5e6f7a8b"
 ```
 
 ## Comments
@@ -55,9 +57,9 @@ app/controllers/users_controller.rb:
 Use `#` to annotate each identifier with its human-readable title or purpose:
 
 ```yaml
-app/models/user.rb:
-  - "@S92321384"  # Suite: user settings
-  - "@Ta011dfa3"  # Test: avatar upload
+<path/to/file>:
+  - "@S1a2b3c4d"  # Suite: <suite title>
+  - "@T5e6f7a8b"  # Test: <test title>
 ```
 
 ## Reporter usage

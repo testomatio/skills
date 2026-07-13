@@ -28,6 +28,7 @@ npx @testomatio/reporter run --kind manual --filter "coverage:file=coverage.test
   - `.gitignore` — add a `.testeiya/` line if it is missing.
 - **Never modify a source or test file.**
 - Never pull or clone tests into a tracked folder — only into the gitignored `.testeiya/`.
+- **Everything in the coverage file must come from this project:** file keys from its source tree, identifiers from the Step 2 inventory. Never copy a path or ID from this skill's docs — they are placeholders.
 - **No ad-hoc scripts, no parsers, never Python.** Read test files with your file tool; extract IDs with `grep` (Step 2). The only script is the bundled checker (Step 5). If you ever need more than a `grep`, a one-line `node -e '…'` is the limit.
 - Stop if you cannot write the output file, or no tests are found and the user declines every option in Step 1.
 
@@ -85,7 +86,7 @@ Missing IDs mean the tests were never synced with Testomat.io — the reporter c
   - HTML and component templates: `.html`, `.htm`, `.vue`, `.svelte`, Angular `*.component.html`.
   - Logic-in-markup engines: `.hbs`/`.handlebars`, `.ejs`, `.pug`/`.jade`, `.mustache`, `.liquid`.
   - Server-side views: `.erb`, `.haml`, `.slim` (Rails); `.blade.php`, `.twig` (PHP); `.j2`/`.jinja`/`.jinja2` (Python); `.cshtml`/`.razor` (.NET); `.jsp` (Java).
-  - Map a template like code: `app/views/sessions/new.html.erb` → the login suite.
+  - Map a template like code: a login page template belongs to the same entry as the code that renders it.
 - ❓ If the structure is ambiguous, ask the user which directories to focus on or exclude.
 
 ### Step 4: Map source files to tests
@@ -93,7 +94,7 @@ Missing IDs mean the tests were never synced with Testomat.io — the reporter c
 Split the mapping by codebase size (complexity from Step 1):
 
 - `small` / `medium` — map directly in this session.
-- `large` / `very-large`, or many top-level source folders — spawn subagents in parallel, one per source folder (`app/controllers`, `src/components`, …). Give each subagent:
+- `large` / `very-large`, or many top-level source folders — spawn subagents in parallel, one per source folder. Give each subagent:
   - its folder path and the skip rules from Step 3;
   - the full test inventory from Step 2 (IDs, titles, tags, context) — subagents must not re-extract it;
   - the mapping strategies below and the [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md);
@@ -102,35 +103,19 @@ Split the mapping by codebase size (complexity from Step 1):
 
 For each candidate source file, pick one strategy — whichever gives the cleanest, most stable selection:
 
-A) Suite (`@S...`) — most tests in a suite relate to the file. Prefer this over listing many test IDs from the same suite.
-
-```yaml
-app/models/user.rb:
-  - "@S816410d6"  # Suite: User permissions
-```
-
-B) Test (`@T...`) — only one test in a large suite matches the file.
-
-```yaml
-app/controllers/sessions_controller.rb:
-  - "@T6f8e9174"  # Test: User is blocked after 5 failed login attempts
-```
-
-C) Tag (`@tag`) — the relevant tests live across several suites.
-
-```yaml
-app/services/jira_service.rb:
-  - "@jira"      # Tag: All JIRA integration tests
-```
+- Suite (`@S` + 8 chars) — most tests in the suite relate to the file. Prefer one suite ID over listing many test IDs from that suite.
+- Test (`@T` + 8 chars) — only one test in a large suite matches the file.
+- Tag (`@word`) — the relevant tests live across several suites.
 
 Rules:
 
-- Globs (`app/services/jira/**`) are valid file keys when a whole subtree maps to the same identifiers.
+- Keys are source file paths or globs, relative to the repo root.
+- Use a glob key when a whole subtree maps to the same identifiers.
 - Manual and automated identifiers mix freely in one entry — the file maps to every test that checks it, whatever the kind.
 - No empty entries.
-- Add a `#` comment next to each identifier explaining the mapping.
+- Annotate each identifier with a `#` comment naming its suite/test/tag title.
 
-See [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md) for the full YAML grammar.
+YAML grammar: [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md).
 
 ### Step 5: Save and validate the coverage file
 

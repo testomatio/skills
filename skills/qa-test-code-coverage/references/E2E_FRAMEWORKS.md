@@ -23,18 +23,18 @@ IDs are appended to test/suite names — never inside code blocks:
 
 ```javascript
 // Playwright / WebdriverIO / Mocha / Jest / Puppeteer / Cypress
-describe('user settings @S92321384', () => {
-  it('updates avatar @Ta011dfa3', () => { ... });
+describe('<suite title> @S1a2b3c4d', () => {
+  it('<test title> @T5e6f7a8b', () => { ... });
 });
 
-test('login @smoke @T6f8e9174', async ({ page }) => { ... });
+test('<test title> @smoke @T5e6f7a8b', async ({ page }) => { ... });
 ```
 
 ```javascript
 // CodeceptJS
-Feature('Checkout @Sabcd1234');
+Feature('<suite title> @S1a2b3c4d');
 
-Scenario('completes purchase @Tdef56789', ({ I }) => { ... });
+Scenario('<test title> @T5e6f7a8b', ({ I }) => { ... });
 ```
 
 Tags use the same `@word` form (`@smoke`, `@regression`, `@jira-123`).
