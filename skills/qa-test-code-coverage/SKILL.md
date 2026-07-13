@@ -9,15 +9,7 @@ metadata:
 
 # Tests to Code Coverage
 
-Analyze the project's tests — manual markdown cases and automated e2e tests — and its source code. Produce `coverage.tests.yml` — a map from source files (or globs) to test identifiers: suite IDs, test IDs, tags. Testomat.io keeps manual and automated tests in one project, so one coverage file serves both. `@testomatio/reporter` consumes it to run only the tests affected by a diff:
-
-```bash
-# Automated tests — the runner command is required
-npx @testomatio/reporter run "npx playwright test" --filter "coverage:file=coverage.tests.yml,diff=main"
-
-# Manual tests — creates a pending run with only the affected cases
-npx @testomatio/reporter run --kind manual --filter "coverage:file=coverage.tests.yml,diff=main"
-```
+Analyze the project's tests — manual markdown cases and automated e2e tests — and its source code. Produce `coverage.tests.yml` — a map from source files (or globs) to test identifiers: suite IDs, test IDs, tags. Testomat.io keeps manual and automated tests in one project, so one coverage file serves both. `@testomatio/reporter` consumes it to run only the tests affected by a diff (Step 6).
 
 ## Critical Constraints
 
