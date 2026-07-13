@@ -131,7 +131,8 @@ The script can't tell which identifiers are real — check the listed ones again
 ## Authoring tips
 
 - Prefer Suite IDs when most of a suite relates to a file.
-- Use Test IDs only when one test in a large suite is relevant.
-- Use tags (`@smoke`, `@billing`, `@jira-…`) for cross-cutting concerns.
+- Use tags for cross-cutting concerns that span suites.
+- Use Test IDs only when one or two tests in a suite are relevant — a long test-ID list goes stale as tests are added, a suite or tag keeps selecting new ones.
+- Never list a test ID whose suite is already in the entry — the suite ID already selects it.
 - Avoid empty entries.
 - Commit the coverage file to the repo so CI and teammates use the same mapping.

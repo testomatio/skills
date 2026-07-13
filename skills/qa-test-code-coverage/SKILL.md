@@ -101,14 +101,16 @@ Split the mapping by codebase size (complexity from Step 1):
   - the instruction to explore only its folder and return a YAML fragment mapping only files inside it.
 - Merge the fragments into one map, drop duplicate keys and empty entries. Only the main session writes the file (Step 5).
 
-For each candidate source file, pick one strategy — whichever gives the cleanest, most stable selection:
+For each candidate source file, pick the identifier that keeps selecting the right tests as the test suite grows:
 
-- Suite (`@S` + 8 chars) — most tests in the suite relate to the file. Prefer one suite ID over listing many test IDs from that suite.
-- Test (`@T` + 8 chars) — only one test in a large suite matches the file.
+- Suite (`@S` + 8 chars) — the default. Most tests in the suite relate to the file.
 - Tag (`@word`) — the relevant tests live across several suites.
+- Test (`@T` + 8 chars) — the exception. Use only when just one or two tests in a suite match the file.
 
 Rules:
 
+- **More than a few test IDs from one suite or category → replace them with the suite or tag.** Tests added to that suite/tag later are picked up automatically; a list of test IDs goes stale.
+- Never list a test ID whose suite is already in the same entry — the suite ID already selects it.
 - Keys are source file paths or globs, relative to the repo root.
 - Use a glob key when a whole subtree maps to the same identifiers.
 - Manual and automated identifiers mix freely in one entry — the file maps to every test that checks it, whatever the kind.
