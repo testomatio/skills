@@ -22,8 +22,12 @@ npx @testomatio/reporter run --kind manual --filter "coverage:file=coverage.test
 ## Critical Constraints
 
 - **Map the tests that exist — manual markdown cases, automated e2e tests, or both.** No unit tests. Do not suggest creating new tests.
-- **Only touch two files in this repo:** the coverage file (default `coverage.tests.yml`, or the path the user gave) and one `.testeiya/` line in `.gitignore` if missing. Never a source or test file.
-- Pulled or cloned tests go into the gitignored cache — manual cases into `.testeiya/manual-tests/`, external e2e repos into `.testeiya/e2e-tests/` — never a tracked folder.
+- You may write to exactly three places, nothing else:
+  - the coverage file — default `coverage.tests.yml`, or the path the user gave;
+  - the `.testeiya/` cache dir — clone automated test repos, pull manual cases from Testomat.io (Step 1);
+  - `.gitignore` — add a `.testeiya/` line if it is missing.
+- **Never modify a source or test file.**
+- Never pull or clone tests into a tracked folder — only into the gitignored `.testeiya/`.
 - **No ad-hoc scripts, no parsers, never Python.** Read test files with your file tool; extract IDs with `grep` (Step 2). The only script is the bundled checker (Step 5). If you ever need more than a `grep`, a one-line `node -e '…'` is the limit.
 - Stop if you cannot write the output file, or no tests are found and the user declines every option in Step 1.
 
