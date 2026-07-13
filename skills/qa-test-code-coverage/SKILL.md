@@ -22,6 +22,7 @@ Analyze the project's tests — manual markdown cases and automated e2e tests �
 - Never pull or clone tests into a tracked folder — only into the gitignored `.testeiya/`.
 - **Everything in the coverage file must come from this project:** file keys from its source tree, identifiers from the Step 2 inventory. Never copy a path or ID from this skill's docs — they are placeholders.
 - **No ad-hoc scripts, no parsers, never Python.** File reads and `grep` only; the single exception is the bundled checker (Step 5); beyond that a one-line `node -e '…'` is the limit.
+- **Be proactive — never stop at a representative sample.** A few entries per domain is a failed run. Keep mapping without asking permission to continue until the completion criterion in Step 4 is met.
 - Stop if you cannot write the output file, or no tests are found and the user declines every option in Step 1.
 
 ## Workflow
@@ -77,14 +78,19 @@ Missing IDs mean the tests were never synced with Testomat.io — the reporter c
 
 ### Step 4: Map source files to tests
 
-Split the mapping by codebase size (complexity from Step 1):
+**The Step 2 inventory is the work list. The map is complete only when every suite in it is either present in the coverage file or recorded as unmapped with a reason.** Run two passes — always both:
 
-- `small` / `medium` — map directly in this session.
-- `large` / `very-large`, or many top-level source folders — spawn subagents in parallel, one per source folder. Give each subagent:
-  - its folder path and the skip rules from Step 3;
+- Code → tests: walk the source tree from Step 3; for each file or subtree, add the identifiers of the tests that check it.
+- Tests → code: walk the inventory; for every suite still absent from the map, find the source it exercises and add it — or record why it cannot be mapped (feature has no code here, external system, needs user input).
+
+Scale the passes to the project — codebase size and suite count from Step 1:
+
+- Small codebase and few suites — run both passes in this session.
+- Large codebase or dozens of suites — spawn subagents in parallel: one per source folder for the code→tests pass, then one per batch of still-unmapped suites for the tests→code pass. Give each subagent:
+  - its slice — a folder path, or a batch of suites;
   - the full test inventory from Step 2 — subagents must not re-extract it;
   - the mapping rules below and the [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md);
-  - the instruction to return a YAML fragment for files inside its folder only.
+  - the instruction to return a YAML fragment for its slice only.
 - Merge the fragments into one map, drop duplicate keys and empty entries. Only the main session writes the file (Step 5).
 
 For each candidate source file, pick the identifier that keeps selecting the right tests as the test suite grows:
@@ -108,16 +114,24 @@ YAML grammar: [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md).
 
 - Write the YAML to the output path, keeping the `#` comments.
 - Keys are paths to source files in this repo — never `.testeiya/...` paths.
-- Check it from the project root:
+- Check it with the bundled checker. It ships in this skill's `scripts/` directory (next to this SKILL.md), not in the project — resolve its path from the skill location:
 
 ```bash
-npx js-yaml coverage.tests.yml | node scripts/check-coverage.mjs
+npx js-yaml coverage.tests.yml | node <path-to-this-skill>/scripts/check-coverage.mjs
 ```
 
 - The checker flags keys missing on disk and empty entries, and prints every identifier referenced — cross-check them against the Step 2 inventory; only you know which are real.
-- Show the produced YAML to the user.
+- Reconcile the other direction too: every suite in the inventory must appear in the file or in the unmapped list. Anything missing from both means the tests→code pass is not finished — go back to Step 4.
 
-### Step 6: Show next steps
+### Step 6: Report coverage completeness
+
+Show the user:
+
+- Suites mapped vs. total suites in the inventory; same for tests and tags where meaningful.
+- Every unmapped suite with its reason.
+- The produced YAML (or its path and entry count when large).
+
+### Step 7: Show next steps
 
 Tell the user how to use the file with `@testomatio/reporter`:
 
@@ -137,7 +151,7 @@ npx @testomatio/reporter run --kind manual \
 - In CI, diff against the base branch — `diff=origin/main` — and checkout with `fetch-depth: 0`.
 - Pulled or cloned tests stay in the gitignored `.testeiya/` cache for re-runs — don't delete it or move it into a tracked folder.
 
-### Step 7: Suggest follow-ups
+### Step 8: Suggest follow-ups
 
 - Coverage gaps — source features no test maps to. On approval, propose new cases (delegate to `qa-write-test-cases`).
 - Dead tests — tests whose features no longer exist in source.
