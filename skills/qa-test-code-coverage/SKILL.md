@@ -69,25 +69,32 @@ Missing IDs mean the tests were never synced with Testomat.io — the reporter c
 - ❓ Manual files without IDs: ask whether to push them first via `sync-test-cases-with-tms`, or skip those files.
 - Automated tests without IDs in most files: stop and instruct the user to run `npx check-tests@latest <Framework> "<glob>" --update-ids` first (per-framework commands: [E2E Frameworks](./references/E2E_FRAMEWORKS.md)).
 
-### Step 3: Explore the codebase
+### Step 3: Plan the coverage map by domain
 
-- Find the business code that implements the behaviors the tests check — controllers, models, services, components, pages, routes.
-- Skip test code, manual test directories, dependency/build/vendor folders, framework configs, lock files.
+**Do not crawl the codebase file by file.** Identify the application's domain areas first; Step 4 then maps area by area.
+
+- Derive the areas from both sides:
+  - the suite tree from Step 2 — the suite hierarchy is the QA team's own map of the product;
+  - the source structure — modules, routes, services, entry points.
+- Pair each area with the suites that test it and the source folders that implement it.
+- Order the areas by criticality, most critical first: payments/billing, auth and access control, data integrity, core business flows — then supporting features, then peripheral UI. Suite size is a signal: what QA tests heavily, they consider critical.
+- Show the ordered plan to the user before mapping.
+- Business code only: skip test code, manual test directories, dependency/build/vendor folders, framework configs, lock files.
 - **Templates and views are mappable source** (`.vue`, `.erb`, `.blade.php`, …) — tests check the rendered UI, so map them like code.
-- ❓ If the structure is ambiguous, ask the user which directories to focus on or exclude.
+- ❓ If areas or their priority are unclear, ask the user.
 
 ### Step 4: Map source files to tests
 
-**The Step 2 inventory is the work list. The map is complete only when every suite in it is either present in the coverage file or recorded as unmapped with a reason.** Run two passes — always both:
+**The Step 2 inventory is the work list. The map is complete only when every suite in it is either present in the coverage file or recorded as unmapped with a reason.** Work through the areas in Step 3's order — most critical first, so even an interrupted run covers what matters most. Run two passes — always both:
 
-- Code → tests: walk the source tree from Step 3; for each file or subtree, add the identifiers of the tests that check it.
+- Code → tests: for each area, map its source files and subtrees to the identifiers of the tests that check them.
 - Tests → code: walk the inventory; for every suite still absent from the map, find the source it exercises and add it — or record why it cannot be mapped (feature has no code here, external system, needs user input).
 
 Scale the passes to the project — codebase size and suite count from Step 1:
 
 - Small codebase and few suites — run both passes in this session.
-- Large codebase or dozens of suites — spawn subagents in parallel: one per source folder for the code→tests pass, then one per batch of still-unmapped suites for the tests→code pass. Give each subagent:
-  - its slice — a folder path, or a batch of suites;
+- Large codebase or dozens of suites — spawn subagents in parallel: one per domain area for the code→tests pass, then one per batch of still-unmapped suites for the tests→code pass. Give each subagent:
+  - its slice — one area (its suites and source folders), or a batch of suites;
   - the full test inventory from Step 2 — subagents must not re-extract it;
   - the mapping rules below and the [Coverage File Format](./references/COVERAGE_FILE_FORMAT.md);
   - the instruction to return a YAML fragment for its slice only.
