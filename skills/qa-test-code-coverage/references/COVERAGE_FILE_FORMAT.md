@@ -118,13 +118,13 @@ jobs:
 
 ## Checking the coverage file
 
-One command, run from the project root — no parser of your own:
+One command — no parser of your own. Run it with the project root as working directory (file keys resolve against it), but the checker itself lives in the skill's `scripts/` directory, not in the project:
 
 ```bash
-npx js-yaml coverage.tests.yml | node scripts/check-coverage.mjs
+npx js-yaml coverage.tests.yml | node <path-to-this-skill>/scripts/check-coverage.mjs
 ```
 
-`npx js-yaml` parses the YAML (it fails loudly on a malformed file, so a broken one never reaches the script). `scripts/check-coverage.mjs` (~25 lines, zero deps; ships with `qa-test-code-coverage`) reads that parsed map on stdin, flags any key whose path is missing on disk, flags any key with no identifiers, lists every `@S…` / `@T…` / tag the file references, and exits non-zero on a problem.
+`npx js-yaml` parses the YAML (it fails loudly on a malformed file, so a broken one never reaches the script). `check-coverage.mjs` (~25 lines, zero deps) reads that parsed map on stdin, flags any key whose path is missing on disk, flags any key with no identifiers, lists every `@S…` / `@T…` / tag the file references, and exits non-zero on a problem.
 
 The script can't tell which identifiers are real — check the listed ones against the set you extracted earlier in the workflow. Don't re-parse the test set, don't write your own YAML parser, and never use `python`.
 
