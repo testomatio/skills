@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// Sanity-check a coverage.*.yml mapping (manual or e2e — same format).
+// Sanity-check a coverage YAML mapping (manual and automated — same format).
 //
 // `js-yaml` does the YAML parsing; this script just checks the result.
 // Run it from the project root and pipe the parsed file in:
 //
-//   npx js-yaml coverage.manual.yml | node check-coverage.mjs
+//   npx js-yaml coverage.tests.yml | node check-coverage.mjs
 //
 // (`npx js-yaml` prints JSON, and fails loudly if the YAML is malformed,
 // so a broken file never reaches this script.)
