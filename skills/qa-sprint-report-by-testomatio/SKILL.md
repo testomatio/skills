@@ -180,23 +180,99 @@ Would you like to export it as a `.html` file to share with the team?
 3. 👍 No, keep the `.md` only
 ```
 
-> **Note:** HTML export requires the template file to be present at `./references/qa-sprint-report-template.html`. If the template is missing, notify the user and offer to save the `.md` only.
-
 **If user picks option 1 (cache folder):**
-1. Read the HTML template from `./references/qa-sprint-report-template.html`.
-2. Map the `.md` content into the corresponding template sections.
-3. Save as `QA_Sprint_Progress_Report_{SprintName}_{YYYY-MM-DD}.html` in the cache folder `.testeiya/`.
+1. Generate HTML using the styles defined in the **HTML Template Styling** section above.
+  - Apply the color palette, typography, status badges, and layout from the styling reference.
+2. Map the `.md` content into the corresponding HTML sections (header, metadata, tables per section).
+3. Save as `QA_Sprint_Progress_Report_{SprintName}_{YYYY-MM-DD}.html` in the **cache folder `.testeiya/`**.
 
 **If user picks option 2 (custom location):**
-1. Ask for the target directory path.
-2. Read the HTML template.
-3. Map the `.md` content into the corresponding template sections.
-4. Save as `QA_Sprint_Progress_Report_{SprintName}_{YYYY-MM-DD}.html` in the specified directory.
+1. Generate HTML using the styles defined in the **HTML Template Styling** section above.
+  - Apply the color palette, typography, status badges, and layout from the styling reference.
+2. Map the `.md` content into the corresponding HTML sections (header, metadata, tables per section).
+3. Save as `QA_Sprint_Progress_Report_{SprintName}_{YYYY-MM-DD}.html` in the **user-specified directory**.
 
 **If user picks option 3:**
 - Confirm the `.md` path and end the workflow.
 
-## Quick Commands
+## HTML Template Styling
+
+When exporting to HTML, apply the following styles:
+
+### Color Palette
+
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `--primary-color` | `#6366f1` | Headers, badges, links |
+| `--primary-hover` | `#4f46e5` | Hover states |
+| `--success-color` | `#10b981` | Passed/ready badges |
+| `--danger-color` | `#ef4444` | Failed/blocked badges |
+| `--warning-color` | `#f59e0b` | In-progress badges |
+| `--info-color` | `#3b82f6` | Info badges |
+| `--gray-50` to `--gray-900` | `#f9fafb` → `#111827` | Text hierarchy |
+
+### Typography
+
+- **Font Family:** Inter (Google Fonts) with fallback: `-apple-system, BlinkMacSystemFont, sans-serif`
+- **Font Weights:** 300 (light), 400 (regular), 500 (medium), 600 (semibold), 700 (bold), 800 (extrabold)
+- **Monospace:** `ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas` — for ticket IDs and code
+- **Icons:** Font Awesome 6.4.0 (`fa-solid`)
+
+### Status Badges
+
+| Status | Background | Text Color |
+|--------|------------|------------|
+| `passed`, `ready` | `#d1fae5` | `#065f46` |
+| `failed`, `blocked` | `#fee2e2` | `#991b1b` |
+| `progress` | `#fef3c7` | `#92400e` |
+| `info` | `#dbeafe` | `#1e40af` |
+
+### Key Elements
+
+| Element | Description |
+|---------|-------------|
+| `.main-container` | White glass card (`rgba(255,255,255,0.98)`) with `backdrop-filter: blur(20px)`, max-width 1300px, border-radius 20px |
+| `.header` | Gradient background (`linear-gradient(135deg, #6366f1, #4f46e5)`), white text, flex layout |
+| `.section-card` | White background, 1px border `--gray-200`, border-radius 12px, box-shadow |
+| `.report-table` | Full-width, collapse borders, hover highlight on rows |
+| `.meta-grid` | CSS Grid (`repeat(auto-fit, minmax(220px, 1fr))`), gap 20px |
+| `.instruction-card` | Info box with left 5px border in `--primary-color`, background `#eef2ff` |
+| `.tms-link` | Primary color link with hover underline |
+
+### HTML Structure
+
+```html
+<div class="main-container">
+  <header class="header">
+    <div class="header-title">
+      <h1>QA Sprint Progress Report</h1>
+      <p><i class="fa-solid fa-cubes"></i> [Project Name]</p>
+    </div>
+    <div class="header-badge">
+      <i class="fa-solid fa-calendar-days"></i> Sprint: [Sprint Number]
+    </div>
+  </header>
+
+  <section class="instruction-section">
+    <div class="instruction-card">
+      <h5><i class="fa-solid fa-circle-info"></i> How to Use This Template</h5>
+      <ul>...</ul>
+    </div>
+  </section>
+
+  <main class="content-section">
+    <div class="section-card">
+      <div class="section-title"><i class="fa-solid fa-chart-pie"></i> 1. Sprint Summary Scorecard</div>
+      <div class="meta-grid">...</div>
+    </div>
+    <!-- Repeat section-card for each section -->
+  </main>
+</div>
+```
+
+---
+
+# Quick Commands
 
 | Action | MCP Tool | Key Parameters |
 |--------|----------|----------------|
@@ -209,9 +285,10 @@ Would you like to export it as a `.html` file to share with the team?
 | Get test health analytics | `analytics_tests` | `kind`, `days`, `from`, `to` |
 | Get stats analytics | `analytics_stats` | `kind`, `from`, `to` |
 
-## Report Template Reference
+---
+
+# Report Template Reference
 
 | Section | Description |
 |---------|-------------|
 | [QA_Sprint_Progress_Report_Summary.md](./references/QA_Sprint_Progress_Report_Summary.md) | Full template with all sections, emoji, and fill-in placeholders |
-| [qa-sprint-report-template.html](./references/qa-sprint-report-template.html) | HTML template for optional html report export |
