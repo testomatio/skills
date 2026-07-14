@@ -21,8 +21,7 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 | `qa-e2e-tests-reporting`             | Add Testomat.io reporter to your automation project                               |
 | `automate-manual-test-cases`         | Convert manual test cases into automated test scripts (write new autotests)       |
 | `debug-fix-failed-flaky-autotests`   | Diagnose and fix failing or flaky autotests (heal autotests)                      |
-| `qa-manual-tests-to-code-coverage`   | Map manual test cases to source files (`coverage.manual.yml`)                     |
-| `e2e-test-coverage-mapping`          | Map automated e2e tests to source files (`coverage.e2e.yml`)                      |
+| `qa-test-code-coverage`              | Map manual & automated tests to source files (`coverage.tests.yml`)               |
 | `testomatio-mcp`                     | Analyze runs, cluster failures, investigate root causes via Testomat.io MCP       |
 
 ## Routing
@@ -70,7 +69,7 @@ Use `pull-request-diff-analyzer` skill to detect features/fixes and extract acce
 After analysis fully completed, suggest next actions:
 1. 🧠 Deepen QA analysis on the change (with `qa-thinking` skill)
 2. 📝 Generate test cases for the change (with `qa-write-test-cases` skill)
-3. 🎯 Run only the affected tests via coverage mapping (`e2e-test-coverage-mapping` / `qa-manual-tests-to-code-coverage` skills)
+3. 🎯 Run only the affected tests via coverage mapping (with `qa-test-code-coverage` skill)
 ```
 
 ### Test Case Improvement Flow
@@ -106,7 +105,7 @@ Use `automate-manual-test-cases` skill to convert manual cases into automated te
 =>
 After automation fully completed, suggest next actions:
 1. 🔧 Add Testomat.io reporter to your automation project (with `qa-e2e-tests-reporting` skill)
-2. 🗺️ Map the new autotests to source files (with `e2e-test-coverage-mapping` skill)
+2. 🗺️ Map the new autotests to source files (with `qa-test-code-coverage` skill)
 3. 🩺 Fix/heal any failing or flaky tests (with `debug-fix-failed-flaky-autotests` skill)
 ```
 
@@ -126,7 +125,7 @@ After fixes fully completed, suggest next actions:
 ```
 User: asks to run only affected tests, build a traceability matrix, or set up change-aware regression
 =>
-Use `qa-manual-tests-to-code-coverage` (manual cases) and/or `e2e-test-coverage-mapping` (autotests) to generate coverage mapping files
+Use `qa-test-code-coverage` to generate the coverage mapping file (manual & automated tests)
 =>
 After mapping fully completed, suggest next actions:
 1. 🔧 Add Testomat.io reporter so `--filter "coverage:..."` runs work (with `qa-e2e-tests-reporting` skill)
