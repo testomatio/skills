@@ -43,84 +43,22 @@ The user may identify the sprint in one of these ways (in priority order):
 
 # MCP Tools Mapping
 
-Each report section maps to specific MCP tools. Use only the tools needed per section.
+Each report section maps to specific MCP tools. See the full section structure and metrics in the template:
 
-### Section 1 — Sprint Summary Scorecard
+- [qa-sprint-report.md](./references/qa-sprint-report.md) — section layout with fill-in placeholders
 
-| Metric | MCP Tool(s) | Notes |
-|--------|-------------|-------|
-| 🖊️ **New Test Cases Added to TMS** | `tests_list` (compare count vs prior sprint) | Store baseline TC count in `Before`; compare at sprint end |
-| 📋 **Total TCs in Project** | `tests_list` → count | `tests_list(per_page=1)` + `total_count` or iterate all |
-| ⚙️ **Automation Rate** | `analytics_stats(kind="automation-rate-by-date")` | Enterprise only; fallback to `tests_list` → count `state=="automated"` |
-| 📈 **Overall Pass Rate** | `analytics_stats(kind="success-rate-by-date")` | Enterprise only; fallback: sum `testruns_list(filter_status="passed")` ÷ total |
-| 🏁 **Tickets Tested** | `runs_list` → linked suite counts | Runs marked finished with results |
-| ✅ **Tickets Completed (All Tests Passed)** | `runs_list` + filter `status_event="finish"` | Runs that reached "finished" state |
-| 🐛 **Defects/Bugs Registered** | `tests_issues_list` or `testruns_list(filter_message=true)` or defects from the run `runs_search("tql": "finished and with_defect") | Tests with linked issues or error messages |
+### Quick Commands
 
-### Section 2 — Test Design & Coverage Expansion
-
-| Field | MCP Tool(s) | Notes |
-|-------|-------------|-------|
-| Ticket ID | `suites_list` / `runs_list` | Link to project ticket ID via `link` field |
-| Ticket Name / Suite / Feature Area | `suites_list` → title | Primary grouping |
-| Test Case Titles | `tests_list(suite_id="...")` | Filter by suite |
-| Total TCs | `tests_list` count per suite | |
-| TMS State | `tests_list` → `state` field | `manual`, `automated`, `mix: automated & manual` |
-
-### Section 3 — Testing Execution Progress by Ticket, Suite
-
-If a Suite contains nested Suites, report each nested Suite as a separate row. Parent Suites should be used only as organizational containers and should not have aggregated execution metrics.
-
-| Field | MCP Tool(s) | Notes |
-|-------|-------------|-------|
-| Ticket Name / Suite / Feature Area | `suites_list` | Primary TMS grouping |
-| Run Title | `runs_list` | Filter by `milestone_id` or `rungroup_id` |
-| Total TCs | `tests_list(suite_id="...")` or `runs_get` | Tests linked to the run |
-| Passed / Failed / Skipped | `testruns_list(run_id="...", filter_status)` | Separate calls per status |
-| Execution % | Calculated: (passed + failed + skipped) ÷ total | |
-| Suite Release Status | Derived from execution % | ✅ Completed (All Tests Passed) - 100% pass = Ready; 🟡>51% pass = In Progress; 🔴<50% pass or blocked |
-
-> **Important:** Filter `runs_list` by `milestone % "Sprint N"` or `rungroup_id` to scope only the sprint's runs. Use TQL: `milestone % '{sprint_name}'`.
-
-### Section 4 — Tickets Moved to Sign-Off
-
-| Field | MCP Tool(s) | Notes |
-|-------|-------------|-------|
-| Ticket | `runs_list` with `status_event="finish"` | Fully executed runs |
-| Verified date | `runs_get` → `finished_at` | |
-| TMS Run link | Construct from `runs_get` result | `baseUrl + /runs/{run_id}` |
-
-### Section 5 — Quality Feedback Loop (Returned to Dev)
-
-Not directly queryable via MCP. Use manual user input combined with `testruns_list(filter_status="failed")` to surface failed tests that may indicate returns.
-
-### Section 6 — Sprint Bug Tracking
-
-| Field | MCP Tool(s) | Notes |
-|-------|-------------|-------|
-| Bug ID | `tests_issues_list` or manual | Linked issues on failed tests |
-| Priority | `issues_list` or from related test priority | Not in MCP; issue importance |
-| Linked Ticket | `tests_issues_list` → linked issue | |
-
-### Section 8 — TMS Test Health Analytics
-
-> **Requires `@testomatio/mcp-enterprise`** package and `api_analytics` subscription. If unavailable, hide this section.
-
-| Sub-section | MCP Tool | Parameters |
-|-------------|----------|------------|
-| 8.1 Test Health Overview | `analytics_tests` | `kind`: `flaky`, `never-executed`, `evergreen`, `skipped`, `defects`, `slow` |
-| 8.2 Success Rate Trend | `analytics_stats(kind="success-rate-by-date")` | `from`, `to`, `days` |
-| 8.3 Execution Volume Trend | `analytics_stats(kind="testruns-by-date")` | `from`, `to`, `days` |
-
-Fallback for non-Enterprise: `testruns_list` aggregated over the sprint date range.
-
-### Section 9 — Sprint Health & Project Readiness Assessment
-
-| Field | Source | Notes |
-|-------|--------|-------|
-| Sprint Completion Risk | Calculated from Section 3 execution % | Green ≥80%, Yellow ≥50%, Red <50% |
-| Spillover / Scope Creep Risk | Manual + `runs_list` incomplete runs | Runs not finished |
-| Environment & CI/CD Stability | Manual | Not directly queryable |
+| Action | MCP Tool | Key Parameters |
+|--------|----------|----------------|
+| Find sprint milestone | `milestones_list` | `type="Sprint"`, `status="active"` |
+| List runs for sprint | `runs_list` | `tql`: `milestone == '{id}'` |
+| Get run details | `runs_get` | `run_id` |
+| Get test results | `testruns_list` | `run_id`, `filter_status` |
+| Get suite tests | `tests_list` | `suite_id`, `per_page=100` |
+| Check analytics availability | `system_ping` | (Enterprise flag in response) |
+| Get test health analytics | `analytics_tests` | `kind`, `days`, `from`, `to` |
+| Get stats analytics | `analytics_stats` | `kind`, `from`, `to` |
 
 ---
 
@@ -268,21 +206,6 @@ When exporting to HTML, apply the following styles:
   </main>
 </div>
 ```
-
----
-
-# Quick Commands
-
-| Action | MCP Tool | Key Parameters |
-|--------|----------|----------------|
-| Find sprint milestone | `milestones_list` | `type="Sprint"`, `status="active"` |
-| List runs for sprint | `runs_list` | `tql`: `milestone == '{id}'` |
-| Get run details | `runs_get` | `run_id` |
-| Get test results | `testruns_list` | `run_id`, `filter_status` |
-| Get suite tests | `tests_list` | `suite_id`, `per_page=100` |
-| Check analytics availability | `system_ping` | (Enterprise flag in response) |
-| Get test health analytics | `analytics_tests` | `kind`, `days`, `from`, `to` |
-| Get stats analytics | `analytics_stats` | `kind`, `from`, `to` |
 
 ---
 

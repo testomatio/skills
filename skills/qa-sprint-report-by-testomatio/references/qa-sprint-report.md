@@ -1,4 +1,4 @@
-# QA Sprint Progress Summary Report
+# QA Sprint Progress Summary Report Example
 
 The **QA Sprint Progress Summary Report** provides a structured, end-of-cycle view of all testing activities carried out during a sprint. It captures test design coverage, execution results, defect trends, and quality signals to keep stakeholders informed on product readiness.
 
