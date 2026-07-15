@@ -6,7 +6,7 @@ The **QA Sprint Progress Summary Report** provides a structured, end-of-cycle vi
 
 ## 📋 General Sprint Meta
 * **Project / Stream:** [Project Name / Stream]
-* **QA Lead Manager:** [Your Name]
+* **QA Manager:** [Your Name]
 * **Sprint Cycle:** [Sprint Number / Name]
 * **Timeline Period:** [DD.MM.YYYY – DD.MM.YYYY]
 
@@ -16,14 +16,13 @@ The **QA Sprint Progress Summary Report** provides a structured, end-of-cycle vi
 
 | Metric | Value | Notes & Data Source |
 | :--- | :---: | :--- |
-| 🎫 **Total Tickets in Sprint Scope** | [N] | Baseline scope + mid-sprint modifications. |
 | 🖊️ **New Test Cases Added to TMS** | [N] | Net new TCs authored in Testomat.io during this sprint. |
 | 📋 **Total TCs in Project (End of Sprint)** | [N] | `tests_list` count at sprint close. |
 | ⚙️ **Automation Rate** | [XX%] | Automated TCs ÷ Total TCs — from `analytics_stats(kind="automation-rate-by-date")`. |
 | 📈 **Overall Pass Rate** | [XX%] | From `analytics_stats(kind="success-rate-by-date")` for the sprint window. |
-| ✅ **Tickets Verified / Tested** | [N] | Total features subjected to active evaluation. |
-| 🏁 **Tickets Signed-Off (QA Done)** | [N] | Formally approved and ready for delivery/release. |
-| 🐛 **Defects / Bugs Registered** | [N] | Newly identified defects logged during execution. |
+| 🏁 **Tickets Tested** | [N] | Total number of tickets which were finished during the sprint. |
+| ✅ **Tickets Completed (All Tests Passed)** | [N] | Formally approved and ready for delivery/release -> finished with all passed tests. |
+| 🐛 **Defects/Bugs Registered** | [N] | Newly identified defects logged during execution. |
 
 ---
 
@@ -31,29 +30,30 @@ The **QA Sprint Progress Summary Report** provides a structured, end-of-cycle vi
 
 | Ticket ID | Suite / Feature Area | Test Case Title(s) | Total TCs | TMS State |
 | :--- | :--- | :--- | :---: | :--- |
-| **[PROJ-123]** | Authentication | [TC Title 1]; [TC Title 2]; [TC Title 3] | [N] | [Manual / Automated] |
-| **[PROJ-456]** | Data Export | [TC Title 1]; [TC Title 2] | [N] | [Automated] |
+| **[PROJ-123]** | Authentication | [TC Title 1]; [TC Title 2] | [N] | [Manual / Automated] |
+| **[PROJ-456]** | Data Export | [TC Title 1] | [N] | [Automated] |
+| **[PROJ-789]** | Data Export | [TC Title 1]; [TC Title 2] | [N] | [Mix: Automated & Manual] |
 | *— No new test cases added —* | | | | |
 
-> **TMS State** column: pull from `tests_list` → `state` field (`Manual` / `Automated`).
+> **TMS State** column: pull from `tests_list` → `state` field (`Manual` / `Automated` / `Mix: Automated & Manual`).
 
 ---
 
-## 🎯 3. Testing Execution Progress by Suite
+## 🎯 3. Testing Execution Progress by Ticket, Suite
 
 > Report group is **Suite** (the primary TMS grouping). Each row corresponds to a Testomat.io Suite. Use `testruns_list(run_id="...")` to populate Passed / Failed / Skipped counts per suite.
 
-| Suite / Feature Area | Run Title | Total TCs | Passed | Failed | Skipped | Blocked | Execution % | Suite Release Status |
+| Ticket Name / Suite / Feature Area | Run Title | Total TCs | Passed | Failed | Skipped | Blocked | Execution % | Suite Release Status |
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :--- |
 | [Suite Name — e.g. Billing] | [Run Title] | [N] | `[N]` | `[N]` | `[N]` | `[N]` | `[XX]%` | 🟡 In Progress |
-| [Suite Name — e.g. Profile] | [Run Title] | [N] | `[N]` | `[N]` | `[N]` | `[N]` | `[XX]%` | ✅ Ready for Sign-Off |
+| [Suite Name — e.g. Profile] | [Run Title] | [N] | `[N]` | `[N]` | `[N]` | `[N]` | `[XX]%` | ✅ Completed (All Tests Passed) |
 | [Suite Name — e.g. Analytics] | [Run Title] | [N] | `[N]` | `[N]` | `[N]` | `[N]` | `[XX]%` | 🔴 Blocked |
 | **TOTAL** | | **[N]** | **`[N]`** | **`[N]`** | **`[N]`** | **`[N]`** | **`[XX]%`** | **Overall Pass Rate:** `[XX%]` |
 
 > **Status Key:**
-> ✅ **Ready for Sign-Off:** 100% test execution completed with zero critical defects.
-> 🟡 **In Progress:** Validations are actively running; no major technical hurdles encountered.
-> 🔴 **Blocked:** Discovered critical failure, missing dependency, or severe infrastructure down-time.
+> ✅ **Completed (All Tests Passed):** 100% test execution completed with zero critical defects.
+> 🟡 **In Progress:** Validations are actively running or includes in-progress cases; no major technical hurdles encountered (🟡 >51% pass = In Progress).
+> 🔴 **Blocked:** Discovered failure, issues (🔴<50% pass or blocked).
 
 ---
 
@@ -72,11 +72,11 @@ The **QA Sprint Progress Summary Report** provides a structured, end-of-cycle vi
 
 ## 🐛 6. Sprint Bug Tracking
 
-| Bug ID | Title / Summary Description | Severity | Linked Ticket | Current Status |
+| Bug ID | Title / Summary Description | Priority | Linked Ticket |
 | :--- | :--- | :---: | :--- | :--- |
-| `[BUG-001]` | `[Short descriptive bug title]` | 🔴 Critical | `[PROJ-XXX]` | `[Open / In Fix]` |
-| `[BUG-002]` | `[Short descriptive bug title]` | 🟠 Major | `[PROJ-XXX]` | `[Resolved / Retest]` |
-| *— No bugs registered this week —* | | | |
+| `[BUG-001]` | `[Short descriptive bug title]` | 🔴 Critical | `[PROJ-XXX]` |
+| `[BUG-002]` | `[Short descriptive bug title]` | 🟠 Major | `[PROJ-XXX]` |
+| *— No bugs registered this week —* | | |
 
 ---
 
@@ -123,7 +123,4 @@ The **QA Sprint Progress Summary Report** provides a structured, end-of-cycle vi
 | 🖥️ **Environment & CI/CD Stability** | `[Stable / Degraded]` | Log testing framework bottlenecks, env down times, or pipeline blockers. |
 
 **Sprint Summary Overview:**
-[Write a summary 1-5 sentences overview by current sprint based on the provided info from this report.] 
-
-**Next Sprint Notes:**
-[Write a brief 2-3 sentence narrative highlighting core priorities for upcoming days based on the registred issues, test cases comments, ect.]
+[Write a summary 1-5 sentences overview by current sprint based on the provided info from this report.]

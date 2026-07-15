@@ -9,7 +9,7 @@ metadata:
 
 # QA Sprint Report by Testomat.io
 
-Generates a **QA Sprint Progress Summary Report** by querying Testomat.io TMS via MCP. The report covers sprint metadata, test design coverage, execution progress by suite, defect tracking, TMS test health analytics, and project readiness — all mapped to the [QA_Sprint_Progress_Report_Summary.md template](./references/QA_Sprint_Progress_Report_Summary.md).
+Generates a **QA Sprint Progress Summary Report** by querying Testomat.io TMS via MCP. The report covers sprint metadata, test design coverage, execution progress by suite, defect tracking, TMS test health analytics, and project readiness.
 
 ## When to Use
 
@@ -49,36 +49,36 @@ Each report section maps to specific MCP tools. Use only the tools needed per se
 
 | Metric | MCP Tool(s) | Notes |
 |--------|-------------|-------|
-| 🎫 Total Tickets in Sprint Scope | `runs_list` + count linked tickets | From `runs_create` linked entities or `plans_list` scope |
-| 🖊️ New Test Cases Added to TMS | `tests_list` (compare count vs prior sprint) | Store baseline TC count in `Before`; compare at sprint end |
-| 📋 Total TCs in Project | `tests_list` → count | `tests_list(per_page=1)` + `total_count` or iterate all |
-| ⚙️ Automation Rate | `analytics_stats(kind="automation-rate-by-date")` | Enterprise only; fallback to `tests_list` → count `state=="automated"` |
-| 📈 Overall Pass Rate | `analytics_stats(kind="success-rate-by-date")` | Enterprise only; fallback: sum `testruns_list(filter_status="passed")` ÷ total |
-| ✅ Tickets Verified / Tested | `runs_list` → linked suite counts | Runs marked finished with results |
-| 🏁 Tickets Signed-Off | `runs_list` + filter `status_event="finish"` | Runs that reached "finished" state |
-| 🐛 Defects / Bugs Registered | `tests_issues_list` or `testruns_list(filter_message=true)` | Tests with linked issues or error messages |
-| 🔁 Tickets Returned to Dev | Manual entry or defect loop count | Not directly queryable; rely on user input |
+| 🖊️ **New Test Cases Added to TMS** | `tests_list` (compare count vs prior sprint) | Store baseline TC count in `Before`; compare at sprint end |
+| 📋 **Total TCs in Project** | `tests_list` → count | `tests_list(per_page=1)` + `total_count` or iterate all |
+| ⚙️ **Automation Rate** | `analytics_stats(kind="automation-rate-by-date")` | Enterprise only; fallback to `tests_list` → count `state=="automated"` |
+| 📈 **Overall Pass Rate** | `analytics_stats(kind="success-rate-by-date")` | Enterprise only; fallback: sum `testruns_list(filter_status="passed")` ÷ total |
+| 🏁 **Tickets Tested** | `runs_list` → linked suite counts | Runs marked finished with results |
+| ✅ **Tickets Completed (All Tests Passed)** | `runs_list` + filter `status_event="finish"` | Runs that reached "finished" state |
+| 🐛 **Defects/Bugs Registered** | `tests_issues_list` or `testruns_list(filter_message=true)` or defects from the run `runs_search("tql": "finished and with_defect") | Tests with linked issues or error messages |
 
 ### Section 2 — Test Design & Coverage Expansion
 
 | Field | MCP Tool(s) | Notes |
 |-------|-------------|-------|
 | Ticket ID | `suites_list` / `runs_list` | Link to project ticket ID via `link` field |
-| Suite / Feature Area | `suites_list` → title | Primary grouping |
+| Ticket Name / Suite / Feature Area | `suites_list` → title | Primary grouping |
 | Test Case Titles | `tests_list(suite_id="...")` | Filter by suite |
 | Total TCs | `tests_list` count per suite | |
-| TMS State | `tests_list` → `state` field | `manual` or `automated` |
+| TMS State | `tests_list` → `state` field | `manual`, `automated`, `mix: automated & manual` |
 
-### Section 3 — Testing Execution Progress by Suite
+### Section 3 — Testing Execution Progress by Ticket, Suite
+
+If a Suite contains nested Suites, report each nested Suite as a separate row. Parent Suites should be used only as organizational containers and should not have aggregated execution metrics.
 
 | Field | MCP Tool(s) | Notes |
 |-------|-------------|-------|
-| Suite / Feature Area | `suites_list` | Primary TMS grouping |
+| Ticket Name / Suite / Feature Area | `suites_list` | Primary TMS grouping |
 | Run Title | `runs_list` | Filter by `milestone_id` or `rungroup_id` |
 | Total TCs | `tests_list(suite_id="...")` or `runs_get` | Tests linked to the run |
 | Passed / Failed / Skipped | `testruns_list(run_id="...", filter_status)` | Separate calls per status |
 | Execution % | Calculated: (passed + failed + skipped) ÷ total | |
-| Suite Release Status | Derived from execution % | ✅ 100% pass = Ready; 🟡 >0% pass = In Progress; 🔴 0% pass or blocked |
+| Suite Release Status | Derived from execution % | ✅ Completed (All Tests Passed) - 100% pass = Ready; 🟡>51% pass = In Progress; 🔴<50% pass or blocked |
 
 > **Important:** Filter `runs_list` by `milestone % "Sprint N"` or `rungroup_id` to scope only the sprint's runs. Use TQL: `milestone % '{sprint_name}'`.
 
@@ -99,9 +99,8 @@ Not directly queryable via MCP. Use manual user input combined with `testruns_li
 | Field | MCP Tool(s) | Notes |
 |-------|-------------|-------|
 | Bug ID | `tests_issues_list` or manual | Linked issues on failed tests |
-| Severity | Manual or `issues_list` | Not in MCP; use manual classification |
+| Priority | `issues_list` or from related test priority | Not in MCP; issue importance |
 | Linked Ticket | `tests_issues_list` → linked issue | |
-| Current Status | Manual | Not queryable via MCP |
 
 ### Section 8 — TMS Test Health Analytics
 
@@ -291,4 +290,4 @@ When exporting to HTML, apply the following styles:
 
 | Section | Description |
 |---------|-------------|
-| [QA_Sprint_Progress_Report_Summary.md](./references/QA_Sprint_Progress_Report_Summary.md) | Full template with all sections, emoji, and fill-in placeholders |
+| [qa-sprint-report.md](./references/qa-sprint-report.md) | Full template with all sections, emoji, and fill-in placeholders |
