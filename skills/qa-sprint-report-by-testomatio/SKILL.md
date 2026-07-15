@@ -74,12 +74,26 @@ Ask the user if no sprint identifier is provided. Try to resolve:
 3. runs_list(tql="title % 'Sprint N'") — find runs by title
 ```
 
-### Step 2: Gather Sprint Metadata
+### Step 2: Gather Sprint Metadata & Time Range
 
 Collect for the report header:
 
-- `milestones_get(milestone_id)` or `rungroups_get(rungroup_id)` for sprint title/dates
-- Ask user for QA Lead name, timeline period if not in TMS
+- `milestones_get(milestone_id)` or `rungroups_get(rungroup_id)` for sprint title/dates.
+- Ask user for QA Lead name if not in TMS.
+
+**Critical: Extract Sprint Time Range**
+
+Resolve the sprint time range in this priority order:
+
+1. **User-provided** — If the user specified a time range in their original prompt, use it.
+2. **Milestone/Rungroup dates** — Extract `start_date` / `due_date` from `milestones_get` or `rungroups_get`.
+3. **Run timestamps** — If milestone/rungroup has no dates, derive from earliest `created_at` and latest `finished_at` across the sprint's runs (`runs_get`).
+4. **Manual input** — If no time range can be determined from TMS, ask the user to specify the sprint period manually.
+
+The time range is required for:
+- `analytics_tests(kind="...", from="YYYY-MM-DD", to="YYYY-MM-DD")`
+- `analytics_stats(kind="...", from="YYYY-MM-DD", to="YYYY-MM-DD")`
+- Filtering runs by sprint period
 
 ### Step 3: Collect Run Data
 

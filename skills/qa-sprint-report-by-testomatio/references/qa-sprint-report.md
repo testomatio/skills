@@ -22,7 +22,7 @@ The **QA Sprint Progress Summary Report** provides a structured, end-of-cycle vi
 | 📈 **Overall Pass Rate** | [XX%] | From `analytics_stats(kind="success-rate-by-date")` for the sprint window. |
 | 🏁 **Tickets Tested** | [N] | Total number of tickets which were finished during the sprint. |
 | ✅ **Tickets Completed (All Tests Passed)** | [N] | Formally approved and ready for delivery/release -> finished with all passed tests. |
-| 🐛 **Defects/Bugs Registered** | [N] | Newly identified defects logged during execution. |
+| 🐛 **Defects/Bugs Identified** | [N] | Newly identified defects during execution. |
 
 ---
 
