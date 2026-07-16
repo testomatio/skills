@@ -9,8 +9,6 @@ metadata:
 
 # QA Sprint Report by Testomat.io
 
-Generates a **QA Sprint Progress Summary Report** by querying Testomat.io TMS via MCP. The report covers sprint metadata, test design coverage, execution progress by suite, defect tracking, TMS test health analytics, and project readiness.
-
 ## When to Use
 
 - End of sprint — produce a shareable QA report for stakeholders.
