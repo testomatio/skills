@@ -1,6 +1,6 @@
 ---
 name: qa-sprint-report-by-testomatio
-description: Generate a QA Sprint Progress Summary Report from Testomat.io TMS data. Use when the user wants to produce a structured end-of-sprint report covering test design coverage, execution results, defect trends, and quality signals. The skill reads data via Testomat.io MCP tools, maps it to the report sections, and outputs a `.md` file. Optionally offer to export as `.html`.
+description: Generate a QA Sprint Progress Summary Report from Testomat.io TMS data. Use when the user wants to produce a structured end-of-sprint report covering test design coverage, execution results, defect trends, and quality signals. The skill reads data via Testomat.io MCP tools, maps it to the report sections, and outputs an `.html` file by default (or `.md` if explicitly requested).
 license: MIT
 metadata:
   author: Testomat.io
@@ -35,7 +35,7 @@ The user may identify the sprint in one of these ways (in priority order):
 - **Hide unavailable sections.** If analytics (Section 8) is not available, omit it entirely rather than leaving placeholder text.
 - **One blank line between actions.** In any generated code or CLI snippets.
 - **Use TQL for filtering.** Always prefer `tql` filters over client-side filtering when calling `runs_list`, `tests_list`, `testruns_list`.
-- **HTML is optional.** Always generate the `.md` first; only offer `.html` after the `.md` is saved.
+- **HTML is the default output.** Generate `.html` first; only offer `.md` if the user explicitly asks for it or their initial prompt includes a request to save as `.md`.
 
 ---
 
@@ -111,38 +111,30 @@ Iterate sections 1–9 of the template, populating each with MCP data. Apply rul
 
 Write the filled report to:
 ```
-{user-specified-path}/QA_Sprint_Progress_Report_{SprintName}_{YYYY-MM-DD}.md
+{user-specified-path}/QA_Sprint_Progress_Report_{SprintName}_{YYYY-MM-DD}.html
 ```
 
 If no path specified, save to current working directory.
 
-### Step 6: Offer Export
+### Step 6: Offer Markdown Export
 
-After writing the `.md` file, ask the user if they want to export the report and where to save it:
+After writing the `.html` file, ask the user if they also want to export the report as a `.md` file:
 
 ```
 ❓ The report has been saved to `{path}`.
-Would you like to export it as a `.html` file to share with the team?
+Would you like to also export it as a `.md` file?
 
-1. 📂 Yes, export to cache folder (default)
-2. ✏️ Yes, but let me specify a different location
-3. 👍 No, keep the `.md` only
+1. ✏️ Yes, save as `.md` in the same location
+2. 👍 No, keep the `.html` only
 ```
 
-**If user picks option 1 (cache folder):**
-1. Generate HTML using the styles defined in the **HTML Template Styling** section above.
-  - Apply the color palette, typography, status badges, and layout from the styling reference.
-2. Map the `.md` content into the corresponding HTML sections (header, metadata, tables per section).
-3. Save as `QA_Sprint_Progress_Report_{SprintName}_{YYYY-MM-DD}.html` in the **cache folder `.testeiya/`**.
+**If user picks option 1:**
+1. Convert the HTML content to Markdown format.
+1. Generate ".md" markdown format report using template from the references - [qa-sprint-report.md](./references/qa-sprint-report.md).
+2. Save as `QA_Sprint_Progress_Report_{SprintName}_{YYYY-MM-DD}.md` in the **same directory** as the HTML file.
 
-**If user picks option 2 (custom location):**
-1. Generate HTML using the styles defined in the **HTML Template Styling** section above.
-  - Apply the color palette, typography, status badges, and layout from the styling reference.
-2. Map the `.md` content into the corresponding HTML sections (header, metadata, tables per section).
-3. Save as `QA_Sprint_Progress_Report_{SprintName}_{YYYY-MM-DD}.html` in the **user-specified directory**.
-
-**If user picks option 3:**
-- Confirm the `.md` path and end the workflow.
+**If user picks option 2:**
+- Confirm the `.html` path and end the workflow.
 
 ## HTML Template Styling
 
