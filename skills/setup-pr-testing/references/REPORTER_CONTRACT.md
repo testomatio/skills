@@ -11,7 +11,7 @@ How `@testomatio/reporter` consumes the coverage map, creates runs without execu
 - `file=` — path to the coverage map (default `coverage.tests.yml`, produced by `qa-test-code-coverage`). May be absolute; it is read with `fs`, independent of the working directory.
 - `diff=` — git ref to diff against; defaults to `master` if omitted. The reporter runs `git diff <ref> --name-only` **in `process.cwd()`** — it must be launched from inside the repo whose changes are being detected.
 - The changed files are mapped through the YAML; the matching suite/test IDs and tags become the run's scope.
-- One mixed map serves both kinds; the `--kind` flag on the command decides the run type (`--kind manual`, `--kind mixed`, or no flag for automated).
+- One mixed map serves both kinds; the `--kind` flag on the command decides the run type (§3).
 - A filter resolving to zero tests creates no run (`No tests found.`) — the CI job must treat that as success.
 
 ## 2. Diff base rules
@@ -20,23 +20,26 @@ How `@testomatio/reporter` consumes the coverage map, creates runs without execu
 - **Post-merge jobs** — the target branch now equals `HEAD`, so diffing against it yields nothing. Use the previous mainline tip instead: `HEAD~1` for squash merges, `HEAD^1` for merge commits.
 - The diff base is computed where the job runs; confirm the repo history is available there.
 
-## 3. PR opened — create the runs
+## 3. PR opened — create the run
 
-Required env on every call: `TESTOMATIO` (project API key), `TESTOMATIO_TITLE` (PR-based, identical across all phases, e.g. `PR <number>: <title>`), `TESTOMATIO_RUNGROUP_TITLE`. `TESTOMATIO_ENV` optional.
+Required env: `TESTOMATIO` (project API key), `TESTOMATIO_TITLE` (PR-based, identical across all phases, e.g. `PR <number>: <title>`), `TESTOMATIO_RUNGROUP_TITLE`. `TESTOMATIO_ENV` optional.
 
-**Manual run — pending, complete at creation.** No runner; the affected manual cases wait for testers:
-
-```bash
-npx @testomatio/reporter start --kind manual \
-  --filter "coverage:file=<coverage-map>,diff=<target-branch>"
-```
-
-**Automated run — scheduled, not executed.** `start` creates the run scoped to the affected tests and returns its id. `--format id` prints only the run id to stdout (banner and logs go to stderr), so capture is clean:
+One `start` call creates one run covering both kinds. Its manual cases are immediately pending for testers; its automated part stays scheduled until launched (§5). `--format id` prints only the run id to stdout (banner and logs go to stderr), so capture is clean:
 
 ```bash
-RUN_ID=$(npx @testomatio/reporter start \
+RUN_ID=$(npx @testomatio/reporter start --kind mixed \
   --filter "coverage:file=<coverage-map>,diff=<target-branch>" --format id)
 ```
+
+### The `--kind` rule
+
+The flag follows which kinds of tests the project has:
+
+| Project tests      | Flag            | Launch phases                                  |
+| ------------------ | --------------- | ---------------------------------------------- |
+| manual + automated | `--kind mixed`  | preview/merge launch the automated part        |
+| manual only        | `--kind manual` | none — the run is complete at creation         |
+| automated only     | *(no flag)*     | preview/merge launch the run                   |
 
 The stored scope is a snapshot of the diff at creation time; a fresh `--filter` at launch (§5) replaces it.
 
@@ -61,6 +64,7 @@ TESTOMATIO_RUN=$RUN_ID npx @testomatio/reporter run --remote <profile-name> \
 
 - With no `--filter` at launch, the server greps the run's stored scope from creation time. Passing a fresh `--filter` overrides it — this is how the final merged diff decides what actually runs.
 - `--remote-param <key>=<value>` forwards a parameter to the CI profile config (repeat for several) — the carrier for a preview URL or target branch.
+- In a mixed run the launched automated tests report into the same run the testers work in — one run per PR, both kinds.
 - Guards: requires `TESTOMATIO` (exits 1 otherwise); cannot combine with `--filter-list`; any positional command is ignored with a warning; a missing profile surfaces as `CI launch failed: <message>` and exit 1.
 - Keep the launch job non-blocking — it observes the change, it does not gate the merge or release.
 

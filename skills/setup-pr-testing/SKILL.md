@@ -1,6 +1,6 @@
 ---
 name: setup-pr-testing
-description: Wire a project's CI so pull requests drive coverage-based selective testing with Testomat.io — on PR open create a pending manual run and a scheduled automated run scoped to the diff (via the coverage map from `qa-test-code-coverage`), then launch the automated tests after a preview deploy or on merge through a Testomat.io CI profile (`reporter run --remote`), inline in the pipeline, or by dispatching another repo. Use this skill when the user wants to integrate a coverage map into CI, set up PR-triggered testing, run only affected tests per PR or on merge, launch e2e via Testomat.io CI profiles, or wire preview-deploy test runs. CI-agnostic — adapts to whatever CI the project uses (GitHub Actions, GitLab CI, Azure Pipelines, Jenkins, Bitbucket, CircleCI, etc.).
+description: Wire a project's CI so pull requests drive coverage-based selective testing with Testomat.io — on PR open create one mixed run scoped to the diff (manual cases pending for testers, automated part scheduled; via the coverage map from `qa-test-code-coverage`), then launch the automated tests after a preview deploy or on merge through a Testomat.io CI profile (`reporter run --remote`), inline in the pipeline, or by dispatching another repo. Use this skill when the user wants to integrate a coverage map into CI, set up PR-triggered testing, run only affected tests per PR or on merge, launch e2e via Testomat.io CI profiles, or wire preview-deploy test runs. CI-agnostic — adapts to whatever CI the project uses (GitHub Actions, GitLab CI, Azure Pipelines, Jenkins, Bitbucket, CircleCI, etc.).
 license: MIT
 metadata:
   author: Testomat.io
@@ -9,19 +9,19 @@ metadata:
 
 # Setup PR Testing
 
-I wire a project's CI so each pull request drives coverage-based selective testing with Testomat.io. Runs are created the moment a PR opens — a pending manual run for testers and a scheduled automated run — and executed later, after a preview deploy or on merge.
+I wire a project's CI so each pull request drives coverage-based selective testing with Testomat.io. One mixed run is created the moment a PR opens — its manual cases pending for testers, its automated part scheduled — and the automated part is launched later, after a preview deploy or on merge.
 
 > **GOAL: a working pipeline committed to the project's own CI system.** That CI configuration is the one and only finished result. **I run locally to author it — I am never part of CI.** Do not create runs or execute `@testomatio/reporter` to "see it work". The single network call allowed while authoring is the read-only project info API (Step 2). Every other command below is something the pipeline executes later.
 
 ```
-PR opened   ──▶ create runs scoped to the PR diff — nothing executes
-                  manual    → reporter start --kind manual --filter coverage:…  (pending, testers begin)
-                  automated → reporter start --filter coverage:… --format id    (scheduled; RUN_ID persisted)
+PR opened   ──▶ create one mixed run scoped to the PR diff — nothing executes
+                  reporter start --kind mixed --filter coverage:… --format id
+                  (manual cases pending — testers begin · automated part scheduled · RUN_ID persisted)
 
 PR updated  ──▶ nothing is recreated — the scope refreshes at execution time
 
 preview up  ──▶ only if each commit deploys to a preview environment:
-                  after the deploy-finished signal, launch the scheduled run
+                  after the deploy-finished signal, launch the run's automated part
                   against the preview (remote profile · inline · another repo)
 
 PR merged   ──▶ launch the prepared run with the final diff
@@ -52,7 +52,7 @@ The valuable knowledge here is the phase model, the reporter command contract ([
 - **Discovery first.** Delegate to `scan-automation-project` before writing anything.
 - **Never assume or hardcode the CI system.** Read the repo; if unclear, ask.
 - **No coverage map → no pipeline.** Delegate map creation to `qa-test-code-coverage`; filtering is never skipped.
-- **PR open creates runs, it executes nothing.** Manual runs are complete at creation; automated runs stay scheduled.
+- **PR open creates the run, it executes nothing.** Manual cases are pending at creation; the automated part stays scheduled.
 - **Preview launches gate on a deploy-finished signal** — never on the push itself.
 - **Execution jobs never block a PR and never fail a merge/release pipeline.** They are observation, not gates.
 - **PR comments come from the reporter's own pipes** (GitHub / GitLab / Bitbucket) — never script a PR-comment API call.
@@ -113,24 +113,18 @@ Read the CI files first so you don't ask what's already answered:
 
 Write the jobs in the CI's own syntax. The skill-specific parts are the reporter commands and env vars ([references/REPORTER_CONTRACT.md](references/REPORTER_CONTRACT.md)); triggers and value-passing are ordinary CI config.
 
-**(a) PR opened → create the runs.**
+**(a) PR opened → create the run.**
 
-Required env on both calls: `TESTOMATIO` (from the secret, Step 6), `TESTOMATIO_TITLE` (PR-based, e.g. `PR <number>: <title>`), `TESTOMATIO_RUNGROUP_TITLE`.
+Required env: `TESTOMATIO` (from the secret, Step 6), `TESTOMATIO_TITLE` (PR-based, e.g. `PR <number>: <title>`), `TESTOMATIO_RUNGROUP_TITLE`.
 
-Manual run — created pending, complete at creation; testers pick it up while the PR is open:
-
-```bash
-npx @testomatio/reporter start --kind manual \
-  --filter "coverage:file=<coverage-map>,diff=<target-branch>"
-```
-
-Automated run — scheduled, not executed; `--format id` keeps stdout to just the run id:
+One mixed run serves both kinds — its manual cases are pending immediately for testers, its automated part stays scheduled; `--format id` keeps stdout to just the run id:
 
 ```bash
-RUN_ID=$(npx @testomatio/reporter start \
+RUN_ID=$(npx @testomatio/reporter start --kind mixed \
   --filter "coverage:file=<coverage-map>,diff=<target-branch>" --format id)
 ```
 
+- `--kind` follows the project's tests: `mixed` when manual and automated both exist, `manual` when manual-only (nothing to launch later), no flag when automated-only (contract §3).
 - Persist `$RUN_ID` with the CI's native mechanism for passing a value to a later pipeline (artifact, variable, output). Fallback: shared-run title matching (contract §4).
 - Run once per PR (on open); pushes to the PR don't recreate runs — the scope refreshes at launch time.
 - A diff affecting zero tests creates no run — treat that as success; this job never blocks the PR.
@@ -144,7 +138,7 @@ TESTOMATIO_RUN=$RUN_ID npx @testomatio/reporter run --remote <profile-name> \
   --remote-param <param-name>=<preview-url>
 ```
 
-The manual run needs no launch — its pending cases are tested against the preview by hand.
+The manual cases need no launch — testers work through them against the preview by hand.
 
 **(c) PR merged → launch the prepared run with the final diff.**
 
@@ -175,7 +169,7 @@ Report: the CI targeted and files written; which phases are wired and which were
 ## Examples
 
 **Example 1 — previews + a configured CI profile**
-Info API lists a profile matching the Playwright suite; the user confirms every commit deploys to a preview. → Wire all three phases: runs created on PR open, preview launch gated on the deployment-success event with the preview URL as a `--remote-param`, merge launch with a fresh post-merge filter. Enable the platform's comment pipe.
+Info API lists a profile matching the Playwright suite; the user confirms every commit deploys to a preview. → Wire all three phases: one mixed run created on PR open, preview launch gated on the deployment-success event with the preview URL as a `--remote-param`, merge launch with a fresh post-merge filter. Enable the platform's comment pipe.
 
 **Example 2 — e2e lives in another repo, no CI profile**
 Unsure how to execute → present all three modes. User picks cross-repo dispatch: the merge job triggers the e2e repo's pipeline via the CI's native mechanism, passing `TESTOMATIO_RUN` so results land in the prepared run. Note the remote-profile option as the simpler future path.
@@ -184,7 +178,7 @@ Unsure how to execute → present all three modes. User picks cross-repo dispatc
 No `coverage*.yml` found → explain nothing can be filtered without a map; delegate to `qa-test-code-coverage`; wire CI only after the map exists.
 
 **Example 4 — manual-only project**
-`scan-automation-project` finds `.test.md` cases and no e2e framework → wire only the PR-open manual run. No preview or merge launch phases; explain the automated phases need an e2e suite first.
+`scan-automation-project` finds `.test.md` cases and no e2e framework → wire only the PR-open run with `--kind manual`, complete at creation. No preview or merge launch phases; explain those need an e2e suite first.
 
 ---
 
