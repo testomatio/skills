@@ -11,7 +11,7 @@ metadata:
 
 I wire a project's CI so each pull request drives coverage-based selective testing with Testomat.io. One mixed run is created the moment a PR opens — its manual cases pending for testers, its automated part scheduled — and the automated part is launched later, after a preview deploy or on merge.
 
-> **GOAL: a working pipeline committed to the project's own CI system.** That CI configuration is the one and only finished result. **I run locally to author it — I am never part of CI.** Do not create runs or execute `@testomatio/reporter` to "see it work". The single network call allowed while authoring is the read-only project info API (Step 2). Every other command below is something the pipeline executes later.
+> **GOAL: a working pipeline committed to the project's own CI system.** That CI configuration is the one and only finished result. **I run locally to author it — I am never part of CI.** Do not create runs or execute `@testomatio/reporter` while authoring; the single network call allowed is the read-only project info API (Step 2). The one exception is the final battle-test (Step 8): with the user's approval, on a PR they picked, run the pipeline's own commands once to prove the setup works.
 
 ```
 PR opened   ──▶ create one mixed run scoped to the PR diff — nothing executes
@@ -48,7 +48,8 @@ The valuable knowledge here is the phase model, the reporter command contract ([
 
 ## Critical Constraints
 
-- **The deliverable is committed CI config — never execute the reporter while authoring.** Only the read-only project info API call is allowed.
+- **The deliverable is committed CI config — never execute the reporter while authoring.** Only the read-only project info API call is allowed; the sole exception is the user-approved battle-test (Step 8).
+- **Battle-test safety:** an open PR only gets a scheduled `start` — execution via `--remote` is allowed only for a PR that is already merged.
 - **Discovery first.** Delegate to `scan-automation-project` before writing anything.
 - **Never assume or hardcode the CI system.** Read the repo; if unclear, ask.
 - **No coverage map → no pipeline.** Delegate map creation to `qa-test-code-coverage`; filtering is never skipped.
@@ -152,17 +153,44 @@ TESTOMATIO_RUN=$RUN_ID npx @testomatio/reporter run --remote <profile-name> \
 - Inline and cross-repo modes: same `TESTOMATIO_RUN` carry, launch shape per contract §6.
 - Keep this job non-blocking and off the release's critical path.
 
-### Step 6 — Provision secrets and enable the PR-comment pipe
+### Step 6 — Ensure secrets are set
 
 - Store the project API key in the CI's secret store as `TESTOMATIO_<project_slug>` — slug from Step 2.
+- Tell the user exactly where to add it: name the secret-store location the CI at hand uses for this repo/pipeline and the exact secret name to type.
 - Map that secret to the `TESTOMATIO` env var inside every job that calls the reporter.
-- Enable the PR-comment pipe by provisioning its token: GitHub → `GH_PAT` (the workflow's built-in token works), GitLab → `GITLAB_PAT` (`api` scope), Bitbucket → `BITBUCKET_ACCESS_TOKEN` (repository variable).
+- Enable the PR-comment pipe by provisioning its token the same way: GitHub → `GH_PAT` (the workflow's built-in token works), GitLab → `GITLAB_PAT` (`api` scope), Bitbucket → `BITBUCKET_ACCESS_TOKEN` (repository variable).
+- The key itself is already proven valid — the Step 2 info call succeeded with it.
+- ❓ Ask the user to confirm the secrets are in place before the pipeline PR merges — a pipeline with missing secrets fails on its first PR.
 - CI platform without a reporter pipe (e.g. Azure DevOps) → no PR comment; results are visible in Testomat.io.
 - The CI profile for `--remote` is configured in Testomat.io (Settings → CI), not stored as a repo secret.
 
-### Step 7 — Summarize and hand off
+### Step 7 — Suggest a PR with the new workflow
 
-Report: the CI targeted and files written; which phases are wired and which were skipped (no previews / no e2e / no CI profile); the chosen execution mode; title scheme and rungroup; how the launch steps find the prepared run (`RUN_ID` carrier or shared title); secrets and prerequisites still to provision; assumptions to confirm. Recommend committing the coverage map alongside the CI config.
+- Commit the CI config on a branch and suggest opening a PR through the project's normal flow — the pipeline lands reviewed, never pushed straight to the default branch.
+- Put in the PR description: the phases wired, the execution mode chosen, and the secrets/prerequisites the reviewers must provision before merging.
+- Where the CI runs PR-triggered workflows from the branch itself, point out that this very PR will exercise the PR-opened phase.
+
+### Step 8 — Battle-test the setup (on approval)
+
+Prove the pipeline's commands work before the CI ever runs them — by running them once, locally, on a real change.
+
+- ❓ Ask the user for a real PR to validate with — open or already merged — and for approval to create real runs.
+- Reproduce the pipeline's diff locally: open PR → check out its branch and diff against the target branch; merged PR → check out the merge commit and diff against the pre-merge tip (contract §2).
+- Create the run exactly as phase (a) does — same `--kind`, same filter — with a title that marks it as a battle-test:
+
+```bash
+RUN_ID=$(npx @testomatio/reporter start --kind mixed \
+  --filter "coverage:file=<coverage-map>,diff=<base>" --format id)
+```
+
+- Open PR → stop here: the run stays scheduled, nothing executes.
+- Merged PR → the change is already in mainline, so launching is safe: `TESTOMATIO_RUN=$RUN_ID npx @testomatio/reporter run --remote <profile-name>`.
+- Report every run created — id, kind, and the tests it scoped — and ask the user to review it in Testomat.io: does the scope match what that diff should affect?
+- Zero tests matched → report it as a finding, then pick a PR that touches mapped source files together with the user.
+
+### Step 9 — Summarize and hand off
+
+Report: the CI targeted and files written; which phases are wired and which were skipped (no previews / no e2e / no CI profile); the chosen execution mode; title scheme and rungroup; how the launch steps find the prepared run (`RUN_ID` carrier or shared title); the battle-test outcome and the runs awaiting the user's review; secrets and prerequisites still to provision; assumptions to confirm. Recommend committing the coverage map alongside the CI config.
 
 ---
 
