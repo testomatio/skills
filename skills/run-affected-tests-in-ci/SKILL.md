@@ -1,6 +1,6 @@
 ---
 name: run-affected-tests-in-ci
-description: Wire a project's CI to execute only the automated tests affected by a change — filtered through the coverage map from `qa-test-code-coverage` — at the trigger the team picks (after a preview deploy, on merge, on a schedule). Three execution modes — a Testomat.io CI profile (`reporter run --remote`), inline in the pipeline, or dispatching the repo where the e2e suite lives. Launches the run prepared per PR by `setup-pr-test-runs` when one exists, or creates its own. Use this skill when the user wants to run only the affected tests on preview or after merge, launch e2e through a Testomat.io CI profile or `--remote`, wire preview-deploy test runs, or integrate the coverage map into CI execution. CI-agnostic — adapts to whatever CI the project uses (GitHub Actions, GitLab CI, Azure Pipelines, Jenkins, Bitbucket, CircleCI, etc.).
+description: Execute only the automated tests affected by a code change. CI triggers the launch — after a preview deploy, on merge, or on a schedule. The coverage map from `qa-test-code-coverage` filters the diff down to the impacted tests. Three ways to execute — a Testomat.io CI profile (`reporter run --remote`), inline in the pipeline, or dispatching the repo where the e2e suite lives. Use when the user wants to run affected tests on preview or merge, launch e2e via a Testomat.io CI profile or `--remote`, or skip unaffected tests to speed up CI. Picks up the run prepared by `setup-pr-test-runs` when one exists. Works with any CI (GitHub Actions, GitLab CI, Azure Pipelines, Jenkins, Bitbucket, CircleCI, etc.).
 license: MIT
 metadata:
   author: Testomat.io
@@ -9,7 +9,7 @@ metadata:
 
 # Run Affected Tests in CI
 
-I wire a project's CI to execute the automated tests affected by a change — the coverage map filtered by the diff decides what runs. Launch happens at the trigger the team picks: after a preview deploy, on merge, or on a schedule. When `setup-pr-test-runs` prepared a run for the PR, the launch lands in it; otherwise the launch creates its own run.
+A change lands → CI launches only the automated tests it affects. The coverage map filtered by the diff decides the scope. The team picks the trigger: preview deploy, merge, or schedule. When `setup-pr-test-runs` prepared a run for the PR, results land in it; otherwise the launch creates its own run. My deliverable is the CI jobs that make this happen.
 
 > **GOAL: a working launch pipeline committed to the project's own CI system.** That CI configuration is the one and only finished result. **I run locally to author it — I am never part of CI.** While authoring, the single network call allowed is the read-only project info API (Step 2). The one exception is the final battle-test (Step 8): with the user's approval, on a merged PR they picked, run the pipeline's own commands once to prove the setup works.
 

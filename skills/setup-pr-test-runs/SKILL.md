@@ -1,6 +1,6 @@
 ---
 name: setup-pr-test-runs
-description: Wire a project's CI so every pull request gets one test run in Testomat.io the moment it opens — scoped to the PR diff through the coverage map from `qa-test-code-coverage`, manual cases pending for testers, automated part scheduled, nothing executed. Use this skill when the user wants a test run created per pull request, testers to get a manual run for each PR, or the coverage map wired into the PR-open pipeline. Creation only — launching the automated tests later on preview or merge is `run-affected-tests-in-ci`. CI-agnostic — adapts to whatever CI the project uses (GitHub Actions, GitLab CI, Azure Pipelines, Jenkins, Bitbucket, CircleCI, etc.).
+description: Create a Testomat.io test run for every pull request. The run is scoped to the PR diff via the coverage map from `qa-test-code-coverage`. Manual cases become pending the moment the PR opens, so testers know what to check. Automated tests are only scheduled — nothing executes. Use when the user wants a test run per PR, a manual run for testers on each pull request, or PR-scoped test planning in CI. This skill only creates runs; to execute the automated tests use `run-affected-tests-in-ci`. Works with any CI (GitHub Actions, GitLab CI, Azure Pipelines, Jenkins, Bitbucket, CircleCI, etc.).
 license: MIT
 metadata:
   author: Testomat.io
@@ -9,7 +9,7 @@ metadata:
 
 # Setup PR Test Runs
 
-I wire a project's CI so the moment a pull request opens, one Testomat.io run exists for it, scoped to its diff. Manual cases are pending immediately — testers begin; the automated part stays scheduled. Nothing executes here — launching the automated part later is `run-affected-tests-in-ci`'s job.
+A pull request opens → one Testomat.io run appears for it, scoped to its diff. Manual cases are pending immediately, so testers begin. The automated part stays scheduled. Nothing executes here — launching the automated part later is `run-affected-tests-in-ci`'s job. My deliverable is the CI job that makes this happen.
 
 > **GOAL: a working PR-open job committed to the project's own CI system.** That CI configuration is the one and only finished result. **I run locally to author it — I am never part of CI.** While authoring, the single network call allowed is the read-only project info API (Step 2). The battle-test (Step 7) may create real runs with the user's approval — `start` never executes tests, so it is safe on any PR.
 
