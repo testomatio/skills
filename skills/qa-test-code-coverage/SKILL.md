@@ -160,7 +160,8 @@ npx @testomatio/reporter run --kind manual \
 
 ### Step 8: Suggest follow-ups
 
-- Wire the map into CI — runs created per PR and launched on preview/merge: delegate to `setup-pr-testing`.
+- Wire the map into CI — a coverage-scoped run created per PR: delegate to `setup-pr-test-runs`.
+- Run only the affected automated tests on preview/merge: delegate to `run-affected-tests-in-ci`.
 - Coverage gaps — source features no test maps to. On approval, propose new cases (delegate to `qa-write-test-cases`).
 - Dead tests — tests whose features no longer exist in source.
 - Answer questions like "do we have tests for X?" from the inventory.

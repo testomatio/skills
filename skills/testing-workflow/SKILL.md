@@ -22,7 +22,8 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 | `automate-manual-test-cases`         | Convert manual test cases into automated test scripts (write new autotests)       |
 | `debug-fix-failed-flaky-autotests`   | Diagnose and fix failing or flaky autotests (heal autotests)                      |
 | `qa-test-code-coverage`              | Map manual & automated tests to source files (`coverage.tests.yml`)               |
-| `setup-pr-testing`                   | Wire coverage-driven selective testing into the project's CI PR pipeline          |
+| `setup-pr-test-runs`                 | Create a coverage-scoped Testomat.io run for every PR the moment it opens         |
+| `run-affected-tests-in-ci`           | Launch coverage-filtered automated tests from CI (preview, merge, schedule)       |
 | `testomatio-mcp`                     | Analyze runs, cluster failures, investigate root causes via Testomat.io MCP       |
 
 ## Routing
@@ -129,20 +130,33 @@ User: asks to run only affected tests, build a traceability matrix, or set up ch
 Use `qa-test-code-coverage` to generate the coverage mapping file (manual & automated tests)
 =>
 After mapping fully completed, suggest next actions:
-1. 🔁 Wire the coverage map into the CI PR pipeline (with `setup-pr-testing` skill)
-2. 🔧 Add Testomat.io reporter so `--filter "coverage:..."` runs work (with `qa-e2e-tests-reporting` skill)
-3. 📊 Analyze affected runs and failures (with `testomatio-mcp` skill)
+1. 🔁 Create a coverage-scoped run per PR (with `setup-pr-test-runs` skill)
+2. 🚀 Launch affected automated tests from CI on preview/merge (with `run-affected-tests-in-ci` skill)
+3. 🔧 Add Testomat.io reporter so `--filter "coverage:..."` runs work (with `qa-e2e-tests-reporting` skill)
+4. 📊 Analyze affected runs and failures (with `testomatio-mcp` skill)
 ```
 
-### CI PR Pipeline Flow
+### PR Test Runs Flow
 
 ```
-User: asks to integrate testing into CI/PR pipeline, create runs per PR, or launch affected tests on preview/merge
+User: asks to create test runs per PR, or wants testers to get a manual run for each pull request
 =>
-Use `setup-pr-testing` skill to wire coverage-driven runs into the project's CI
+Use `setup-pr-test-runs` skill to wire run creation into the PR-open pipeline
 =>
 After setup fully completed, suggest next actions:
-1. 🗺️ Regenerate or extend the coverage map (with `qa-test-code-coverage` skill)
+1. 🚀 Launch the runs' automated part on preview/merge (with `run-affected-tests-in-ci` skill)
+2. 🗺️ Regenerate or extend the coverage map (with `qa-test-code-coverage` skill)
+```
+
+### CI Test Execution Flow
+
+```
+User: asks to run only affected tests on preview/merge, launch e2e via a Testomat.io CI profile, or integrate the coverage map into CI execution
+=>
+Use `run-affected-tests-in-ci` skill to wire coverage-filtered launches into the project's CI
+=>
+After setup fully completed, suggest next actions:
+1. 🧪 Create a run per PR so testers work the same change (with `setup-pr-test-runs` skill)
 2. 📊 Analyze affected runs and failures (with `testomatio-mcp` skill)
 ```
 
