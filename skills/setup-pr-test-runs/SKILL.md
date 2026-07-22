@@ -1,6 +1,6 @@
 ---
 name: setup-pr-test-runs
-description: Create a Testomat.io test run for every pull request. The run is scoped to the PR diff via the coverage map from `qa-test-code-coverage`. Manual cases become pending the moment the PR opens, so testers know what to check. Automated tests are only scheduled — nothing executes. Use when the user wants a test run per PR, a manual run for testers on each pull request, or PR-scoped test planning in CI. This skill only creates runs; to execute the automated tests use `run-affected-tests-in-ci`. Works with any CI (GitHub Actions, GitLab CI, Azure Pipelines, Jenkins, Bitbucket, CircleCI, etc.).
+description: Create a test run in Testomat.io for every pull request, listing only the test cases affected by that PR. Testers open the run and know exactly what to check. Use when the user asks to create test runs per PR, wants manual testing scoped to each pull request, or wants the coverage map from `qa-test-code-coverage` connected to the PR pipeline. To also execute automated tests, follow up with `run-affected-tests-in-ci`. Works with any CI (GitHub Actions, GitLab CI, Azure Pipelines, Jenkins, Bitbucket, CircleCI, etc.).
 license: MIT
 metadata:
   author: Testomat.io

@@ -1,6 +1,6 @@
 ---
 name: run-affected-tests-in-ci
-description: Execute only the automated tests affected by a code change. CI triggers the launch — after a preview deploy, on merge, or on a schedule. The coverage map from `qa-test-code-coverage` filters the diff down to the impacted tests. Three ways to execute — a Testomat.io CI profile (`reporter run --remote`), inline in the pipeline, or dispatching the repo where the e2e suite lives. Use when the user wants to run affected tests on preview or merge, launch e2e via a Testomat.io CI profile or `--remote`, or skip unaffected tests to speed up CI. Picks up the run prepared by `setup-pr-test-runs` when one exists. Works with any CI (GitHub Actions, GitLab CI, Azure Pipelines, Jenkins, Bitbucket, CircleCI, etc.).
+description: Run only the automated tests affected by a code change instead of the whole suite. Sets up a CI job that launches the affected tests after a preview deploy, on merge, or on schedule — through a Testomat.io CI profile (`reporter run --remote`), inline in the pipeline, or by triggering the e2e repo. Use when the user wants faster CI by skipping unrelated tests, asks to run affected tests on merge or preview, or wants to launch e2e through a Testomat.io CI profile. Needs the coverage map from `qa-test-code-coverage`. Works with any CI (GitHub Actions, GitLab CI, Azure Pipelines, Jenkins, Bitbucket, CircleCI, etc.).
 license: MIT
 metadata:
   author: Testomat.io
