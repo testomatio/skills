@@ -11,7 +11,7 @@ metadata:
 
 I set up a project's CI for PR-driven testing: when a PR opens, a run scoped to its diff is created; the affected automated tests launch after a preview deploy or on merge. Every reporter command the jobs execute is documented in `run-tests-with-testomatio-reporter` — read it before wiring.
 
-> **GOAL: a working pipeline committed to the project's own CI system.** That CI configuration is the one and only finished result. **I run locally to author it — I am never part of CI.** Do not execute reporter commands while authoring; the single network call allowed is the read-only info API (Step 2). The one exception is the final battle-test (Step 8), on a PR the user picked.
+> **GOAL: a working pipeline committed to the project's own CI system.** That CI configuration is the one and only finished result. **I run locally to author it — I am never part of CI.** Do not execute reporter commands while authoring; the one exception is the final battle-test (Step 8), on a PR the user picked.
 
 ```
 PR opened   ──▶ create one run scoped to the PR diff — nothing executes
@@ -36,7 +36,8 @@ The valuable knowledge here is the phase model and the decisions to confirm with
 
 ## Critical Constraints
 
-- **The deliverable is committed CI config — never execute the reporter while authoring.** Only the read-only info API call is allowed; the sole exception is the user-approved battle-test (Step 8).
+- **The deliverable is committed CI config — never execute the reporter while authoring.** The sole exception is the user-approved battle-test (Step 8).
+- **Never guess a CI profile name.** Pick from a list (Testomat.io MCP) confirmed by the user, or ask the user for the name.
 - **Battle-test safety:** an open PR only gets a run created — executing tests is allowed only for a PR that is already merged.
 - **Discovery first.** Delegate to `scan-automation-project` before writing anything.
 - **Never assume or hardcode the CI system.** Read the repo; if unclear, ask.
@@ -56,11 +57,10 @@ The valuable knowledge here is the phase model and the decisions to confirm with
 - Read the repo's CI config files to identify the CI system. Several CIs or none → ask which one runs PRs.
 - Locate the coverage map (default `coverage.tests.yml`). Missing → propose creating it and delegate to `qa-test-code-coverage`.
 
-### Step 2 — Pull the project info from Testomat.io
+### Step 2 — Identify the project and its CI profiles
 
-- Call the read-only info API (command in `run-tests-with-testomatio-reporter`); it needs the project API key locally (env var or `.env`).
-- Capture: the project slug (names the CI secret, Step 6), `ci_profiles` (drives Step 3), `environments`.
-- ❓ No key at hand or the call fails → ask the user for the project slug and CI profile name instead.
+- Testomat.io MCP connected → fetch the project's CI profiles and environments through it (`testomatio-mcp` skill to connect).
+- ❓ No MCP → ask the user for the project slug (it names the CI secret, Step 6) and whether CI profiles exist in Settings → CI.
 
 ### Step 3 — Choose how automated tests execute
 
@@ -70,8 +70,8 @@ The valuable knowledge here is the phase model and the decisions to confirm with
 | Inline — this pipeline          | mobile/simulators, services this pipeline spins up, or an e2e job that already works in this repo |
 | Cross-repo dispatch             | the e2e suite lives in another repo and no CI profile covers it                                   |
 
-- A `ci_profiles` entry matching the e2e suite (by `profile_name` and `service`) → remote is the simplest start; recommend it.
-- ❓ Unsure, several plausible profiles, or none clearly e2e → present the modes and ask.
+- Profiles listed in Step 2 → remote is the simplest start; ❓ present the list and ask the user to choose — profiles differ by workflow and job names, never pick one silently.
+- ❓ No profile known → present the three modes and ask; for remote, ask the user for the exact profile name.
 - No profile but the user wants remote → creating one in Testomat.io (Settings → CI) is a prerequisite; wire the launch step ready to enable.
 - No e2e suite anywhere → wire only the PR-open phase with a manual run; never fabricate an e2e job.
 
@@ -112,7 +112,6 @@ Write the jobs in the CI's own syntax; take every command and env var from `run-
 - Store the project API key as `TESTOMATIO_<project_slug>` in the CI's secret store; map it to the `TESTOMATIO` env var in every job that calls the reporter.
 - Tell the user exactly where to add it: name the secret-store location the CI at hand uses for this repo/pipeline and the exact secret name to type.
 - Provision the PR-comment pipe token the same way (tokens per platform in `run-tests-with-testomatio-reporter`).
-- The key itself is already proven valid — the Step 2 info call succeeded with it.
 - ❓ Ask the user to confirm the secrets are in place before the pipeline PR merges — a pipeline with missing secrets fails on its first PR.
 - The CI profile for remote launches is configured in Testomat.io (Settings → CI), not stored as a repo secret.
 
@@ -141,7 +140,7 @@ Report: the CI targeted and files written; which phases are wired and which were
 ## Examples
 
 **Example 1 — previews + a configured CI profile**
-Info API lists a profile matching the e2e suite; the user confirms every commit deploys to a preview. → Wire all three phases: one mixed run created on PR open, preview launch gated on the deployment-success event with the preview URL as a remote param, merge launch with a fresh post-merge filter. Enable the platform's comment pipe.
+MCP lists the project's CI profiles and the user picks the one running the e2e suite; the user confirms every commit deploys to a preview. → Wire all three phases: one mixed run created on PR open, preview launch gated on the deployment-success event with the preview URL as a remote param, merge launch with a fresh post-merge filter. Enable the platform's comment pipe.
 
 **Example 2 — e2e lives in another repo, no CI profile**
 Unsure how to execute → present the modes. User picks cross-repo dispatch: the merge job triggers the e2e repo's pipeline via the CI's native mechanism, passing the run id so results land in the prepared run. Note the remote-profile option as the simpler future path.

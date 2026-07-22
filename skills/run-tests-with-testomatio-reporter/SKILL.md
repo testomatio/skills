@@ -117,26 +117,13 @@ TESTOMATIO_RUN=$RUN_ID npx @testomatio/reporter run --remote <profile-name> \
 - `--remote-param <key>=<value>` forwards a parameter to the profile config (repeat for several) — e.g. a preview URL or target branch.
 - Guards: cannot combine with `--filter-list`; any positional command is ignored with a warning; a missing profile fails with `CI launch failed: <message>` and exit 1.
 
-### List the CI profiles (info API)
+### Choosing the profile
 
-Read-only:
+Profiles are configured on the Testomat.io project (Settings → CI) and differ by workflow, job names, and parameters — never guess one.
 
-```bash
-curl -s -H "Authorization: Bearer $TESTOMATIO" \
-  "https://app.testomat.io/api/v2/<project-id>/info"
-```
-
-Self-hosted instances replace the host with the instance URL. Relevant `data` fields:
-
-| Field                        | Use                                                                  |
-| ---------------------------- | -------------------------------------------------------------------- |
-| `project_id`                 | the project slug                                                     |
-| `ci_profiles[].profile_name` | the value `--remote` takes                                           |
-| `ci_profiles[].service`      | which CI the profile dispatches                                      |
-| `ci_profiles[].pass_run_id`  | the dispatched workflow receives the run id and reports into the run |
-| `environments`               | candidates for `TESTOMATIO_ENV`                                      |
-
-Empty `ci_profiles` → remote launch needs a profile created in Testomat.io first (Settings → CI).
+- Testomat.io MCP connected → fetch the project's CI profiles, present the list, and ask the user to choose (see `testomatio-mcp` to connect).
+- No MCP → ask the user for the profile name.
+- No profile exists yet → the user must create one in Testomat.io (Settings → CI) first.
 
 ## Local execution (`run "<runner command>"`)
 
