@@ -58,7 +58,7 @@ Without a filter, nothing is scoped:
 | Jira ticket                | `"testomatio:jira-ticket=<ticket-id>"`       |
 
 - The value must match exactly — the tag name, plan id, label, or ticket as stored in the project.
-- Local filtered execution is supported for Playwright and CodeceptJS runners. Remote launches and `--filter-list` work with any framework — they only resolve test ids.
+- Works with every test framework whose runner accepts `--grep` (Playwright, CodeceptJS, Cypress, etc.) — the filter resolves to a grep pattern the runner consumes.
 
 ### Filter by changed source files (`coverage:`)
 
