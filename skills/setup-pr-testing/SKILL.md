@@ -135,7 +135,7 @@ Write the jobs in the CI's own syntax; take every command and env var from `run-
 - Use `start` with the coverage filter; pick the run kind matching the project's tests.
 - Persist the printed run id with the CI's native value-passing mechanism (artifact, variable, output); fallback is shared-run title matching.
 - Run once per PR (on open); pushes to the PR don't recreate runs.
-- A PR touching no mapped tests is normal: `start` creates no run and exits 1. Allow the job to fail via the CI's own option (e.g. `continue-on-error`) so such PRs don't get a red mark — never parse the output.
+- A PR touching no mapped tests is normal — pass `--warn` so `start` exits 0 and the job stays green; never parse the output.
 
 **(b) Preview deployed → launch against the preview** (only when Step 2 confirmed previews).
 
