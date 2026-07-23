@@ -23,6 +23,8 @@ Every reporter command the jobs execute is documented in `run-tests-with-testoma
 
 Post this diagram as a chat message before the first question — never open with a question; it frames everything that follows. When questions go through a form or tool, the diagram must already be on screen in an earlier message. Render diagrams as Mermaid when the environment displays it; fall back to ASCII otherwise.
 
+Never post a diagram bare — follow it immediately with one short paragraph explaining it: this is the general schema of PR testing, for the user to examine before anything is implemented; a run is created when a PR opens, and the user will now choose which types of tests execute (manual, automated, or both) and how the automated ones run — inline in the pipeline, through a Testomat.io CI profile, or by dispatching another repo — and when they launch (preview deploy or merge).
+
 ```mermaid
 flowchart LR
     PR([PR opened]) --> RUN[Run created,<br/>scoped to the PR diff]
@@ -53,7 +55,7 @@ The valuable knowledge here is the flow model and the decisions to confirm with 
 
 - **The deliverable is committed CI config — never execute the reporter while authoring.** The sole exception is the user-approved battle-test (Step 7).
 - **Battle-test safety:** an open PR only gets a run created — executing tests is allowed only for a PR that is already merged.
-- **Diagrams gate the dialogue.** The flows diagram is posted before the first question; no wiring before the user approves the selected-flow diagram (Step 3).
+- **Diagrams gate the dialogue.** The flows diagram is posted before the first question; no wiring before the user approves the selected-flow diagram (Step 3). Every diagram is followed by a one-paragraph plain-words explanation — never a diagram bare.
 - **Discovery first.** Delegate to `scan-automation-project` before writing anything.
 - **Never assume or hardcode the CI system.** Read the repo; if unclear, ask.
 - **Never guess a Testomat.io CI profile name.** Pick from a list (Testomat.io MCP) confirmed by the user, or ask the user for the name.
@@ -77,7 +79,7 @@ The valuable knowledge here is the flow model and the decisions to confirm with 
 
 ### Step 2 — Present the flows and ask the unknowns
 
-Post the possible-flows diagram, trimmed to the kinds found in Step 1, as its own message — then ask only what applies. Read the CI files first so you don't ask what's already answered.
+Post the possible-flows diagram, trimmed to the kinds found in Step 1, as its own message with its one-paragraph explanation (what the schema is, which choices the user is about to make) — then ask only what applies. Read the CI files first so you don't ask what's already answered.
 
 **Manual tests found** — nothing to choose: their part of the run is complete at creation, testers start on Testomat.io immediately.
 
