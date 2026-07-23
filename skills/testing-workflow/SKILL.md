@@ -22,6 +22,8 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 | `automate-manual-test-cases`         | Convert manual test cases into automated test scripts (write new autotests)       |
 | `debug-fix-failed-flaky-autotests`   | Diagnose and fix failing or flaky autotests (heal autotests)                      |
 | `qa-test-code-coverage`              | Map manual & automated tests to source files (`coverage.tests.yml`)               |
+| `setup-pr-testing`                   | Set up CI so PRs create scoped runs and launch affected automated tests           |
+| `run-tests-with-testomatio-reporter` | Create/launch test runs via the reporter CLI (manual, mixed, remote)              |
 | `testomatio-mcp`                     | Analyze runs, cluster failures, investigate root causes via Testomat.io MCP       |
 
 ## Routing
@@ -128,8 +130,34 @@ User: asks to run only affected tests, build a traceability matrix, or set up ch
 Use `qa-test-code-coverage` to generate the coverage mapping file (manual & automated tests)
 =>
 After mapping fully completed, suggest next actions:
-1. 🔧 Add Testomat.io reporter so `--filter "coverage:..."` runs work (with `qa-e2e-tests-reporting` skill)
+1. 🔁 Wire the coverage map into the CI PR pipeline (with `setup-pr-testing` skill)
+2. 🏃 Run the affected tests now from the terminal (with `run-tests-with-testomatio-reporter` skill)
+3. 🔧 Add Testomat.io reporter so `--filter "coverage:..."` runs work (with `qa-e2e-tests-reporting` skill)
+4. 📊 Analyze affected runs and failures (with `testomatio-mcp` skill)
+```
+
+### CI PR Testing Flow
+
+```
+User: asks to integrate testing into CI/PR pipeline, create runs per PR, or launch affected tests on preview/merge
+=>
+Use `setup-pr-testing` skill to wire run creation and launches into the project's CI
+=>
+After setup fully completed, suggest next actions:
+1. 🗺️ Regenerate or extend the coverage map (with `qa-test-code-coverage` skill)
 2. 📊 Analyze affected runs and failures (with `testomatio-mcp` skill)
+```
+
+### Run Tests via Reporter CLI Flow
+
+```
+User: asks to start a test run from the command line, run a scoped group of tests, or launch tests via a Testomat.io CI profile
+=>
+Use `run-tests-with-testomatio-reporter` skill for the run commands (manual, mixed, remote)
+=>
+After the run fully completed, suggest next actions:
+1. 📊 Analyze run results and failures (with `testomatio-mcp` skill)
+2. 🔁 Wire these runs into the CI pipeline (with `setup-pr-testing` skill)
 ```
 
 ### Run Analysis / Failure Investigation Flow
