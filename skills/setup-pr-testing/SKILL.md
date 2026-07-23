@@ -11,13 +11,13 @@ metadata:
 
 I set up a project's CI for PR-driven testing. What gets wired depends on the project's tests:
 
-- **manual** — testers get a run to start on Testomat.io the moment the PR opens; nothing to execute.
-- **automated** — an execution mode must be chosen: inline in the pipeline, a Testomat.io CI profile, or another workflow/repo.
-- **mixed** — both, sharing one run per PR.
+- manual — testers get a run to start on Testomat.io the moment the PR opens; nothing to execute.
+- automated — an execution mode must be chosen: inline in the pipeline, a Testomat.io CI profile, or another workflow/repo.
+- mixed — both, sharing one run per PR.
 
 Every reporter command the jobs execute is documented in `run-tests-with-testomatio-reporter` — read it before wiring.
 
-> **GOAL: a working pipeline committed to the project's own CI system.** That CI configuration is the one and only finished result. **I run locally to author it — I am never part of CI.** Do not execute reporter commands while authoring; the one exception is the final battle-test (Step 7), on a PR the user picked.
+> **GOAL: a working pipeline committed to the project's own CI system.** That CI configuration is the one and only finished result. I run locally to author it — I am never part of CI. Do not execute reporter commands while authoring; the one exception is the final battle-test (Step 7), on a PR the user picked.
 
 ## Possible flows
 
@@ -55,28 +55,28 @@ The valuable knowledge here is the flow model and the decisions to confirm with 
 
 ## Critical Constraints
 
-- **The deliverable is committed CI config — never execute the reporter while authoring.** The sole exception is the user-approved battle-test (Step 7).
-- **Battle-test safety:** an open PR only gets a run created — executing tests is allowed only for a PR that is already merged.
-- **Diagrams gate the dialogue.** The flows diagram is posted before the first question; no wiring before the user approves the selected-flow diagram (Step 3). Every diagram is followed by a one-paragraph plain-words explanation — never a diagram bare.
-- **Discovery first.** Delegate to `scan-automation-project` before writing anything.
-- **Never assume or hardcode the CI system.** Read the repo; if unclear, ask.
-- **Never guess a Testomat.io CI profile name.** Pick from a list (Testomat.io MCP) confirmed by the user, or ask the user for the name.
-- **Define terms when asking.** Say "Testomat.io CI profile" in full — never bare "profile" — and make every question option explain itself in plain words; the user may have never heard these terms.
-- **Avoid presenting the project's full test inventory as the run scope; never print full test lists.**
-- **No coverage map → no pipeline.** Delegate map creation to `qa-test-code-coverage`; filtering is never skipped.
-- **The PR-open job creates the run and executes nothing.**
-- **Preview launches gate on a deploy-finished signal** — never on the push itself.
-- **Launch jobs never block a PR and never fail a merge/release pipeline.** They are observation, not gates.
-- **PR comments come from the reporter's own pipes** — never script a PR-comment API call.
-- **Every run gets a PR-based title and a rungroup.**
-- **Only touch CI config files.** Never source or test files.
+- **Never execute the reporter while authoring — the deliverable is committed CI config.** Sole exception: the user-approved battle-test (Step 7).
+- **Battle-test executes tests only for an already-merged PR**; an open PR only gets a run created.
+- **Only touch CI config files** — never source or test files.
+- Diagrams gate the dialogue: flows diagram before the first question, selected-flow diagram approved before wiring (Step 3), every diagram followed by a one-paragraph explanation.
+- Discovery first — delegate to `scan-automation-project` before writing anything.
+- Never assume or hardcode the CI system; read the repo, ask if unclear.
+- Never guess a Testomat.io CI profile name — pick from a list (Testomat.io MCP) confirmed by the user, or ask.
+- Say "Testomat.io CI profile" in full, never bare "profile"; every question option explains itself in plain words.
+- Avoid presenting the project's full test inventory as the run scope; never print full test lists.
+- No coverage map → no pipeline; delegate map creation to `qa-test-code-coverage`.
+- The PR-open job creates the run and executes nothing.
+- Preview launches gate on the deploy-finished signal, never on the push.
+- Launch jobs never block a PR and never fail a merge/release pipeline.
+- PR comments come from the reporter's own pipes — never script a PR-comment API call.
+- Every run gets a PR-based title and a rungroup.
 
 ## Workflow
 
 ### Step 1 — Discover
 
 - Delegate to `scan-automation-project`: are there manual `.test.md` cases, which e2e framework exists (unit/integration don't count), do automated tests live in this repo or elsewhere.
-- The result fixes the project kind — **manual**, **automated**, or **mixed** — and with it which flows apply.
+- The result fixes the project kind — manual, automated, or mixed — and with it which flows apply.
 - Read the repo's CI config files to identify the CI system. Several CIs or none → ask which one runs PRs.
 - Locate the coverage map (default `coverage.tests.yml`). Missing → propose creating it and delegate to `qa-test-code-coverage`.
 
@@ -84,9 +84,9 @@ The valuable knowledge here is the flow model and the decisions to confirm with 
 
 Post the possible-flows diagram, trimmed to the kinds found in Step 1, as its own message with its one-paragraph explanation (what the schema is, which choices the user is about to make) — then ask only what applies. Read the CI files first so you don't ask what's already answered.
 
-**Manual tests found** — nothing to choose: their part of the run is complete at creation, testers start on Testomat.io immediately.
+Manual tests found — nothing to choose: their part of the run is complete at creation, testers start on Testomat.io immediately.
 
-**Automated tests found** — ❓ choose the execution mode. Each option in the question must explain itself in plain words — what runs where and who triggers it. In particular spell out what a Testomat.io CI profile is: a CI workflow configuration saved on the Testomat.io project (Settings → CI) that Testomat.io dispatches to execute the tests, with results reporting back into the run.
+Automated tests found — ❓ choose the execution mode. Each option in the question must explain itself in plain words — what runs where and who triggers it. In particular spell out what a Testomat.io CI profile is: a CI workflow configuration saved on the Testomat.io project (Settings → CI) that Testomat.io dispatches to execute the tests, with results reporting back into the run.
 
 | Mode                            | When it fits                                                                                                  |
 | ------------------------------- | ------------------------------------------------------------------------------------------------------------- |
@@ -99,13 +99,13 @@ Post the possible-flows diagram, trimmed to the kinds found in Step 1, as its ow
 
 Then the launch triggers (automated/mixed only):
 
-1. **Preview environments** — is every commit deployed to a preview server? If yes: what is the observable deploy-finished signal, and where does the preview URL surface?
-2. **Post-merge timing** — launch right on merge, or wait for a staging/production deploy to finish? A deploy gate needs its own observable signal.
+1. Preview environments — is every commit deployed to a preview server? If yes: what is the observable deploy-finished signal, and where does the preview URL surface?
+2. Post-merge timing — launch right on merge, or wait for a staging/production deploy to finish? A deploy gate needs its own observable signal.
 
 And for every kind:
 
-3. **Rungroup strategy** — week / day / release / milestone.
-4. **Diff base** — the PR's target branch for PR jobs; post-merge jobs need the previous mainline tip (diff-base rules in `run-tests-with-testomatio-reporter`).
+3. Rungroup strategy — week / day / release / milestone.
+4. Diff base — the PR's target branch for PR jobs; post-merge jobs need the previous mainline tip (diff-base rules in `run-tests-with-testomatio-reporter`).
 
 ### Step 3 — Confirm the selected flow
 
