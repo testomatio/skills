@@ -106,8 +106,6 @@ And for every kind:
 
 3. Rungroup strategy — week / day / release / milestone.
 
-Diff bases are never a question — derive them yourself: the PR's target branch for PR jobs, the previous mainline tip for post-merge jobs per the repo's merge style (rules in `run-tests-with-testomatio-reporter`). Note the choice in the workflow PR description instead.
-
 ### Step 3 — Confirm the selected flow
 
 - Draw the flow the answers produced — only the chosen kind, triggers, and execution mode. Mermaid when supported, ASCII otherwise.
