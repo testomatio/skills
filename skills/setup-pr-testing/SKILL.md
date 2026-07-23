@@ -27,17 +27,25 @@ Never post a diagram bare — follow it immediately with one short paragraph exp
 
 ```mermaid
 flowchart LR
-    PR([PR opened]) --> RUN[Run created,<br/>scoped to the PR diff]
-    RUN -->|manual / mixed| TESTERS[Manual cases pending —<br/>testers start on Testomat.io]
-    RUN -->|automated / mixed| SCHED[Automated part<br/>scheduled]
-    SCHED --> TRIG{Launch trigger}
-    TRIG -->|preview deployed| LAUNCH[Launch affected tests]
-    TRIG -->|PR merged| LAUNCH
-    LAUNCH --> MODE{Execution mode}
-    MODE --> REMOTE[Testomat.io CI profile]
-    MODE --> INLINE[Inline in this pipeline]
-    MODE --> CROSS[Dispatch another repo]
+    PR([PR opened]) --> RUN[Create a run scoped<br/>to the PR changes]
+    RUN -->|manual / mixed| TESTERS[Testers execute manual cases<br/>on Testomat.io]
+    RUN -->|automated / mixed| SCHED[Schedule automated tests —<br/>nothing runs yet]
+    SCHED --> TRIG{When to launch?}
+    TRIG -->|preview deployed| MODE{How to execute?}
+    TRIG -->|PR merged| MODE
+    MODE -->|via a Testomat.io CI profile| RES
+    MODE -->|inline in this pipeline| RES
+    MODE -->|by dispatching another repo| RES
+    RES[Run the affected automated tests —<br/>results land in the PR run]
 ```
+
+Diagram rules — for this diagram and every one drawn later:
+
+- Every block states an action, verb first ("Create a run", "Testers execute manual cases", "Launch automated tests"). A bare noun phrase ("pending manual run") is not a block — nobody can tell what it does.
+- Decisions are diamond questions ("When to launch?", "How to execute?"); the options go on the edges.
+- Configuration details — titles, rungroups, filters, env vars, run-id carriers — are never blocks; they belong in the explanation text under the diagram.
+- End at an outcome block ("results land in the PR run") so the last block reads as the end state, never a dangling detail.
+- Keep it small — about 8 blocks.
 
 - Manual-only project → only the top branch: the run is complete at creation, testers execute it on Testomat.io, nothing launches.
 - Automated-only project → only the bottom branch: the scheduled run launches on a trigger through the chosen mode.
@@ -60,6 +68,7 @@ The valuable knowledge here is the flow model and the decisions to confirm with 
 - **Never assume or hardcode the CI system.** Read the repo; if unclear, ask.
 - **Never guess a Testomat.io CI profile name.** Pick from a list (Testomat.io MCP) confirmed by the user, or ask the user for the name.
 - **Define terms when asking.** Say "Testomat.io CI profile" in full — never bare "profile" — and make every question option explain itself in plain words; the user may have never heard these terms.
+- **Never present the project inventory as the run scope.** The project's total test count is inventory; the run will contain only the tests matched by the PR diff — say so explicitly whenever a count appears, and never print full test lists (a count plus a few examples is enough).
 - **No coverage map → no pipeline.** Delegate map creation to `qa-test-code-coverage`; filtering is never skipped.
 - **The PR-open job creates the run and executes nothing.**
 - **Preview launches gate on a deploy-finished signal** — never on the push itself.
@@ -113,13 +122,15 @@ Example — mixed project, Testomat.io CI profile, previews confirmed:
 
 ```mermaid
 flowchart LR
-    PR([PR opened]) --> RUN[Mixed run created,<br/>scoped to the diff]
-    RUN --> TESTERS[Testers work manual cases<br/>on Testomat.io]
-    RUN --> SCHED[Automated part scheduled]
-    PREV([Preview deployed]) --> L1[Launch via the Testomat.io CI profile<br/>against the preview]
-    MERGE([PR merged]) --> L2[Launch with the final diff]
+    PR([PR opened]) --> RUN[Create one mixed run<br/>scoped to the diff]
+    RUN --> TESTERS[Testers execute manual cases<br/>on Testomat.io]
+    RUN --> SCHED[Schedule automated tests —<br/>nothing runs yet]
+    PREV([Preview deployed]) --> L1[Launch automated tests via the<br/>Testomat.io CI profile, against the preview]
+    MERGE([PR merged]) --> L2[Launch automated tests<br/>with the final diff]
     SCHED -.-> L1
     SCHED -.-> L2
+    L1 --> RES[Results land in the PR run]
+    L2 --> RES
 ```
 
 ### Step 4 — Wire the phases into CI
