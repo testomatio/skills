@@ -18,7 +18,7 @@ Analyze how a feature is implemented, design a balanced dataset that covers ever
 - **Balance the dataset: at least 70% regular (expected) data, at most 30% edge cases.**
 - **Do not seed until the user approves the categories and the exact item count** (Step 3 gate).
 - Credentials, tokens, and connection strings come from env vars or user input — never hardcode them.
-- Prefer the project's existing seeding mechanisms (factories, seed scripts, fixtures, admin console) or REST API. Write a new script only when nothing exists; keep it small; Write seed script in language of application.
+- Prefer the project's existing seeding mechanisms (factories, seed scripts, fixtures, admin console) or REST API or MCP. Write seed script in language of application.
 - Generated artifacts (dataset plans, one-off seed scripts) go into the gitignored `.testeiya/seed-data/` — add `.testeiya/` to `.gitignore` if missing.
 - Mark every seeded record with one recognizable marker (in a name, note, or tag field the schema allows) so QA can find the data and clean it up later. Use the same marker for the whole run.
 
@@ -34,7 +34,7 @@ Read the implementation before proposing anything. Collect:
 - Business variations that change behavior: roles, statuses, types, plans/tiers, locales, feature flags, time-dependent logic.
 - API endpoints (or UI flows) that create these records, and what they require.
 
-If there is no code access, fall back to the API schema (OpenAPI/Swagger, GraphQL introspection) or ask the user for docs.
+If there is no code access, fall back to the API schema (OpenAPI/Swagger, GraphQL introspection) or ask the user for docs. If MCP available - use it.
 
 ### Step 2: Collect environment details
 
@@ -47,7 +47,7 @@ If there is no code access, fall back to the API schema (OpenAPI/Swagger, GraphQ
 - How to authenticate: which env vars hold tokens or credentials.
 - Which account/tenant/workspace to seed into, or whether to create a fresh one.
 
-Pick the seeding channel in this order: existing seed mechanism → app console/code → new small script -> REST API.
+Pick the seeding channel in this order: existing seed mechanism → app console/code → new small script -> REST API -> MCP .
 For local environments data can be seeded through the backend.
 
 
