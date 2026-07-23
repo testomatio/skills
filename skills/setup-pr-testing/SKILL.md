@@ -105,7 +105,8 @@ Then the launch triggers (automated/mixed only):
 And for every kind:
 
 3. Rungroup strategy — week / day / release / milestone.
-4. Diff base — the PR's target branch for PR jobs; post-merge jobs need the previous mainline tip (diff-base rules in `run-tests-with-testomatio-reporter`).
+
+Diff bases are never a question — derive them yourself: the PR's target branch for PR jobs, the previous mainline tip for post-merge jobs per the repo's merge style (rules in `run-tests-with-testomatio-reporter`). Note the choice in the workflow PR description instead.
 
 ### Step 3 — Confirm the selected flow
 
