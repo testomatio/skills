@@ -21,7 +21,7 @@ Every reporter command the jobs execute is documented in `run-tests-with-testoma
 
 ## Possible flows
 
-Open the conversation with this diagram, before asking anything — it frames every question that follows. Render diagrams as Mermaid when the environment displays it; fall back to ASCII otherwise.
+Post this diagram as a chat message before the first question — never open with a question; it frames everything that follows. When questions go through a form or tool, the diagram must already be on screen in an earlier message. Render diagrams as Mermaid when the environment displays it; fall back to ASCII otherwise.
 
 ```mermaid
 flowchart LR
@@ -53,10 +53,11 @@ The valuable knowledge here is the flow model and the decisions to confirm with 
 
 - **The deliverable is committed CI config — never execute the reporter while authoring.** The sole exception is the user-approved battle-test (Step 7).
 - **Battle-test safety:** an open PR only gets a run created — executing tests is allowed only for a PR that is already merged.
-- **No wiring before the user approves the selected-flow diagram (Step 3).**
+- **Diagrams gate the dialogue.** The flows diagram is posted before the first question; no wiring before the user approves the selected-flow diagram (Step 3).
 - **Discovery first.** Delegate to `scan-automation-project` before writing anything.
 - **Never assume or hardcode the CI system.** Read the repo; if unclear, ask.
-- **Never guess a CI profile name.** Pick from a list (Testomat.io MCP) confirmed by the user, or ask the user for the name.
+- **Never guess a Testomat.io CI profile name.** Pick from a list (Testomat.io MCP) confirmed by the user, or ask the user for the name.
+- **Define terms when asking.** Say "Testomat.io CI profile" in full — never bare "profile" — and make every question option explain itself in plain words; the user may have never heard these terms.
 - **No coverage map → no pipeline.** Delegate map creation to `qa-test-code-coverage`; filtering is never skipped.
 - **The PR-open job creates the run and executes nothing.**
 - **Preview launches gate on a deploy-finished signal** — never on the push itself.
@@ -76,19 +77,19 @@ The valuable knowledge here is the flow model and the decisions to confirm with 
 
 ### Step 2 — Present the flows and ask the unknowns
 
-Show the possible-flows diagram trimmed to the kinds found in Step 1, then ask only what applies. Read the CI files first so you don't ask what's already answered.
+Post the possible-flows diagram, trimmed to the kinds found in Step 1, as its own message — then ask only what applies. Read the CI files first so you don't ask what's already answered.
 
 **Manual tests found** — nothing to choose: their part of the run is complete at creation, testers start on Testomat.io immediately.
 
-**Automated tests found** — ❓ choose the execution mode:
+**Automated tests found** — ❓ choose the execution mode. Each option in the question must explain itself in plain words — what runs where and who triggers it. In particular spell out what a Testomat.io CI profile is: a CI workflow configuration saved on the Testomat.io project (Settings → CI) that Testomat.io dispatches to execute the tests, with results reporting back into the run.
 
-| Mode                            | When it fits                                                                                      |
-| ------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Remote — Testomat.io CI profile | a profile for the e2e suite exists (Settings → CI); Testomat.io owns runner, env, secrets         |
-| Inline — this pipeline          | mobile/simulators, services this pipeline spins up, or an e2e job that already works in this repo |
-| Cross-repo dispatch             | the e2e suite lives in another repo and no CI profile covers it                                   |
+| Mode                            | When it fits                                                                                                  |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Remote — Testomat.io CI profile | a Testomat.io CI profile for the e2e suite exists (Settings → CI); Testomat.io owns runner, env, secrets      |
+| Inline — this pipeline          | mobile/simulators, services this pipeline spins up, or an e2e job that already works in this repo             |
+| Cross-repo dispatch             | the e2e suite lives in another repo and no Testomat.io CI profile covers it                                   |
 
-- Remote chosen → identify the profile, never guess it: Testomat.io MCP connected → fetch the profiles, present the list, ❓ ask the user to choose (profiles differ by workflow and job names); no MCP → ❓ ask for the exact name; none exists yet → creating one in Testomat.io (Settings → CI) is a prerequisite; wire the launch step ready to enable.
+- Remote chosen → identify the Testomat.io CI profile, never guess it: Testomat.io MCP connected → fetch the list, present it, ❓ ask the user to choose (profiles differ by workflow and job names); no MCP → ❓ ask for the exact profile name; none exists yet → creating one in Testomat.io (Settings → CI) is a prerequisite; wire the launch step ready to enable.
 - No e2e suite anywhere → wire only the manual flow; never fabricate an e2e job.
 
 Then the launch triggers (automated/mixed only):
@@ -106,14 +107,14 @@ And for every kind:
 - Draw the flow the answers produced — only the chosen kind, triggers, and execution mode. Mermaid when supported, ASCII otherwise.
 - ❓ Present the diagram and get approval; wire nothing until the user accepts it.
 
-Example — mixed project, remote profile, previews confirmed:
+Example — mixed project, Testomat.io CI profile, previews confirmed:
 
 ```mermaid
 flowchart LR
     PR([PR opened]) --> RUN[Mixed run created,<br/>scoped to the diff]
     RUN --> TESTERS[Testers work manual cases<br/>on Testomat.io]
     RUN --> SCHED[Automated part scheduled]
-    PREV([Preview deployed]) --> L1[Launch via the chosen CI profile<br/>against the preview]
+    PREV([Preview deployed]) --> L1[Launch via the Testomat.io CI profile<br/>against the preview]
     MERGE([PR merged]) --> L2[Launch with the final diff]
     SCHED -.-> L1
     SCHED -.-> L2
@@ -148,7 +149,7 @@ Write the jobs in the CI's own syntax; take every command and env var from `run-
 - Tell the user exactly where to add it: name the secret-store location the CI at hand uses for this repo/pipeline and the exact secret name to type.
 - Provision the PR-comment pipe token the same way (tokens per platform in `run-tests-with-testomatio-reporter`).
 - ❓ Ask the user to confirm the secrets are in place before the pipeline PR merges — a pipeline with missing secrets fails on its first PR.
-- The CI profile for remote launches is configured in Testomat.io (Settings → CI), not stored as a repo secret.
+- The Testomat.io CI profile for remote launches is configured in Testomat.io (Settings → CI), not stored as a repo secret.
 
 ### Step 6 — Suggest a PR with the new workflow
 
@@ -170,15 +171,15 @@ Prove the pipeline's commands work before the CI ever runs them — by running t
 
 ### Step 8 — Summarize and hand off
 
-Present the approved flow diagram once more, now marked as wired. Report: the CI targeted and files written; which phases are wired and which were skipped (no previews / no e2e / no CI profile); the chosen execution mode; title scheme and rungroup; how the launch steps find the prepared run (run id carrier or shared title); the battle-test outcome and the runs awaiting the user's review; secrets and prerequisites still to provision; assumptions to confirm. Recommend committing the coverage map alongside the CI config.
+Present the approved flow diagram once more, now marked as wired. Report: the CI targeted and files written; which phases are wired and which were skipped (no previews / no e2e / no Testomat.io CI profile); the chosen execution mode; title scheme and rungroup; how the launch steps find the prepared run (run id carrier or shared title); the battle-test outcome and the runs awaiting the user's review; secrets and prerequisites still to provision; assumptions to confirm. Recommend committing the coverage map alongside the CI config.
 
 ## Examples
 
-**Example 1 — mixed project, previews, remote profile**
-Discovery finds manual cases and an e2e suite; MCP lists the project's CI profiles and the user picks the one running the e2e suite; previews confirmed. → Diagram approved, then all three phases wired: mixed run on PR open, preview launch gated on the deployment-success event with the preview URL as a remote param, merge launch with a fresh post-merge filter. Comment pipe enabled.
+**Example 1 — mixed project, previews, Testomat.io CI profile**
+Discovery finds manual cases and an e2e suite; MCP lists the Testomat.io CI profiles and the user picks the one running the e2e suite; previews confirmed. → Diagram approved, then all three phases wired: mixed run on PR open, preview launch gated on the deployment-success event with the preview URL as a remote param, merge launch with a fresh post-merge filter. Comment pipe enabled.
 
-**Example 2 — e2e lives in another repo, no CI profile**
-The user picks cross-repo dispatch from the mode table: the merge job triggers the e2e repo's pipeline via the CI's native mechanism, passing the run id so results land in the prepared run. Note the remote-profile option as the simpler future path.
+**Example 2 — e2e lives in another repo, no Testomat.io CI profile**
+The user picks cross-repo dispatch from the mode table: the merge job triggers the e2e repo's pipeline via the CI's native mechanism, passing the run id so results land in the prepared run. Note the Testomat.io CI profile option as the simpler future path.
 
 **Example 3 — no coverage map yet**
 No `coverage*.yml` found → explain nothing can be filtered without a map; delegate to `qa-test-code-coverage`; wire CI only after the map exists.

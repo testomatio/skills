@@ -9,7 +9,7 @@ metadata:
 
 # Run Tests with Testomat.io Reporter
 
-`npx @testomatio/reporter` creates test runs in Testomat.io and launches groups of tests — locally or remotely through a CI profile. Every command requires the `TESTOMATIO` env var (the project API key, `tstmt_*`) and exits 1 without it. Every value in angle brackets is a placeholder.
+`npx @testomatio/reporter` creates test runs in Testomat.io and launches groups of tests — locally or remotely through a Testomat.io CI profile. Every command requires the `TESTOMATIO` env var (the project API key, `tstmt_*`) and exits 1 without it. Every value in angle brackets is a placeholder.
 
 ## Pick the command by intent
 
@@ -43,7 +43,7 @@ Without a filter, nothing is scoped:
 
 - `start` creates a run with no predefined test list — results land in it later, when tests report with `TESTOMATIO_RUN=<run-id>`.
 - `run "<runner command>"` executes the full suite and reports every result.
-- `run --remote <profile-name>` dispatches the CI profile with its default scope.
+- `run --remote <profile-name>` dispatches the Testomat.io CI profile with its default scope.
 
 `--filter "<pipe>:<criteria>"` narrows the run to the matching tests instead. Two filter pipes exist — `testomatio:` (match by test metadata stored in the project) and `coverage:` (match by changed source files); any other prefix is rejected. `start` and `run` accept the same filters, so a filtered run can be prepared first and launched later.
 
@@ -105,25 +105,25 @@ Cannot be combined with `--remote`.
 
 ## Remote launch (`run --remote`)
 
-`--remote <profile-name>` asks Testomat.io to dispatch a CI profile configured on the project (Settings → CI) instead of executing tests locally:
+`--remote <profile-name>` asks Testomat.io to dispatch a **Testomat.io CI profile** — a CI workflow configuration saved on the project (Settings → CI) — instead of executing tests locally. Testomat.io triggers that workflow, and its results report back into the run:
 
 ```bash
 TESTOMATIO_RUN=$RUN_ID npx @testomatio/reporter run --remote <profile-name> \
   --filter "coverage:file=<coverage-map>,diff=<git-ref>"
 ```
 
-- With `TESTOMATIO_RUN`, the profile is triggered for that run; without it, a new run is created.
+- With `TESTOMATIO_RUN`, the Testomat.io CI profile is triggered for that run; without it, a new run is created.
 - Works with every filter form — the resolved test ids are forwarded to the CI workflow as a grep pattern. No filter → no grep; the workflow runs its default scope, or a prepared run's stored scope from creation time. A fresh `--filter` at launch replaces the stored scope.
-- `--remote-param <key>=<value>` forwards a parameter to the profile config (repeat for several) — e.g. a preview URL or target branch.
-- Guards: cannot combine with `--filter-list`; any positional command is ignored with a warning; a missing profile fails with `CI launch failed: <message>` and exit 1.
+- `--remote-param <key>=<value>` forwards a parameter to the Testomat.io CI profile config (repeat for several) — e.g. a preview URL or target branch.
+- Guards: cannot combine with `--filter-list`; any positional command is ignored with a warning; a missing Testomat.io CI profile fails with `CI launch failed: <message>` and exit 1.
 
-### Choosing the profile
+### Choosing the Testomat.io CI profile
 
-Profiles are configured on the Testomat.io project (Settings → CI) and differ by workflow, job names, and parameters — never guess one.
+Profiles differ by workflow, job names, and parameters — never guess one. When talking to the user, always say "Testomat.io CI profile" in full and explain what it is; the bare word "profile" means nothing to them.
 
-- Testomat.io MCP connected → fetch the project's CI profiles, present the list, and ask the user to choose (see `testomatio-mcp` to connect).
-- No MCP → ask the user for the profile name.
-- No profile exists yet → the user must create one in Testomat.io (Settings → CI) first.
+- Testomat.io MCP connected → fetch the Testomat.io CI profiles, present the list, and ask the user to choose (see `testomatio-mcp` to connect).
+- No MCP → ask the user for the Testomat.io CI profile name.
+- None exists yet → the user must create one in Testomat.io (Settings → CI) first.
 
 ## Local execution (`run "<runner command>"`)
 
