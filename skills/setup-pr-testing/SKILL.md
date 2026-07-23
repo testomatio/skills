@@ -39,13 +39,7 @@ flowchart LR
     RES[Run the affected automated tests —<br/>results land in the PR run]
 ```
 
-Diagram rules — for this diagram and every one drawn later:
-
-- Every block states an action, verb first ("Create a run", "Testers execute manual cases", "Launch automated tests"). A bare noun phrase ("pending manual run") is not a block — nobody can tell what it does.
-- Decisions are diamond questions ("When to launch?", "How to execute?"); the options go on the edges.
-- Configuration details — titles, rungroups, filters, env vars, run-id carriers — are never blocks; they belong in the explanation text under the diagram.
-- End at an outcome block ("results land in the PR run") so the last block reads as the end state, never a dangling detail.
-- Keep it small — about 8 blocks.
+Keep every diagram clear: verb-first action blocks ("Create a run", "Testers execute manual cases"), decisions as questions, configuration details in the text below — never as blocks, and end at an outcome.
 
 - Manual-only project → only the top branch: the run is complete at creation, testers execute it on Testomat.io, nothing launches.
 - Automated-only project → only the bottom branch: the scheduled run launches on a trigger through the chosen mode.
@@ -68,7 +62,7 @@ The valuable knowledge here is the flow model and the decisions to confirm with 
 - **Never assume or hardcode the CI system.** Read the repo; if unclear, ask.
 - **Never guess a Testomat.io CI profile name.** Pick from a list (Testomat.io MCP) confirmed by the user, or ask the user for the name.
 - **Define terms when asking.** Say "Testomat.io CI profile" in full — never bare "profile" — and make every question option explain itself in plain words; the user may have never heard these terms.
-- **Never present the project inventory as the run scope.** The project's total test count is inventory; the run will contain only the tests matched by the PR diff — say so explicitly whenever a count appears, and never print full test lists (a count plus a few examples is enough).
+- **Avoid presenting the project's full test inventory as the run scope; never print full test lists.**
 - **No coverage map → no pipeline.** Delegate map creation to `qa-test-code-coverage`; filtering is never skipped.
 - **The PR-open job creates the run and executes nothing.**
 - **Preview launches gate on a deploy-finished signal** — never on the push itself.
