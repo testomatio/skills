@@ -128,14 +128,14 @@ flowchart LR
 
 ### Step 4 — Wire the phases into CI
 
-Write the jobs in the CI's own syntax; take every command and env var from `run-tests-with-testomatio-reporter`. Manual-only projects get phase (a) alone.
+Write the jobs in the CI's own syntax; take every command and env var from `run-tests-with-testomatio-reporter`. Manual-only projects get phase (a) alone. Keep each job to its single reporter command plus the CI's native primitives — no log parsing, no `--filter-list` pre-checks, no wrapper bash.
 
 **(a) PR opened → create the run.**
 
 - Use `start` with the coverage filter; pick the run kind matching the project's tests.
 - Persist the printed run id with the CI's native value-passing mechanism (artifact, variable, output); fallback is shared-run title matching.
 - Run once per PR (on open); pushes to the PR don't recreate runs.
-- A diff affecting zero tests creates no run — the job still succeeds.
+- A diff affecting zero tests creates no run and `start` exits 1 — mark the job non-blocking with the CI's native setting instead of parsing logs.
 
 **(b) Preview deployed → launch against the preview** (only when Step 2 confirmed previews).
 

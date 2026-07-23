@@ -71,7 +71,7 @@ This is how "run only the tests affected by a code change" works — and it need
 - `file=` — path to the coverage map. May be absolute; it is read with `fs`, independent of the working directory.
 - `diff=` — git ref to diff against; defaults to `master`. The reporter runs `git diff <ref> --name-only` **in `process.cwd()`** — launch it from inside the repo whose changes are being detected.
 - Changed files are mapped through the YAML; the matching suite/test IDs and tags become the run's scope.
-- Zero matching tests → no run is created (`No tests found.`); treat that as success in scripts and CI jobs.
+- Zero matching tests → no run is created (`No tests found.`). Exit codes: `start` exits 1, `run` exits 0, `--filter-list` exits 1 — no output parsing needed.
 
 #### Picking the diff base
 
