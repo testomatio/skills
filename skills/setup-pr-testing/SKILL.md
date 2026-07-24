@@ -145,7 +145,7 @@ Write the jobs in the CI's own syntax; take every command and env var from `run-
 
 **(c) PR merged → launch with the final diff.**
 
-- Check out the PR's own merge commit, not the branch tip — a merge landing right after would shift the diff.
+- Pin the job to the exact revision this PR landed on the mainline and diff against the mainline state just before it — the branch tip moves as later merges or rebases land.
 - Target the persisted run id; pass a fresh coverage filter with the post-merge diff base so the final merged diff decides what runs.
 - Cross-repo mode: trigger the e2e repo's pipeline with the CI's native mechanism, passing the run id, API key, and title env into it.
 - Keep the job non-blocking and off the release's critical path.
