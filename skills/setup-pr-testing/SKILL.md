@@ -128,7 +128,7 @@ flowchart LR
 
 ### Step 4 — Wire the phases into CI
 
-Write the jobs in the CI's own syntax; take every command and env var from `run-tests-with-testomatio-reporter`. Manual-only projects get phase (a) alone. Keep each job to its single reporter command plus the CI's native primitives — no log parsing, no `--filter-list` pre-checks, no wrapper bash.
+Write the jobs in the CI's own syntax; take every command and env var from `run-tests-with-testomatio-reporter`. Manual-only projects get phase (a) alone. Keep each job to its single reporter command plus the CI's native primitives — no log parsing, no `--filter-list` pre-checks, no shell-strictness preambles, no manual `git fetch` (the checkout's full-history option provides the refs).
 
 **(a) PR opened → create the run.**
 
@@ -145,6 +145,7 @@ Write the jobs in the CI's own syntax; take every command and env var from `run-
 
 **(c) PR merged → launch with the final diff.**
 
+- Check out the PR's own merge commit, not the branch tip — a merge landing right after would shift the diff.
 - Target the persisted run id; pass a fresh coverage filter with the post-merge diff base so the final merged diff decides what runs.
 - Cross-repo mode: trigger the e2e repo's pipeline with the CI's native mechanism, passing the run id, API key, and title env into it.
 - Keep the job non-blocking and off the release's critical path.
