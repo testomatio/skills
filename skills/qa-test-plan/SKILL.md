@@ -28,7 +28,20 @@ Input: a feature description, or risk scenarios from a prior QA analysis.
 
 - Section `☑️ What is already tested`: number and scope of existing unit/e2e tests.
 - Section `🧪 Testing plan`: scenario → level (unit / e2e / manual), with reasoning.
+- Draw the plan as an ASCII test pyramid: test count and share per level.
 - For manual items: how to verify (`action → expected result`).
+
+Pyramid template:
+
+```
+        /\
+       /  \      🖐 manual — <count> checks (<percent>%)
+      /----\
+     /      \    🤖 e2e — <count> tests (<percent>%)
+    /--------\
+   /          \  🔬 unit — <count> tests (<percent>%)
+  --------------
+```
 
 ## Next actions
 
