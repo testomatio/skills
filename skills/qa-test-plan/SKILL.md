@@ -28,7 +28,7 @@ Input: a feature description, or risk scenarios from a prior QA analysis.
 
 - Section `☑️ What is already tested`: number and scope of existing unit/e2e tests.
 - Section `🧪 Testing plan`: scenario → level (unit / e2e / manual), with reasoning.
-- When the environment renders charts (e.g. Mermaid), add a pie chart or test pyramid: test count and share per level. Skip the diagram in plain terminal output.
+- When the environment can render charts, add a pie chart or test pyramid: test count and share per level. Skip the diagram in plain terminal output.
 - For manual items: how to verify (`action → expected result`).
 
 ## Next actions
