@@ -133,6 +133,8 @@ Write the jobs in the CI's own syntax; take every command and env var from `run-
 **(a) PR opened → create the run.**
 
 - Use `start` with the coverage filter; pick the run kind matching the project's tests.
+- Set `TESTOMATIO_DESCRIPTION` to a direct link to the PR when the CI exposes its URL.
+- Provide the platform's comment-pipe token on this job too — `start` posts a pending PR comment with the planned tests (tokens per platform in `run-tests-with-testomatio-reporter`).
 - Persist the printed run id with the CI's native value-passing mechanism (artifact, variable, output); fallback is shared-run title matching.
 - Run once per PR (on open); pushes to the PR don't recreate runs.
 - A PR touching no mapped tests is normal — pass `--warn` so `start` exits 0 and the job stays green; never parse the output.

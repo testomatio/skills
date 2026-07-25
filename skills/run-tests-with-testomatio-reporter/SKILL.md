@@ -93,6 +93,7 @@ Cannot be combined with `--remote`.
 
 - `TESTOMATIO_TITLE` — the run title (e.g. `PR <number>: <title>`).
 - `TESTOMATIO_RUNGROUP_TITLE` — groups related runs (per week / release / milestone).
+- `TESTOMATIO_DESCRIPTION` — free-form run description, shown on the run and in PR/MR comments; put the link to the change here (a generated coverage scope is appended after it).
 - `TESTOMATIO_ENV` — optional environment labels.
 
 ## Report into an existing run
@@ -136,7 +137,7 @@ TESTOMATIO_RUN=$RUN_ID npx @testomatio/reporter run "<runner command>" \
 
 ## PR/MR comments
 
-When results report, the reporter posts and updates the PR/MR summary comment itself — never script a comment API call. Enable the pipe by setting its token:
+The reporter posts and updates the PR/MR summary comment itself — `start` posts a pending comment with the planned tests the moment the run is created, and results replace it as they report. Never script a comment API call. Enable the pipe by setting its token on every reporter command, `start` included:
 
 | Platform  | Env var                  | Note                                               |
 | --------- | ------------------------ | -------------------------------------------------- |
