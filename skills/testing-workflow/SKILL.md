@@ -13,7 +13,8 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 | ------------------------------------ | --------------------------------------------------------------------------------- |
 | `scan-automation-project`            | Scan source code to inventory languages, frameworks, and existing tests           |
 | `pull-request-diff-analyzer`         | Analyze a PR/branch diff to detect features/fixes and extract acceptance criteria |
-| `qa-thinking`                        | Analyze a feature as QA — edge cases, negative flows, abuses, acceptance criteria |
+| `qa-thinking`                        | Analyze a feature as QA — edge cases, negative flows, abuses, risk scenarios      |
+| `qa-test-plan`                       | Build a testing plan — assign scenarios to unit/e2e/manual, coverage split        |
 | `qa-write-test-cases`                | Generate new test cases and checklists from requirements                          |
 | `improve-test-cases`                 | Improve existing test cases quality                                               |
 | `detect-duplicate-test-cases`        | Find duplicate, near-duplicate, and overlapping test cases                        |
@@ -48,15 +49,29 @@ After generation fully completed, suggest next actions:
 5. 🎭 Generate specific test cases using `qa-write-test-cases` skill and role name
 ```
 
-### QA Analysis / Acceptance Criteria Flow
+### QA Analysis Flow
 
 ```
-User: asks "what could go wrong?", "what am I missing?", "review this as QA", or wants acceptance criteria before tests exist
+User: asks "what could go wrong?", "what am I missing?", or "review this as QA"
 =>
-Use `qa-thinking` skill to surface edge cases, negative flows, abuses and propose acceptance criteria
+Use `qa-thinking` skill to surface edge cases, negative flows, abuses and risk scenarios
 =>
 After analysis fully completed, suggest next actions:
-1. 📝 Generate test cases from the acceptance criteria (with `qa-write-test-cases` skill)
+1. 🧪 Build a testing plan for the scenarios (with `qa-test-plan` skill)
+2. 📝 Generate test cases from the scenarios (with `qa-write-test-cases` skill)
+```
+
+### Test Plan Flow
+
+```
+User: asks "how should we test this?", "unit or e2e?", or wants a test plan / coverage split
+=>
+Use `qa-test-plan` skill to inventory existing tests and assign scenarios to unit/e2e/manual
+=>
+After the plan fully completed, suggest next actions:
+1. 📝 Write manual test cases or a checklist (with `qa-write-test-cases` skill)
+2. 🤖 Automate manual cases into autotests (with `automate-manual-test-cases` skill)
+3. 🗺️ Map tests to source files for change-aware runs (with `qa-test-code-coverage` skill)
 ```
 
 ### PR / Diff-Driven Testing Flow
