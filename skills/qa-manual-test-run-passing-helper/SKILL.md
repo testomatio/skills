@@ -23,6 +23,32 @@ Trigger this skill when user wants to:
 
 ## Workflow: Manual Test Case Execution
 
+## Possible flows
+
+Never post a diagram to user's chat - follow it immediately with one short paragraph explaining it: this is the general schema of manual test execution, for the user to examine before anything is implemented; execution branches based on what tools are available - MCP for TMS integration, browser automation for navigation and screenshots - and the user will choose how to handle browser visibility.
+
+```mermaid
+flowchart LR
+   START([Start]) --> MCP{Testomat.io<br/>MCP configured?}
+   MCP -->|yes| TMS[Create test run<br/>in TMS]
+   MCP -->|no| LOCAL[Work locally<br/>no TMS updates]
+   TMS --> BROWSER{Browser<br/>automation?}
+   LOCAL --> BROWSER
+   BROWSER -->|Playwright MCP| FULL[Full automation — navigate,<br/>verify, screenshot, update TMS]
+   BROWSER -->|CLI only| GUIDED[Guided mode — you describe actions,<br/>I take screenshots]
+   BROWSER -->|none| GUIDE[Guide only — I parse cases,<br/>you perform steps manually]
+   FULL --> CONFIRM[Confirm result with user]
+   GUIDED --> CONFIRM
+   GUIDE --> CONFIRM
+   CONFIRM --> STATUS[Update TMS status<br/>if MCP available]
+   STATUS --> SUMMARY[Final summary<br/>+ screenshot paths]
+```
+
+- **MCP + Playwright MCP** → full workflow: create run, automate all verifications, push results to TMS, collect screenshots
+- **MCP only** → execute from `.md` file, take screenshots, update TMS manually after session
+- **No MCP** → guide through execution, user sets statuses manually in TMS
+- **No browser tools** → parse test cases, describe steps, user performs everything manually
+
 ### Step 0.1: MCP Availability Check (Preparation)
 
 Before starting, check if Testomat.io MCP is configured:
