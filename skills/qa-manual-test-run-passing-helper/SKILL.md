@@ -23,7 +23,7 @@ Trigger this skill when user wants to:
 
 ## Workflow: Manual Test Case Execution
 
-### Step 0: MCP Availability Check (Preparation)
+### Step 0.1: MCP Availability Check (Preparation)
 
 Before starting, check if Testomat.io MCP is configured:
 
@@ -39,7 +39,7 @@ Before starting, check if Testomat.io MCP is configured:
 3. **Decision matrix:**
 
    | MCP Status | Capabilities | Limitations |
-   |------------|--------------|-------------|
+   |------------|--------------|--------------|
    | **Available & configured** | Full workflow: create runs, update statuses in TMS | None |
    | **Not configured** | Execute test cases from `.md` file only, take screenshots | Cannot create TMS runs, cannot update statuses automatically |
 
@@ -47,6 +47,40 @@ Before starting, check if Testomat.io MCP is configured:
    - Inform user: "MCP is not configured. I can help with local test case execution from .md files and screenshots, but status updates require manual setup in TMS."
    - Continue with local-only workflow
    - Skip TMS-specific steps
+
+---
+
+### Step 0.2: Browser Automation Tools Check
+
+Before starting test execution, verify browser automation tools are available:
+
+1. **Check for Playwright MCP** (if configured via MCP):
+   - Try `browser_navigate` or `browser_evaluate` — if it responds, browser MCP is working
+   - If timeout/error → browser MCP not available
+
+2. **Check for Playwright CLI:**
+   - `npx playwright --version` — if available, can use `playwright open`, `playwright codegen`
+   - Check for `playwright.config.ts` or `playwright.config.js` in project
+
+3. **Check for Selenium/WebDriver tools:**
+   - `selenium-ide` or `webdriverio` if project uses these
+
+4. **Decision matrix:**
+
+   | Tool Status | Capabilities | Action |
+   |-------------|--------------|--------|
+   | **Playwright MCP available** | Full browser control via MCP | Use MCP browser tools |
+   | **Playwright CLI available** | `playwright open`, `codegen`, screenshots | Use CLI with user assistance |
+   | **Neither available** | Cannot automate browser | Inform user and abort |
+
+5. **If no browser tools available:**
+   - Inform user: "No browser automation tools detected. I can help parse test cases and guide you through manual execution, but cannot automate browser actions."
+   - Offer to continue in "guide only" mode where you describe steps and user performs them
+
+6. **Browser mode decision** (after tools confirmed):
+   - Ask user: "Run in headless mode (faster, no visible window) or with visible browser (--ui)?"
+   - Note preference for this session
+   - Default to headless unless user requests otherwise
 
 ---
 
@@ -91,7 +125,26 @@ For each test case, perform this sequence:
 
 #### 3.1 Open Browser Session
 
-Start a Playwright browser session to navigate to the app under test.
+**Default mode: headless** — browser runs without visible window for faster execution.
+
+**When to use headed mode (`--ui`):**
+- First time executing a test suite for this project
+- User requests to see what's happening
+- Debugging flaky tests
+- Complex navigation that needs visual verification
+
+**When to use headless mode:**
+- Repeat executions of known test cases
+- CI/CD pipelines
+- Faster execution when visual feedback not needed
+
+**Startup sequence:**
+```
+1. Ask user preference if not clear from context: "Run in headless mode (faster) or with visible browser?"
+2. If headed mode requested: launch with --ui flag
+3. If headless: launch with headless: true
+4. Always maximize window in headed mode for best visibility
+```
 
 #### 3.2 Navigate to Target Page
 
@@ -133,16 +186,18 @@ For each step in the test case:
 - Test case mentions "network log" → capture HAR file
 - Last step of test case reached with no screenshot taken → take final screenshot
 
-**Screenshot save location (in order of priority):**
-1. **Project folder**: `./screens/testomatio-screenshots/{run_id}/{test_id}/{timestamp}.png`
-2. **Root folder**: `./testomatio-screenshots/{run_id}/{test_id}/{timestamp}.png`
-3. **Temp folder** (last resort): `/tmp/testomatio-screenshots/{run_id}/{test_id}/{timestamp}.png`
+**Screenshot save location — ALWAYS use project folder first:**
+1. **Project folder (PRIMARY)**: `{project_root}/screens/testomatio-screenshots/{run_id}/{test_id}_{timestamp}.png`
+2. **Root folder (fallback)**: `testomatio-screenshots/{run_id}/{test_id}_{timestamp}.png`
+3. **Temp folder (last resort)**: `/tmp/testomatio-screenshots/{run_id}/{test_id}_{timestamp}.png`
 
-> If project has no write permissions, fall back to temp folder.
+> **CRITICAL**: Before taking a screenshot, detect project root by checking for `package.json`, `.git`, or similar markers. Always prefer project folder. Only fall back if no write permissions.
+
+**Screenshot filename format:** `{test_id}_{timestamp}.png`
 
 #### 3.5 Update Test Result in TMS
 
-**Only if MCP is available** (from Step 0).
+**Only if MCP is available** (from Step 0.1).
 
 After completing each test case, update status via MCP:
 
@@ -202,6 +257,19 @@ After all test cases executed:
 
 ---
 
+### Step 5: Post-Condition Cleanup (MANDATORY)
+
+**CRITICAL**: After test execution session ends, clean up ALL temporary artifacts:
+
+**Clean up in this order:**
+1. **Close browser session** — ensure all Playwright/browser processes terminated
+2. **Remove temporary scripts** — any `.js`, `.ts`, `.playwright.js` files created during session
+3. **Remove browser cache files** — `.cache/` if created in working directory
+4. **Remove HAR files** — any `.har` network logs saved during session
+
+**What to KEEP:**
+- Screenshots saved to `screens/testomatio-screenshots/` — these are project data
+
 ## Error Handling
 
 ### Recovery
@@ -210,6 +278,15 @@ After all test cases executed:
 - **Page navigation failed** → ask user to confirm URL or manually navigate
 - **Element not found** → ask user to verify page state
 - **MCP call failed** → retry once, then inform user to set status manually in TMS
+
+### On Any Failure — ALWAYS run cleanup
+
+Before attempting recovery or continuing:
+```
+1. Close browser session
+2. Remove any temp scripts created
+3. Remove playwright/ folder if created
+```
 
 ### Hard Fail
 
