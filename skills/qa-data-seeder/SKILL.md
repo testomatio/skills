@@ -1,6 +1,6 @@
 ---
 name: qa-data-seeder
-description: Prepare and seed test data for a feature into a target environment. Analyzes the feature's implementation, proposes data categories covering regular and edge cases, and populates the environment via existing seed mechanisms, REST API, or code access. Use when the user asks to seed test data, populate a test or staging environment, prepare data for manual/QA testing of a feature, generate a dataset for a feature, or create fixtures in an environment.
+description: Prepare and seed test data for a feature into a target environment. Analyzes the feature's implementation, proposes data categories covering regular and edge cases, and populates the environment via existing seed mechanisms code access, REST, MCP. Use when the user asks to seed test data, populate a test or staging environment, prepare data for manual/QA testing of a feature, generate a dataset for a feature, or create fixtures in an environment.
 license: MIT
 metadata:
   author: Testomat.io
