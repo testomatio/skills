@@ -1,6 +1,6 @@
 ---
 name: qa-manual-test-run-passing-helper
-description: Guide a QA engineer through manual test case execution by opening the browser, navigating to pages, performing easy verifications, taking screenshots, and asking for help only on complex steps. Use when user wants to pass/execute manual test cases from a .md file or from existing test cases in the TMS, creating a test run and tracking results. The skill handles browser automation via Playwright MCP while the user assists with non-automatable actions like login credentials, complex validations, or ambiguous test steps.
+description: Guide a QA engineer through manual test case execution by opening the browser, navigating to pages, performing easy verifications, taking screenshots, and asking for help only on complex steps. Use when user wants to pass/execute manual test cases from a .md file or from existing test cases in the TMS, creating a test run and tracking results. The skill handles action/asserts via browser or Playwright MCP while the user assists with non-automatable actions like login credentials, complex validations, or ambiguous test steps. At the end - finish run to provide statistic in TMS.
 license: MIT
 metadata:
   author: Testomat.io
@@ -9,7 +9,7 @@ metadata:
 
 # QA-MANUAL-TEST-RUN-PASSING-HELPER SKILL: What I Do
 
-This skill helps QA engineers execute manual test cases by automating browser interactions where possible and requesting human assistance only for complex or ambiguous steps. It creates a test run in TMS (if applicable), executes test cases one-by-one via browser automation, updates results in real-time, and collects screenshots.
+This skill helps QA engineers execute manual test cases by browser interactions where possible and requesting human assistance only for complex or ambiguous steps. It creates a test run in TMS (if applicable), executes test cases one-by-one via browser automation, updates results in real-time, and collects screenshots.
 
 ## When to Use
 
@@ -44,8 +44,9 @@ flowchart LR
    STATUS --> SUMMARY[Final summary<br/>+ screenshot paths]
 ```
 
-- **MCP + Playwright MCP** → full workflow: create run, automate all verifications, push results to TMS, collect screenshots
-- **MCP only** → execute from `.md` file, take screenshots, update TMS manually after session
+- **MCP + browser tools** → ONLY available AI agent browser for interaction + MCP workflow: create run via `runs_create`, automate all verifications via MCP browser tools, update statuses via `testruns_update`, finish run via `runs_update` with `status_event: "finish"`.
+- **MCP + Playwright MCP** → ONLY MCP workflow: create run via `runs_create`, automate all verifications via MCP browser tools, update statuses via `testruns_update`, finish run via `runs_update` with `status_event: "finish"`. **NEVER add API/helper script workflow when MCP is available.**
+- **MCP only** → execute from `.md` file, take screenshots, update TMS via MCP tools
 - **No MCP** → guide through execution, user sets statuses manually in TMS
 - **No browser tools** → parse test cases, describe steps, user performs everything manually
 
@@ -215,7 +216,6 @@ For each step in the test case:
 **Screenshot save location — ALWAYS use project folder first:**
 1. **Project folder (PRIMARY)**: `{project_root}/screens/testomatio-screenshots/{run_id}/{test_id}_{timestamp}.png`
 2. **Root folder (fallback)**: `testomatio-screenshots/{run_id}/{test_id}_{timestamp}.png`
-3. **Temp folder (last resort)**: `/tmp/testomatio-screenshots/{run_id}/{test_id}_{timestamp}.png`
 
 > **CRITICAL**: Before taking a screenshot, detect project root by checking for `package.json`, `.git`, or similar markers. Always prefer project folder. Only fall back if no write permissions.
 
@@ -223,7 +223,7 @@ For each step in the test case:
 
 #### 3.5 Update Test Result in TMS
 
-**Only if MCP is available** (from Step 0.1).
+**ONLY use MCP tools when available** — never fall back to API helper scripts.
 
 After completing each test case, update status via MCP:
 
@@ -268,9 +268,25 @@ Before marking final status, confirm with user:
 
 ---
 
-### Step 4: Final Summary
+### Step 4: Finish Test Run in TMS
 
-After all test cases executed:
+**ONLY if MCP is available.**
+
+After all test cases executed AND cleanup complete, finish the run via MCP:
+
+```
+runs_update:
+  run_id: {created_run_id}
+  status_event: "finish"
+```
+
+**This step is MANDATORY** — it provides the final statistics to TMS and closes the run.
+
+---
+
+### Step 5: Final Summary
+
+After cleanup and run finished:
 
 1. List execution summary:
    - Total cases: N
@@ -283,18 +299,21 @@ After all test cases executed:
 
 ---
 
-### Step 5: Post-Condition Cleanup (MANDATORY)
+### Step 6: Post-Condition Cleanup (MANDATORY)
 
-**CRITICAL**: After test execution session ends, clean up ALL temporary artifacts:
+**CRITICAL**: Cleanup MUST happen BEFORE providing final summary — all artifacts must be removed from the working directory before showing the finish result to user.
 
 **Clean up in this order:**
 1. **Close browser session** — ensure all Playwright/browser processes terminated
 2. **Remove temporary scripts** — any `.js`, `.ts`, `.playwright.js` files created during session
 3. **Remove browser cache files** — `.cache/` if created in working directory
 4. **Remove HAR files** — any `.har` network logs saved during session
+5. **Remove only created by durring test session script files** — if created by Playwright
 
 **What to KEEP:**
-- Screenshots saved to `screens/testomatio-screenshots/` — these are project data
+- `screens/` folder and all screenshots — these are project data, never delete them
+
+**IMPORTANT**: After cleanup is complete AND run is finished via MCP, THEN provide final summary to user. Do NOT provide final summary while temp files still exist in the working directory.
 
 ## Error Handling
 
@@ -310,9 +329,9 @@ After all test cases executed:
 Before attempting recovery or continuing:
 ```
 1. Close browser session
-2. Remove any temp scripts created
-3. Remove playwright/ folder if created
+2. Remove any scripts, temp files created during session
 ```
+**Then** attempt recovery or inform user.
 
 ### Hard Fail
 
@@ -331,6 +350,7 @@ Before attempting recovery or continuing:
 | List tests | `tests_list` | `tql` filter |
 | Search tests | `tests_search` | `search_text` |
 | Update test result | `testruns_update` | `run_id`, `test_id`, `status`, `comment` |
+| Finish test run | `runs_update` | `run_id`, `status_event: "finish"` |
 | List suites | `suites_list` | for grouping |
 
 ---
@@ -342,6 +362,7 @@ Before attempting recovery or continuing:
 | Check MCP status | Read config files | See Step 0 |
 | Create manual run | `runs_create` | Only if MCP available |
 | Update test result | `testruns_update` | Only if MCP available |
+| Finish test run | `runs_update` with `status_event: "finish"` | Only if MCP available — MANDATORY |
 | Get test details | `tests_get` | Only if MCP available |
 | Search TMS tests | `tests_search` | Only if MCP available |
 
