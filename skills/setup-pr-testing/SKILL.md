@@ -1,6 +1,6 @@
 ---
 name: setup-pr-testing
-description: Set up CI so pull requests drive selective testing with Testomat.io. When a PR opens, a test run scoped to its changes is created for testers. The affected automated tests launch after a preview deploy or on merge. Use when the user wants to integrate Testomat.io runs into a CI pipeline, create test runs per pull request, or trigger affected tests from CI events.
+description: Set up CI so every pull request gets a Testomat.io run scoped to the code it changes. When a PR opens, testers get that run immediately; the affected automated tests launch after a preview deploy or on merge. Use when the user wants to integrate Testomat.io runs into a CI pipeline, create test runs per pull request, or trigger affected tests from CI events.
 license: MIT
 metadata:
   author: Testomat.io
@@ -69,7 +69,8 @@ The valuable knowledge here is the flow model and the decisions to confirm with 
 - Preview launches gate on the deploy-finished signal, never on the push.
 - Launch jobs never block a PR and never fail a merge/release pipeline.
 - PR comments come from the reporter's own pipes — never script a PR-comment API call.
-- Every run gets a PR-based title and a rungroup.
+- The run title is the PR's own title, carried verbatim from the CI's PR-title variable, with the PR number in front. Never append words of your own — no "selective tests", no "affected tests", no framework or scope labels.
+- Every run gets that title and a rungroup.
 
 ## Workflow
 
@@ -133,6 +134,7 @@ Write the jobs in the CI's own syntax; take every command and env var from `run-
 **(a) PR opened → create the run.**
 
 - Use `start` with the coverage filter; pick the run kind matching the project's tests.
+- Set `TESTOMATIO_TITLE` from the CI's PR-number and PR-title variables and nothing else, so the run reads as the PR it belongs to; the same expression goes into every later job that matches the run by title.
 - Set `TESTOMATIO_DESCRIPTION` to a direct link to the PR when the CI exposes its URL.
 - Provide the platform's comment-pipe token on this job too — `start` posts a pending PR comment with the planned tests (tokens per platform in `run-tests-with-testomatio-reporter`).
 - Persist the printed run id with the CI's native value-passing mechanism (artifact, variable, output); fallback is shared-run title matching.
@@ -172,7 +174,7 @@ Prove the pipeline's commands work before the CI ever runs them — by running t
 
 - ❓ Ask the user for a real PR to validate with — open or already merged — and for approval to create real runs.
 - Reproduce the pipeline's diff locally: open PR → check out its branch and diff against the target branch; merged PR → check out the merge commit and diff against the pre-merge tip.
-- Create the run exactly as phase (a) does — same kind, same filter — with a title that marks it as a battle-test.
+- Create the run exactly as phase (a) does — same kind, same filter, and the title that PR's own title yields.
 - Open PR → stop here: the run stays scheduled, nothing executes.
 - Merged PR → the change is already in mainline, so launching is safe: run the phase (c) launch against the created run.
 - Report every run created — id, kind, and the tests it scoped — and ask the user to review it in Testomat.io: does the scope match what that diff should affect?
