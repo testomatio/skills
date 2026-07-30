@@ -33,7 +33,7 @@ flowchart LR
    MCP -->|yes| TMS[Create test run<br/>in TMS]
    MCP -->|no| LOCAL[Work locally<br/>no TMS updates]
    TMS --> BROWSER{Browser<br/>automation?}
-   LOCAL --> BROWSER
+   LOCAL --> BROWSER agent tools
    BROWSER -->|Playwright MCP| FULL[Full automation — navigate,<br/>verify, screenshot, update TMS]
    BROWSER -->|CLI only| GUIDED[Guided mode — you describe actions,<br/>I take screenshots]
    BROWSER -->|none| GUIDE[Guide only — I parse cases,<br/>you perform steps manually]
@@ -44,11 +44,7 @@ flowchart LR
    STATUS --> SUMMARY[Final summary<br/>+ screenshot paths]
 ```
 
-- **MCP + browser tools** → ONLY available AI agent browser for interaction + MCP workflow: create run via `runs_create`, automate all verifications via MCP browser tools, update statuses via `testruns_update`, finish run via `runs_update` with `status_event: "finish"`.
-- **MCP + Playwright MCP** → ONLY MCP workflow: create run via `runs_create`, automate all verifications via MCP browser tools, update statuses via `testruns_update`, finish run via `runs_update` with `status_event: "finish"`. **NEVER add API/helper script workflow when MCP is available.**
-- **MCP only** → execute from `.md` file, take screenshots, update TMS via MCP tools
-- **No MCP** → guide through execution, user sets statuses manually in TMS
-- **No browser tools** → parse test cases, describe steps, user performs everything manually
+---
 
 ### Step 0.1: MCP Availability Check (Preparation)
 
@@ -81,7 +77,10 @@ Before starting, check if Testomat.io MCP is configured:
 
 Before starting test execution, verify browser automation tools are available:
 
-1. **Check for Playwright MCP** (if configured via MCP):
+1.1 **Check for AI browser available tools**:
+   - Try `browser_navigate` — if it responds, browser is working
+
+1.2 **Check for Playwright MCP** (if configured via MCP):
    - Try `browser_navigate` or `browser_evaluate` — if it responds, browser MCP is working
    - If timeout/error → browser MCP not available
 
@@ -310,9 +309,6 @@ After cleanup and run finished:
 4. **Remove HAR files** — any `.har` network logs saved during session
 5. **Remove only created by durring test session script files** — if created by Playwright
 
-**What to KEEP:**
-- `screens/` folder and all screenshots — these are project data, never delete them
-
 **IMPORTANT**: After cleanup is complete AND run is finished via MCP, THEN provide final summary to user. Do NOT provide final summary while temp files still exist in the working directory.
 
 ## Error Handling
@@ -352,19 +348,6 @@ Before attempting recovery or continuing:
 | Update test result | `testruns_update` | `run_id`, `test_id`, `status`, `comment` |
 | Finish test run | `runs_update` | `run_id`, `status_event: "finish"` |
 | List suites | `suites_list` | for grouping |
-
----
-
-## Quick Commands
-
-| Action | MCP Tool | Notes |
-|--------|----------|-------|
-| Check MCP status | Read config files | See Step 0 |
-| Create manual run | `runs_create` | Only if MCP available |
-| Update test result | `testruns_update` | Only if MCP available |
-| Finish test run | `runs_update` with `status_event: "finish"` | Only if MCP available — MANDATORY |
-| Get test details | `tests_get` | Only if MCP available |
-| Search TMS tests | `tests_search` | Only if MCP available |
 
 ---
 
