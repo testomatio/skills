@@ -45,6 +45,7 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 | Skill            | Description                                                                                          |
 | ---------------- | ---------------------------------------------------------------------------------------------------- |
 | `qa-e2e-tests-reporting` | Set up Testomat.io test reporting for your automation framework (Playwright, CodeceptJS, Jest, etc.) |
+| `qa-data-seeder` | Analyze a feature's implementation and seed a balanced test dataset (regular + edge cases) into a target environment |
 
 ### Explorbot
 
@@ -110,7 +111,7 @@ Skills are also bundled as [Claude Code plugins](https://docs.testomat.io) via t
 | ----------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | `qa-process`      | `qa-lead-strategy-advisor`, `qa-thinking`, `testing-workflow`        | Assess QA maturity, prioritize a quality roadmap, and orchestrate the test lifecycle |
 | `test-management` | `qa-write-test-cases`, `improve-test-cases`, `sync-test-cases-with-tms`, coverage & more | Manage the test case lifecycle: generate, improve, sync to Testomat.io          |
-| `test-automation` | `automate-manual-test-cases`, `debug-fix-failed-flaky-autotests`     | Create automated tests and heal failing/flaky autotests                         |
+| `test-automation` | `automate-manual-test-cases`, `debug-fix-failed-flaky-autotests`, `qa-data-seeder` | Create automated tests, heal failing/flaky autotests, and seed test data        |
 | `explorbot`       | `explorbot-setup`, `explorbot-fundamentals`, `explorbot-plan`        | Install, configure, run, debug and plan Explorbot autonomous AI web tests       |
 
 ## Links
