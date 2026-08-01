@@ -16,7 +16,7 @@ Input: a feature description, or risk scenarios from a prior QA analysis.
 
 Default layers, bottom to top:
 
-- **unit + integration** — one layer, never split
+- **unit + integration**
 - **e2e**
 - **manual**
 
