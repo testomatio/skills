@@ -14,7 +14,7 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 | `scan-automation-project`            | Scan source code to inventory languages, frameworks, and existing tests           |
 | `pull-request-diff-analyzer`         | Analyze a PR/branch diff to detect features/fixes and extract acceptance criteria |
 | `qa-thinking`                        | Analyze a feature as QA — edge cases, negative flows, abuses, risk scenarios      |
-| `qa-test-plan`                       | Build a testing plan — assign scenarios to unit/e2e/manual, coverage split        |
+| `qa-split-testing-levels-pyramid`    | Apply the test pyramid — assign scenarios to testing levels, coverage split       |
 | `qa-write-test-cases`                | Generate new test cases and checklists from requirements                          |
 | `improve-test-cases`                 | Improve existing test cases quality                                               |
 | `detect-duplicate-test-cases`        | Find duplicate, near-duplicate, and overlapping test cases                        |
@@ -57,16 +57,16 @@ User: asks "what could go wrong?", "what am I missing?", or "review this as QA"
 Use `qa-thinking` skill to surface edge cases, negative flows, abuses and risk scenarios
 =>
 After analysis fully completed, suggest next actions:
-1. 🧪 Build a testing plan for the scenarios (with `qa-test-plan` skill)
+1. 🧪 Split the scenarios across testing levels (with `qa-split-testing-levels-pyramid` skill)
 2. 📝 Generate test cases from the scenarios (with `qa-write-test-cases` skill)
 ```
 
-### Test Plan Flow
+### Testing Levels Flow
 
 ```
-User: asks "how should we test this?", "unit or e2e?", or wants a test plan / coverage split
+User: asks "how should we test this?", "unit, integration or e2e?", or wants a coverage split
 =>
-Use `qa-test-plan` skill to inventory existing tests and assign scenarios to unit/e2e/manual
+Use `qa-split-testing-levels-pyramid` skill to inventory existing tests, discover the project's testing levels and assign each scenario to a level
 =>
 After the plan fully completed, suggest next actions:
 1. 📝 Write manual test cases or a checklist (with `qa-write-test-cases` skill)

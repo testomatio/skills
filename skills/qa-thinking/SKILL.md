@@ -30,6 +30,6 @@ For a PR, gather intent with the `qa-pr-requirements-analyzer` skill first.
 
 Offer after the analysis:
 
-- Build a testing plan for the scenarios → `qa-test-plan` skill.
+- Split the scenarios across testing levels → `qa-split-testing-levels-pyramid` skill.
 - Turn scenarios into test cases or a checklist → `qa-write-test-cases` skill.
 - Ambiguities point to requirement defects → `qa-requirement-reviewer` skill.
