@@ -1,13 +1,13 @@
 ---
-name: qa-test-plan
-description: Decide how a feature should be tested — what to cover with unit tests, e2e tests, and manual checks — and produce a testing plan. Use when asked "how should we test this?", "unit or e2e?", "what test coverage do we need?", or for a test plan for a feature.
+name: qa-split-testing-levels
+description: Apply the testing pyramid to a feature — divide test scenarios across levels (unit, integration, e2e), assign each scenario to the cheapest sufficient level, and produce a coverage split per level. Use when asked "unit, integration or e2e?", "what level should this test be?", "how should we test this feature?", "what test coverage do we need?", or to apply the test pyramid to a feature or project.
 license: MIT
 metadata:
   author: Testomat.io
   version: 1.0.0
 ---
 
-# QA Test Plan
+# QA Split Testing Levels
 
 Builds a testing plan for a feature: which scenarios go to unit, e2e, and manual testing.
 Input: a feature description, or risk scenarios from a prior QA analysis.
