@@ -31,7 +31,8 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 | Skill                  | Description                                                                                          |
 | ---------------------- | ---------------------------------------------------------------------------------------------------- |
 | `qa-write-test-cases`       | Generate test cases and checklists from requirements, tickets, or feature descriptions               |
-| `qa-thinking`          | Analyze a feature from a QA perspective — edge cases, negative flows, abuses, unobvious scenarios — and propose acceptance criteria |
+| `qa-thinking`          | Analyze a feature from a QA perspective — edge cases, negative flows, abuses, unobvious scenarios |
+| `qa-split-testing-levels-pyramid` | Apply the test pyramid to a feature — assign scenarios to testing levels, coverage split per level |
 | `improve-test-cases`   | Analyze and improve existing markdown test cases for clarity                                         |
 | `detect-duplicate-test-cases` | Find duplicate, near-duplicate, and overlapping test cases                                           |
 | `sync-test-cases-with-tms`           | Synchronize Markdown test scenarios between local project and Testomat.io                            |
