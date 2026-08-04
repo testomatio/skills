@@ -22,6 +22,7 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 | `automate-manual-test-cases`         | Convert manual test cases into automated test scripts (write new autotests)       |
 | `debug-fix-failed-flaky-autotests`   | Diagnose and fix failing or flaky autotests (heal autotests)                      |
 | `qa-test-code-coverage`              | Map manual & automated tests to source files (`coverage.tests.yml`)               |
+| `setup-ci-automation`                | Investigate a project's CI and deploy automated QA workflows into it              |
 | `setup-pr-testing`                   | Set up CI so PRs create scoped runs and launch affected automated tests           |
 | `run-tests-with-testomatio-reporter` | Create/launch test runs via the reporter CLI (manual, mixed, remote)              |
 | `testomatio-mcp`                     | Analyze runs, cluster failures, investigate root causes via Testomat.io MCP       |
@@ -134,6 +135,18 @@ After mapping fully completed, suggest next actions:
 2. 🏃 Run the affected tests now from the terminal (with `run-tests-with-testomatio-reporter` skill)
 3. 🔧 Add Testomat.io reporter so `--filter "coverage:..."` runs work (with `qa-e2e-tests-reporting` skill)
 4. 📊 Analyze affected runs and failures (with `testomatio-mcp` skill)
+```
+
+### CI Automation Flow
+
+```
+User: asks what their CI does, wants a CI workflow explained, or wants a QA task to run automatically in CI
+=>
+Use `setup-ci-automation` skill to investigate the CI and deploy the automated workflow
+=>
+After setup fully completed, suggest next actions:
+1. 🔁 Set up PR-scoped test runs in the same CI (with `setup-pr-testing` skill)
+2. 🗺️ Map tests to source files for change-aware runs (with `qa-test-code-coverage` skill)
 ```
 
 ### CI PR Testing Flow
