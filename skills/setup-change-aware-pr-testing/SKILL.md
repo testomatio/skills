@@ -1,15 +1,15 @@
 ---
-name: setup-pr-testing
-description: Set up CI so every pull request gets a Testomat.io run scoped to the code it changes. When a PR opens, testers get that run immediately; the affected automated tests launch after a preview deploy or on merge. Use when the user wants to integrate Testomat.io runs into a CI pipeline, create test runs per pull request, or trigger affected tests from CI events.
+name: setup-change-aware-pr-testing
+description: Set up CI so every pull request gets a Testomat.io run scoped to the code it changes. When a PR opens, testers get that run immediately; the affected automated tests launch after a preview deploy or on merge. Use when the user wants to integrate Testomat.io runs into a CI pipeline, create test runs per pull request, or set up change-aware testing that triggers affected tests from CI events.
 license: MIT
 metadata:
   author: Testomat.io
-  version: 3.0.0
+  version: 4.0.0
 ---
 
-# Setup PR Testing
+# Setup Change-Aware PR Testing
 
-I set up a project's CI for PR-driven testing. The knowledge here is the flow model and the decisions to confirm with the user; what gets wired depends on the project's tests:
+I set up a project's CI for change-aware PR testing. The knowledge here is the flow model and the decisions to confirm with the user; what gets wired depends on the project's tests:
 
 - manual — testers get a run to start on Testomat.io the moment the PR opens; nothing to execute.
 - automated — an execution mode must be chosen: inline in the pipeline, a Testomat.io CI profile, or another workflow/repo.
@@ -62,7 +62,8 @@ A coverage map maps source files/globs to test identifiers; the reporter filters
 - Avoid presenting the project's full test inventory as the run scope; never print full test lists.
 - No coverage map → no pipeline; delegate map creation to `qa-test-code-coverage`.
 - The PR-open job creates the run and executes nothing.
-- Preview launches gate on the deploy-finished signal, never on the push.
+- A launch targeting a deployed environment waits for that deployment to finish — gate on the deploy-finished signal, never on the push or the merge event alone.
+- The run id persisted at creation is the only link between phases — every launch targets it; never wire shared-run title matching.
 - PR comments come from the reporter's own pipes — never script a PR-comment API call.
 - The run title is the PR's own title, carried verbatim from the CI's PR-title variable, with the PR number in front. Never append words of your own — no "selective tests", no "affected tests", no framework or scope labels.
 - Every run gets that title and a rungroup.
@@ -129,16 +130,17 @@ Author the jobs following `setup-ci-automation`'s workflow-authoring rules; take
 **(a) PR opened → create the run.**
 
 - Use `start` with the coverage filter; pick the run kind matching the project's tests.
-- Set `TESTOMATIO_TITLE` from the CI's PR-number and PR-title variables and nothing else, so the run reads as the PR it belongs to; the same expression goes into every later job that matches the run by title.
+- Set `TESTOMATIO_TITLE` from the CI's PR-number and PR-title variables and nothing else, so the run reads as the PR it belongs to.
 - Set `TESTOMATIO_DESCRIPTION` to a direct link to the PR when the CI exposes its URL.
 - Provide the platform's comment-pipe token on this job too — `start` posts a pending PR comment with the planned tests (tokens per platform in `run-tests-with-testomatio-reporter`).
-- Persist the printed run id with the CI's native value-passing mechanism (artifact, variable, output); fallback is shared-run title matching.
+- Persist the printed run id with the CI's native value-passing mechanism (artifact, variable, output) — every launch phase reads it; never set up shared-run title matching.
 - Run once per PR (on open); pushes to the PR don't recreate runs.
 - A PR touching no mapped tests is normal — pass `--warn` so `start` exits 0 and the job stays green; never parse the output.
 
 **(b) Preview deployed → launch against the preview** (only when Step 2 confirmed previews).
 
-- Trigger on the deploy-finished signal, never on the push.
+- Trigger on the deploy-finished signal and only when it reports success — never on the push.
+- Launch into the persisted run id, so results land in the PR's run.
 - Remote mode forwards the preview URL as a remote param; inline mode points the runner's own base-URL env at it.
 - Manual cases need no launch — testers work through them against the preview by hand.
 
@@ -146,7 +148,8 @@ Author the jobs following `setup-ci-automation`'s workflow-authoring rules; take
 
 - Pin the job to the exact revision this PR landed on the mainline and diff against the mainline state just before it — the branch tip moves as later merges or rebases land.
 - Target the persisted run id; pass a fresh coverage filter with the post-merge diff base so the final merged diff decides what runs.
-- Cross-repo mode: trigger the e2e repo's pipeline with the CI's native mechanism, passing the run id, API key, and title env into it.
+- Step 2 chose a deploy gate → launch only after that staging/production deploy finishes, on its own observable signal.
+- Cross-repo mode: trigger the e2e repo's pipeline with the CI's native mechanism, passing the run id and API key into it.
 
 ### Step 5 — Deliver: secrets and the PR
 
@@ -170,7 +173,7 @@ Prove the pipeline's commands work before the CI ever runs them — by running t
 
 ### Step 7 — Summarize and hand off
 
-Present the approved flow diagram once more, now marked as wired. Report: the CI targeted and files written; which phases are wired and which were skipped (no previews / no e2e / no Testomat.io CI profile); the chosen execution mode; title scheme and rungroup; how the launch steps find the prepared run (run id carrier or shared title); the battle-test outcome and the runs awaiting the user's review; secrets and prerequisites still to provision; assumptions to confirm. Recommend committing the coverage map alongside the CI config.
+Present the approved flow diagram once more, now marked as wired. Report: the CI targeted and files written; which phases are wired and which were skipped (no previews / no e2e / no Testomat.io CI profile); the chosen execution mode; title scheme and rungroup; the run-id carrier the launch steps read; the battle-test outcome and the runs awaiting the user's review; secrets and prerequisites still to provision; assumptions to confirm. Recommend committing the coverage map alongside the CI config.
 
 ## Examples
 

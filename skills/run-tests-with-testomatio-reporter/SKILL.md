@@ -149,4 +149,4 @@ No pipe for the platform (e.g. Azure DevOps) → no comment; results remain visi
 
 ## Related skills
 
-`qa-test-code-coverage` (creates the coverage map the `coverage:` filter needs), `setup-pr-testing` (wires these commands into a CI pipeline), `qa-e2e-tests-reporting` (install and configure the reporter in an automation project).
+`qa-test-code-coverage` (creates the coverage map the `coverage:` filter needs), `setup-change-aware-pr-testing` (wires these commands into a CI pipeline), `qa-e2e-tests-reporting` (install and configure the reporter in an automation project).

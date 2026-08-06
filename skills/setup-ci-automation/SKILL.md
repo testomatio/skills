@@ -68,9 +68,9 @@ Tasks worth wiring to CI events — the named skill owns each task's content:
 | ------------- | ----------------------------------------------------------- | ---------------------------------------------------- |
 | PR opened     | Generate test cases from the PR diff                        | `pull-request-diff-analyzer` + `qa-write-test-cases` |
 | Issue opened  | QA-analyze the feature — edge cases, acceptance criteria    | `qa-thinking`                                        |
-| PR opened     | Create a scoped test run, launch affected tests             | `setup-pr-testing`                                   |
+| PR opened     | Create a scoped test run, launch affected tests             | `setup-change-aware-pr-testing`                      |
 | Schedule      | Detect duplicate or overlapping test cases                  | `detect-duplicate-test-cases`                        |
 
 ## Related skills
 
-`setup-pr-testing` (the coverage-driven PR testing workflow built on this skill), `run-tests-with-testomatio-reporter` (reporter commands for run-related jobs), `testing-workflow` (routes QA tasks to the skills that own them).
+`setup-change-aware-pr-testing` (the coverage-driven PR testing workflow built on this skill), `run-tests-with-testomatio-reporter` (reporter commands for run-related jobs), `testing-workflow` (routes QA tasks to the skills that own them).

@@ -23,7 +23,7 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 | `debug-fix-failed-flaky-autotests`   | Diagnose and fix failing or flaky autotests (heal autotests)                      |
 | `qa-test-code-coverage`              | Map manual & automated tests to source files (`coverage.tests.yml`)               |
 | `setup-ci-automation`                | Investigate a project's CI and deploy automated QA workflows into it              |
-| `setup-pr-testing`                   | Set up CI so PRs create scoped runs and launch affected automated tests           |
+| `setup-change-aware-pr-testing`      | Set up CI so PRs create scoped runs and launch affected automated tests           |
 | `run-tests-with-testomatio-reporter` | Create/launch test runs via the reporter CLI (manual, mixed, remote)              |
 | `testomatio-mcp`                     | Analyze runs, cluster failures, investigate root causes via Testomat.io MCP       |
 
@@ -131,7 +131,7 @@ User: asks to run only affected tests, build a traceability matrix, or set up ch
 Use `qa-test-code-coverage` to generate the coverage mapping file (manual & automated tests)
 =>
 After mapping fully completed, suggest next actions:
-1. 🔁 Wire the coverage map into the CI PR pipeline (with `setup-pr-testing` skill)
+1. 🔁 Wire the coverage map into the CI PR pipeline (with `setup-change-aware-pr-testing` skill)
 2. 🏃 Run the affected tests now from the terminal (with `run-tests-with-testomatio-reporter` skill)
 3. 🔧 Add Testomat.io reporter so `--filter "coverage:..."` runs work (with `qa-e2e-tests-reporting` skill)
 4. 📊 Analyze affected runs and failures (with `testomatio-mcp` skill)
@@ -145,7 +145,7 @@ User: asks what their CI does, wants a CI workflow explained, or wants a QA task
 Use `setup-ci-automation` skill to investigate the CI and deploy the automated workflow
 =>
 After setup fully completed, suggest next actions:
-1. 🔁 Set up PR-scoped test runs in the same CI (with `setup-pr-testing` skill)
+1. 🔁 Set up PR-scoped test runs in the same CI (with `setup-change-aware-pr-testing` skill)
 2. 🗺️ Map tests to source files for change-aware runs (with `qa-test-code-coverage` skill)
 ```
 
@@ -154,7 +154,7 @@ After setup fully completed, suggest next actions:
 ```
 User: asks to integrate testing into CI/PR pipeline, create runs per PR, or launch affected tests on preview/merge
 =>
-Use `setup-pr-testing` skill to wire run creation and launches into the project's CI
+Use `setup-change-aware-pr-testing` skill to wire run creation and launches into the project's CI
 =>
 After setup fully completed, suggest next actions:
 1. 🗺️ Regenerate or extend the coverage map (with `qa-test-code-coverage` skill)
@@ -170,7 +170,7 @@ Use `run-tests-with-testomatio-reporter` skill for the run commands (manual, mix
 =>
 After the run fully completed, suggest next actions:
 1. 📊 Analyze run results and failures (with `testomatio-mcp` skill)
-2. 🔁 Wire these runs into the CI pipeline (with `setup-pr-testing` skill)
+2. 🔁 Wire these runs into the CI pipeline (with `setup-change-aware-pr-testing` skill)
 ```
 
 ### Run Analysis / Failure Investigation Flow
