@@ -38,7 +38,8 @@ One or two sentences on what the skill does.
 
 - Prefer bullet points over prose. Bullets are easier to maintain.
 - Short sentences. One idea per line.
-- Bold only for constraints the agent must not miss. No formatting for formatting's sake.
+- One line per rule — "avoid X" is enough; don't elaborate edge cases that may never happen.
+- Bold 2–3 critical points per skill, no more — when half the lines are bold, none stand out.
 - Emoji only inside user-facing output templates.
 - No decorative `---` separators — headings already divide sections.
 
@@ -60,6 +61,7 @@ Smart models don't need to be taught how to fly. Do not write:
 - communication coaching ("be concise", "show a summary", "use tables")
 - examples that re-narrate the workflow
 - generic testing/QA wisdom
+- deep dives into rare edge cases — one terse line covers them
 
 ## Real pitfalls worth stating
 
