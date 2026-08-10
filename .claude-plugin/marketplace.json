@@ -20,7 +20,7 @@
     {
       "name": "explorbot",
       "source": "./plugins/explorbot",
-      "description": "Adds /explorbot-setup, /explorbot-fundamentals and /explorbot-plan skills to install, configure, run, debug and plan Explorbot autonomous AI web tests"
+      "description": "Adds /explorbot-setup, /explorbot-api-setup, /explorbot-fundamentals and /explorbot-plan skills to install, configure, run, debug and plan Explorbot autonomous AI web and API tests"
     }
   ]
 }
