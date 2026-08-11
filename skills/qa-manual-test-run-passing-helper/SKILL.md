@@ -9,8 +9,6 @@ metadata:
 
 # QA-MANUAL-TEST-RUN-PASSING-HELPER SKILL: What I Do
 
-This skill helps QA engineers execute manual test cases by browser interactions where possible and requesting human assistance only for complex or ambiguous steps. It creates a test run in TMS (if applicable), executes test cases one-by-one via browser automation, updates results in real-time, and collects screenshots.
-
 ## Workflow: Manual Test Case Execution
 
 ## Possible flows
@@ -42,7 +40,11 @@ Check if Testomat.io MCP is available. If configured, use it for TMS operations.
 Alternatively, I can help with local test execution from .md files and screenshots only."
 ```
 
-Skip TMS-specific steps if MCP unavailable.
+Skip TMS-specific steps if MCP unavailable:
+- Step 1 (Source A): `tests_list`, `tests_search`, `tests_get` — fetch test cases from TMS
+- Step 2: `runs_create` — create test run in TMS
+- Step 3.5: `testruns_update` — post test result to TMS
+- Step 4: `runs_update` with `status_event: "finish"` — finish run in TMS
 
 ---
 
@@ -110,19 +112,9 @@ Use test case steps to determine navigation:
 
 For each step in the test case:
 
-**EASY (automate directly):**
-- Verify text content is present on page
-- Verify UI element exists (button, input, link)
-- Verify color, size, basic styling (via computed styles)
-- Verify page loads without errors
-- Verify modal/dropdown opens correctly
+**EASY (automate directly):** UI checks, text presence, element visibility, modal/dropdown behavior.
 
-**HARD (ask user for help):**
-- Login credentials (username/password)
-- 2FA or CAPTCHA
-- Complex business logic validation
-- Anything requiring human judgment
-- Navigation to ambiguous/unclear pages
+**HARD (ask user for help):** Login, 2FA/CAPTCHA, complex validations, ambiguous navigation.
 
 **When asking for help:**
 ```
@@ -240,16 +232,6 @@ After cleanup and run finished:
 
 > Provide final summary only after cleanup is complete.
 
-## Error Handling
-
-On failure: close browser, remove temp files, then attempt recovery or inform user.
-
-**Hard Fail conditions:**
-- Invalid test case format (cannot parse)
-- MCP authentication failed (continue without TMS features)
-- All test cases blocked (no progress possible)
-
-> Inform user if we have such kind of issues without extra attempts.
 ---
 
 ## MCP Tools Reference
