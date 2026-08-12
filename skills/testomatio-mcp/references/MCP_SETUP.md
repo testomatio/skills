@@ -140,6 +140,7 @@ Supported operators: `==`, `!=`, `>`, `<`, `>=`, `<=`, `in [...]`, `%` (contains
 - `state == 'automated'`
 - `suite % 'Checkout'`
 - `tag IN ['@smoke', '@regression']`
+- `label == 'regression:yes'` (scoped / `key:value` label)
 
 **Runs:**
 - `title % 'Manual tests'`
@@ -166,4 +167,11 @@ Or in MCP client config, pass `NODE_OPTIONS` in the server `env` block.
 - **Run status transitions** use `runs_update` with `status_event` values: `finish`, `finish_manual`, `launch`, `rerun`, `scheduled`, `terminate`.
 - **Search** for tests and runs uses `tql` as the single filter input; no dedicated `/search` endpoints.
 - **Issue linking** supports scoped helpers: `tests_issues_link/unlink`, `suites_issues_link/unlink`, `runs_issues_link/unlink`.
+- **Linking labels, tags, milestones, issues** to an entity (test, suite, run, plan, step, snippet) uses the `link` array on `*_create` / `*_update`. Each entry is `{ "action": "add"|"remove", "type": "label"|"custom_field"|"tag"|"milestone"|"issue"|"jira", "value": "<title or Key:Value>" }` (suites also accept `requirement`). `label` and `custom_field` are interchangeable on the backend; pass the full `Key:Value` string as `value` for custom fields. Swap a value in one call by combining `remove` and `add`:
+  ```json
+  "link": [
+    { "action": "remove", "type": "label", "value": "regression:no" },
+    { "action": "add", "type": "label", "value": "regression:yes" }
+  ]
+  ```
 - **API Sessions** are automatically managed by the MCP server: a session starts before the first mutating request and stops when the server shuts down.

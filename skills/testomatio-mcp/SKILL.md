@@ -26,7 +26,7 @@ Set up access to Testomat.io via MCP and run QA analysis workflows: run analysis
 - Run: `runs_list`, `runs_get`, `runs_search`
 - Testrun (results within a run): `testruns_list`, `testruns_get`
 - Suite: `suites_list`, `suites_get`, `suites_search`
-- Label: `labels_list`, `labels_get`
+- Label: `labels_list`, `labels_get`, `labels_create`, `labels_update`, `labels_delete`. Labels may be scoped (`key:value`). Attach or swap them on entities via the `link` parameter — [MCP Setup Reference](./references/MCP_SETUP.md).
 - Tag: `tags_list`, `tags_get`, `tags_search`
 
 **CRUD tools (create, update, delete) exist for all entities. Use them only when explicitly needed for targeted updates.**
@@ -169,6 +169,16 @@ Goal: turn recurring failures into trackable defects.
    - if a Jira MCP is available, offer to create the ticket via the Jira skill
 3. After defect creation, call `tests_issues_link` for each affected test to link it to the defect.
 
+### Workflow 5: Update Labels & Tags on Tests
+
+Goal: set, change, or remove labels and tags on tests — for example, update a status label that drives a dashboard chart.
+
+1. Call `labels_list` (or `project_info`) to read the exact label values that exist in the project, including the full `key:value` form of scoped labels. Do not guess label strings.
+2. Optionally find the tests to update with `tests_list` + TQL: `label == 'regression:yes'`.
+3. Update with `tests_update` (or `tests_create`) using the `link` array — one `{ action, type, value }` entry per change. To change a value (e.g. `regression:no` → `regression:yes`), send a `remove` and an `add` in the same call. The same shape works for `tag`, `custom_field`, `milestone`, `issue`, and `jira`.
+
+Link format and a full swap example: [MCP Setup Reference](./references/MCP_SETUP.md).
+
 ## Quick Commands
 
 | Action              | MCP Tool        | Key Parameters |
@@ -179,4 +189,7 @@ Goal: turn recurring failures into trackable defects.
 | Get test details    | `tests_get`     | `test_id` |
 | Get plan details    | `plans_get`     | `plan_id` |
 | Link issue to test  | `tests_issues_link` | `test_id`, `url` or `jira_id` |
+| List labels         | `labels_list`   | `page`, `per_page` |
+| Set / swap label on test | `tests_update` | `test_id`, `link` |
+| Find tests by label | `tests_list`    | `tql: label == '...'` |
 | Check server status | `system_ping`   | none |
