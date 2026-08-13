@@ -13,7 +13,8 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 | ------------------------------------ | --------------------------------------------------------------------------------- |
 | `scan-automation-project`            | Scan source code to inventory languages, frameworks, and existing tests           |
 | `pull-request-diff-analyzer`         | Analyze a PR/branch diff to detect features/fixes and extract acceptance criteria |
-| `qa-thinking`                        | Analyze a feature as QA — edge cases, negative flows, abuses, acceptance criteria |
+| `qa-thinking`                        | Analyze a feature as QA — edge cases, negative flows, abuses, risk scenarios      |
+| `qa-split-testing-levels-pyramid`    | Apply the test pyramid — assign scenarios to testing levels, coverage split       |
 | `qa-write-test-cases`                | Generate new test cases and checklists from requirements                          |
 | `improve-test-cases`                 | Improve existing test cases quality                                               |
 | `detect-duplicate-test-cases`        | Find duplicate, near-duplicate, and overlapping test cases                        |
@@ -22,6 +23,9 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 | `automate-manual-test-cases`         | Convert manual test cases into automated test scripts (write new autotests)       |
 | `debug-fix-failed-flaky-autotests`   | Diagnose and fix failing or flaky autotests (heal autotests)                      |
 | `qa-test-code-coverage`              | Map manual & automated tests to source files (`coverage.tests.yml`)               |
+| `setup-ci-automation`                | Investigate a project's CI and deploy automated QA workflows into it              |
+| `setup-change-aware-pr-testing`      | Set up CI so PRs create scoped runs and launch affected automated tests           |
+| `run-tests-with-testomatio-reporter` | Create/launch test runs via the reporter CLI (manual, mixed, remote)              |
 | `testomatio-mcp`                     | Analyze runs, cluster failures, investigate root causes via Testomat.io MCP       |
 
 ## Routing
@@ -48,15 +52,29 @@ After generation fully completed, suggest next actions:
 5. 🎭 Generate specific test cases using `qa-write-test-cases` skill and role name
 ```
 
-### QA Analysis / Acceptance Criteria Flow
+### QA Analysis Flow
 
 ```
-User: asks "what could go wrong?", "what am I missing?", "review this as QA", or wants acceptance criteria before tests exist
+User: asks "what could go wrong?", "what am I missing?", or "review this as QA"
 =>
-Use `qa-thinking` skill to surface edge cases, negative flows, abuses and propose acceptance criteria
+Use `qa-thinking` skill to surface edge cases, negative flows, abuses and risk scenarios
 =>
 After analysis fully completed, suggest next actions:
-1. 📝 Generate test cases from the acceptance criteria (with `qa-write-test-cases` skill)
+1. 🧪 Split the scenarios across testing levels (with `qa-split-testing-levels-pyramid` skill)
+2. 📝 Generate test cases from the scenarios (with `qa-write-test-cases` skill)
+```
+
+### Testing Levels Flow
+
+```
+User: asks "how should we test this?", "unit, integration or e2e?", or wants a coverage split
+=>
+Use `qa-split-testing-levels-pyramid` skill to inventory existing tests, discover the project's testing levels and assign each scenario to a level
+=>
+After the plan fully completed, suggest next actions:
+1. 📝 Write manual test cases or a checklist (with `qa-write-test-cases` skill)
+2. 🤖 Automate manual cases into autotests (with `automate-manual-test-cases` skill)
+3. 🗺️ Map tests to source files for change-aware runs (with `qa-test-code-coverage` skill)
 ```
 
 ### PR / Diff-Driven Testing Flow
@@ -128,8 +146,46 @@ User: asks to run only affected tests, build a traceability matrix, or set up ch
 Use `qa-test-code-coverage` to generate the coverage mapping file (manual & automated tests)
 =>
 After mapping fully completed, suggest next actions:
-1. 🔧 Add Testomat.io reporter so `--filter "coverage:..."` runs work (with `qa-e2e-tests-reporting` skill)
+1. 🔁 Wire the coverage map into the CI PR pipeline (with `setup-change-aware-pr-testing` skill)
+2. 🏃 Run the affected tests now from the terminal (with `run-tests-with-testomatio-reporter` skill)
+3. 🔧 Add Testomat.io reporter so `--filter "coverage:..."` runs work (with `qa-e2e-tests-reporting` skill)
+4. 📊 Analyze affected runs and failures (with `testomatio-mcp` skill)
+```
+
+### CI Automation Flow
+
+```
+User: asks what their CI does, wants a CI workflow explained, or wants a QA task to run automatically in CI
+=>
+Use `setup-ci-automation` skill to investigate the CI and deploy the automated workflow
+=>
+After setup fully completed, suggest next actions:
+1. 🔁 Set up PR-scoped test runs in the same CI (with `setup-change-aware-pr-testing` skill)
+2. 🗺️ Map tests to source files for change-aware runs (with `qa-test-code-coverage` skill)
+```
+
+### CI PR Testing Flow
+
+```
+User: asks to integrate testing into CI/PR pipeline, create runs per PR, or launch affected tests on preview/merge
+=>
+Use `setup-change-aware-pr-testing` skill to wire run creation and launches into the project's CI
+=>
+After setup fully completed, suggest next actions:
+1. 🗺️ Regenerate or extend the coverage map (with `qa-test-code-coverage` skill)
 2. 📊 Analyze affected runs and failures (with `testomatio-mcp` skill)
+```
+
+### Run Tests via Reporter CLI Flow
+
+```
+User: asks to start a test run from the command line, run a scoped group of tests, or launch tests via a Testomat.io CI profile
+=>
+Use `run-tests-with-testomatio-reporter` skill for the run commands (manual, mixed, remote)
+=>
+After the run fully completed, suggest next actions:
+1. 📊 Analyze run results and failures (with `testomatio-mcp` skill)
+2. 🔁 Wire these runs into the CI pipeline (with `setup-change-aware-pr-testing` skill)
 ```
 
 ### Run Analysis / Failure Investigation Flow
