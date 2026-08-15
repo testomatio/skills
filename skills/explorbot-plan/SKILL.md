@@ -1,6 +1,6 @@
 ---
 name: explorbot-plan
-description: Author an Explorbot test plan in markdown so `explorbot test` can run it. Use this skill whenever the user wants to create, write, or hand-author an Explorbot plan/test plan from a feature description, requirements, ticket, or docs — without exploring a live page. Produces a correctly formatted plan `.md` (suite, Prerequisite URL, prioritized scenarios with Steps and verifiable Expected outcomes) that Explorbot's Tester executes.
+description: Use when the user wants to write an Explorbot test plan by hand — from a feature description, requirements, ticket, or docs, without exploring a live page — so `explorbot test` can run it.
 license: MIT
 metadata:
   author: Testomat.io

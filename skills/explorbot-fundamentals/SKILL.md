@@ -1,10 +1,10 @@
 ---
 name: explorbot-fundamentals
-description: Use whenever the user runs, configures, or debugs Explorbot from the command line — choosing freesail/explore/test/plan/research/context, asking what a flag does, asking where a report or plan lives, driving Explorbot from a coding agent, or troubleshooting a failed run. Covers global (`~/.explorbot`), project-local, and `EXPLORBOT_*` env modes and where each writes its artifacts.
+description: Use when running or debugging Explorbot from the command line — which command to run, what a flag does, where results were written, or why a run failed.
 license: MIT
 metadata:
   author: Testomat.io
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # Explorbot Fundamentals
@@ -18,38 +18,31 @@ npx explorbot --help                  # commands, and the EXPLORBOT_* variables
 npx explorbot <command> --help        # flags for one command
 ```
 
-Nothing configured — no `~/.explorbot/config.js`, no project `explorbot.config.js`, no `EXPLORBOT_AI_PROVIDER` — means [[explorbot-setup]].
+If nothing is configured, the CLI says so and names the three ways to fix it → [[explorbot-setup]].
 
-## Which mode is running
+## Docs
 
-Config resolution order, first match wins:
-
-1. Project-local — `explorbot.config.{js,mjs,ts}` in the working directory (also `config/`, `src/config/`). Root: that directory.
-2. Env vars — `EXPLORBOT_AI_PROVIDER` or `EXPLORBOT_AI_MODEL` set. Root: the site dir, or `EXPLORBOT_OUTPUT`.
-3. Global — `~/.explorbot/config.js`. Root: `~/.explorbot/sites/<host>/`.
-
-`~/.explorbot/.env` is read in all three, without overriding variables already set.
-
-Global mode specifics:
-
-- The config holds models and keys, never a site: it comes from the command's URL argument, a registered host (`explorbot explore app.example.com/dashboard`), or `EXPLORBOT_URL`.
-- `test`, `learn`, `knows`, `experience`, and `compact` take no URL argument — they need `EXPLORBOT_URL` or they stop with `No site to explore`.
-- `npx explorbot sites` lists registered hosts and their last run.
+`node_modules/explorbot/docs/` after a local install, the repo's `docs/` when working inside Explorbot itself, otherwise `https://raw.githubusercontent.com/testomatio/explorbot/main/docs/<path>`. `docs/index.json` lists every page with a description — read it to pick the page, then open that page.
 
 ## Where results land
 
-Under the active output root — `output/` in a project, `~/.explorbot/sites/<host>/output/` otherwise:
+Explorbot writes into the project directory when the run used a project `explorbot.config.js`, and into `~/.explorbot/sites/<host>/` otherwise. Under that root:
 
 | Path | Contents |
 |---|---|
-| `reports/<mode>-<session>.md` | session report: coverage, defects, execution issues |
-| `plans/<page>.md` | the plan generated or executed |
-| `states/` | per-state HTML, ARIA snapshots, screenshots |
-| `research/` | UI maps from the Researcher |
-| `tests/` | generated Playwright / CodeceptJS files, absent in env-var mode |
-| `explorbot.log` | run log — start here on a failure |
+| `output/reports/` | session report: coverage, defects, execution issues |
+| `output/plans/` | the plan generated or executed |
+| `output/states/` | per-state HTML, ARIA snapshots, screenshots |
+| `output/research/` | UI maps from the Researcher |
+| `output/tests/` | generated Playwright / CodeceptJS files |
+| `output/explorbot.log` | run log — start here on a failure |
+| `knowledge/`, `experience/` | what you taught it, and what it learned |
 
 **Exit codes are not pass/fail.** `explore` and `test` exit `0` whenever the session completes; a failing scenario is a result, not a crash. Read the report. `navigate` is the exception — `1` means unreachable, which makes it a pre-flight check.
+
+## Naming the site
+
+Without a project config there is no configured URL, so each command names its own site: a URL argument, or a host already registered (`npx explorbot explore app.example.com/dashboard`, listed by `npx explorbot sites`). Commands that take no URL argument — `test`, `learn`, `knows`, `experience`, `compact` — read `EXPLORBOT_URL`.
 
 ## Cheap before expensive
 
@@ -57,30 +50,6 @@ Under the active output root — `output/` in a project, `~/.explorbot/sites/<ho
 - `npx explorbot shell <url> '<codecept command>'` — run one command and exit.
 - `npx explorbot knows <url>` — what knowledge matches a page.
 - `npx explorbot navigate <url> --session` — reachability, and it saves the session.
-
-## Docs
-
-Read `node_modules/explorbot/docs/` when it exists, the repo's `docs/` when working inside Explorbot itself, and `https://raw.githubusercontent.com/testomatio/explorbot/main/docs/<path>` otherwise. `docs/index.json` lists every page. Open the page when the question comes up; do not pre-load summaries.
-
-| Topic | Page |
-|---|---|
-| Install to first test | `basics/getting-started.md` |
-| TUI vs headless CLI, exit codes | `basics/running.md` |
-| Is this app a fit? | `basics/prerequisites.md` |
-| Providers and model ids | `basics/providers.md`, recommendations in `models.json` |
-| Explore loop and states | `web-testing/basics.md` |
-| Login, cookie bars, modals, test data | `web-testing/customization.md` |
-| Planner, styles, priorities | `web-testing/planner.md`, `workflow/planning-styles.md` |
-| Researcher, page interaction | `web-testing/researcher.md`, `web-testing/page-interaction.md` |
-| Generated tests, rerun with healing | `web-testing/automated-tests.md`, `web-testing/rerun.md` |
-| Agents, hooks | `web-testing/agents.md`, `web-testing/hooks.md` |
-| Knowledge files | `workflow/knowledge.md` |
-| Test plan format | `workflow/test-plans.md` |
-| Driving Explorbot from an agent | `workflow/agentic-usage.md` |
-| CI, reporting | `workflow/ci.md`, `workflow/reporting.md` |
-| Commands, config, scripting API | `reference/commands.md`, `reference/configuration.md`, `reference/scripting.md` |
-| API testing | `api-testing/basics.md`, `api-testing/planning.md`, `api-testing/running-tests.md` |
-| Doc collector | `doc-collection/basics.md` |
 
 ## Rules
 
