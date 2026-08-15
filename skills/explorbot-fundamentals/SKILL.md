@@ -1,10 +1,10 @@
 ---
 name: explorbot-fundamentals
-description: Use when running or debugging Explorbot from the command line — which command to run, what a flag does, where results were written, or why a run failed.
+description: Use when running or debugging Explorbot from the command line — which command to run, what a flag does, where results were written, why a run failed, or how to run it with nothing installed in the project.
 license: MIT
 metadata:
   author: Testomat.io
-  version: 1.1.0
+  version: 1.2.0
 ---
 
 # Explorbot Fundamentals
@@ -18,7 +18,18 @@ npx explorbot --help                  # commands, and the EXPLORBOT_* variables
 npx explorbot <command> --help        # flags for one command
 ```
 
-If nothing is configured, the CLI says so and names the three ways to fix it → [[explorbot-setup]].
+## Running it with nothing installed
+
+Explorbot needs no project install: `npx` plus a provider is enough, and nothing is written into the working directory. Reach for this when the user wants to try Explorbot, or is pointing it at an app that has no repo here.
+
+```bash
+npx explorbot init --global --provider <name>          # once per machine, key in ~/.explorbot/.env
+npx explorbot explore https://app.example.com/login --max-tests 3
+```
+
+Details, including the per-command `EXPLORBOT_*` form for CI: [references/no-install.md](references/no-install.md).
+
+Installing into the project instead — config, knowledge, and generated tests in the repo — is [[explorbot-setup]].
 
 ## Docs
 
@@ -59,5 +70,5 @@ Without a project config there is no configured URL, so each command names its o
 
 ## Related skills
 
-- [[explorbot-setup]] — install, configure, and verify one page reaches the app.
+- [[explorbot-setup]] — install into a project: config, provider, login knowledge, verified navigation.
 - [[explorbot-plan]] — hand-author a test plan and run it with `explorbot test`.
