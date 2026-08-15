@@ -30,6 +30,7 @@ metadata:
 | manual    | `--kind manual` | manual cases only — pending for testers, complete without any launch                            |
 | mixed     | `--kind mixed`  | manual + automated in one run — testers work it while the automated part is launched separately |
 | automated | *(no flag)*     | automated tests only                                                                            |
+| detect    | `--kind detect` | Testomat.io picks the kind from the tests the run was scoped to — prefer it on filtered runs    |
 
 A run created with `start` executes nothing: manual cases are pending immediately; an automated part stays scheduled until launched. `--format id` prints only the run id to stdout (banner and logs go to stderr), so capture is clean:
 

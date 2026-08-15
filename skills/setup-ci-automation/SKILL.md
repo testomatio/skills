@@ -68,7 +68,7 @@ Tasks worth wiring to CI events — the named skill owns each task's content:
 | ------------- | ----------------------------------------------------------- | ---------------------------------------------------- |
 | PR opened     | Generate test cases from the PR diff                        | `pull-request-diff-analyzer` + `qa-write-test-cases` |
 | Issue opened  | QA-analyze the feature — edge cases, acceptance criteria    | `qa-thinking`                                        |
-| PR opened     | Create a scoped test run, launch affected tests             | `setup-change-aware-pr-testing`                      |
+| Deploy done   | Create a scoped test run, launch affected tests             | `setup-change-aware-pr-testing`                      |
 | Schedule      | Detect duplicate or overlapping test cases                  | `detect-duplicate-test-cases`                        |
 
 ## Related skills
