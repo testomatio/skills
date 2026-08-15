@@ -32,8 +32,8 @@ Config resolution order, first match wins:
 
 Global mode specifics:
 
-- The site comes from the command's URL argument, a registered host (`explorbot explore app.example.com/dashboard`), `EXPLORBOT_URL`, or a `web.url` pinned in the global config.
-- `test`, `learn`, `knows`, `experience`, and `compact` take no URL argument — without a pinned `web.url` they need `EXPLORBOT_URL` or they stop with `No site to explore`.
+- The config holds models and keys, never a site: it comes from the command's URL argument, a registered host (`explorbot explore app.example.com/dashboard`), or `EXPLORBOT_URL`.
+- `test`, `learn`, `knows`, `experience`, and `compact` take no URL argument — they need `EXPLORBOT_URL` or they stop with `No site to explore`.
 - `npx explorbot sites` lists registered hosts and their last run.
 
 ## Where results land

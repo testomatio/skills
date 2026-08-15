@@ -103,6 +103,6 @@ npx explorbot test checkout-plan.md '*'
 EXPLORBOT_URL=https://app.example.com npx explorbot test checkout-plan.md '*'
 ```
 
-`test` takes no URL argument: it uses `web.url` from the config, and needs `EXPLORBOT_URL` when
-the global config pins none. It exits `0` whenever the session completes — read the report in
+`test` takes no URL argument: it uses `web.url` from a project config, and needs `EXPLORBOT_URL`
+in global mode. It exits `0` whenever the session completes — read the report in
 `output/reports/`, not the exit code. See [[explorbot-fundamentals]].

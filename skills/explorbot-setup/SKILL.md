@@ -34,11 +34,11 @@ Global mode writes nothing into the user's project — no `package.json`, no `np
 **Providers, models, and key variable names live in Explorbot, never in this skill.** `npx explorbot init --help` lists what `--provider` accepts; `init` picks the model ids from the version's `models.json` and reports the env variable it stored.
 
 ```bash
-npx explorbot init --global --provider <name> --url <app-url>
+npx explorbot init --global --provider <name>
 ```
 
 - Ask the user which provider they have an account with. If they have no preference, point them at `docs/basics/providers.md` in the [Explorbot docs](https://github.com/testomatio/explorbot/tree/main/docs).
-- `--url` pins the default site, so `test`, `learn`, and `knows` work without `EXPLORBOT_URL`. Get the URL first (step 3).
+- The global config holds models and keys, never a site — every command names the site it runs against.
 - If init warns that a role has no recommended model, tell the user: that provider needs model ids filled in by hand, or a different provider.
 - `--force` overwrites an existing global config and keeps the stored key.
 
@@ -55,7 +55,7 @@ Do not guess it. Look for evidence in the project — `package.json` scripts, `.
 How the site is named in global mode:
 
 - Commands with a URL argument use it: `navigate`, `explore`, `plan`, `research`, `context`, `shell`, `freesail`, `docs collect`.
-- Commands without one — `test`, `learn`, `knows`, `experience`, `compact` — use the `--url` default, or need `EXPLORBOT_URL=<app-url>` in front.
+- Commands without one — `test`, `learn`, `knows`, `experience`, `compact` — need `EXPLORBOT_URL=<app-url>` in front.
 - After the first run: `npx explorbot explore app.example.com/dashboard`, `npx explorbot sites`.
 
 Artifacts live in `~/.explorbot/sites/<host>/`: `knowledge/`, `experience/`, `output/` (`reports/`, `plans/`, `states/`, `research/`, `tests/`, `explorbot.log`). Nothing lands in the working directory.
