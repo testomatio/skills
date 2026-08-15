@@ -52,7 +52,7 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 
 | Skill                    | Description                                                                          |
 | ------------------------ | ------------------------------------------------------------------------------------ |
-| `explorbot-setup`        | First-time install & configuration of Explorbot, including initial knowledge          |
+| `explorbot-setup`        | Minimal install & configuration of Explorbot — global by default, including initial knowledge |
 | `explorbot-fundamentals` | Operating reference: run, drive and debug all Explorbot commands, config and outputs   |
 | `explorbot-plan`         | Author an Explorbot test plan in markdown so `explorbot test` can run it               |
 
