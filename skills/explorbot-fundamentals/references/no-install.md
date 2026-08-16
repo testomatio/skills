@@ -10,12 +10,12 @@ npx explorbot init --global --provider <name>
 
 Writes `~/.explorbot/config.js` with the model ids recommended by that Explorbot version, and `~/.explorbot/.env` with the provider's key variable — add the key there, or pass `--api-key`. `npx explorbot init --help` lists the accepted providers. With `--provider` there is no wizard, so an agent can run it unattended.
 
-Every directory can then run Explorbot, and each app keeps what Explorbot learned about it between runs:
+Every directory can then run Explorbot, and each app keeps what Explorbot learned about it between runs. With no project config there is no site to resolve a relative path against, so pass the absolute URL — or set `EXPLORBOT_URL` and pass paths:
 
 ```bash
 npx explorbot explore https://app.example.com/login --max-tests 3
-npx explorbot explore app.example.com/dashboard        # host is registered after the first run
-npx explorbot sites
+EXPLORBOT_URL=https://app.example.com npx explorbot explore /dashboard
+npx explorbot sites                                    # what has been explored, and when
 ```
 
 ## Per command

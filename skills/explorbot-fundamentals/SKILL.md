@@ -53,7 +53,9 @@ Explorbot writes into the project directory when the run used a project `explorb
 
 ## Naming the site
 
-Without a project config there is no configured URL, so each command names its own site: a URL argument, or a host already registered (`npx explorbot explore app.example.com/dashboard`, listed by `npx explorbot sites`). Commands that take no URL argument — `test`, `learn`, `knows`, `experience`, `compact` — read `EXPLORBOT_URL`.
+A target is either **absolute** — starting with `http://` or `https://` — or a **relative path** starting with `/`. Anything else is ambiguous and not a valid target.
+
+A relative path needs a site to resolve against: `web.url` from a project config, or `EXPLORBOT_URL`. Without either, pass the absolute URL. Commands that take no target at all — `test`, `learn`, `knows`, `experience`, `compact` — read the same two sources. `npx explorbot sites` lists what has been explored so far.
 
 ## Cheap before expensive
 
