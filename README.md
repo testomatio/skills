@@ -30,6 +30,7 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 
 | Skill                  | Description                                                                                          |
 | ---------------------- | ---------------------------------------------------------------------------------------------------- |
+| `qa-explain-behavior`  | Answer QA questions about product behavior — features, flows, rules, edge cases, and what is not implemented |
 | `qa-write-test-cases`       | Generate test cases and checklists from requirements, tickets, or feature descriptions               |
 | `qa-thinking`          | Analyze a feature from a QA perspective — edge cases, negative flows, abuses, unobvious scenarios |
 | `qa-split-testing-levels-pyramid` | Apply the test pyramid to a feature — assign scenarios to testing levels, coverage split per level |
@@ -110,7 +111,7 @@ Skills are also bundled as [Claude Code plugins](https://docs.testomat.io) via t
 
 | Plugin            | Bundled skills                                                       | Use it to                                                                       |
 | ----------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `qa-process`      | `qa-lead-strategy-advisor`, `qa-thinking`, `testing-workflow`        | Assess QA maturity, prioritize a quality roadmap, and orchestrate the test lifecycle |
+| `qa-process`      | `qa-lead-strategy-advisor`, `qa-explain-behavior`, `qa-thinking`, `testing-workflow` | Assess QA maturity, prioritize a quality roadmap, explain product behavior, and orchestrate the test lifecycle |
 | `test-management` | `qa-write-test-cases`, `improve-test-cases`, `sync-test-cases-with-tms`, coverage & more | Manage the test case lifecycle: generate, improve, sync to Testomat.io          |
 | `test-automation` | `automate-manual-test-cases`, `debug-fix-failed-flaky-autotests`, `qa-data-seeder` | Create automated tests, heal failing/flaky autotests, and seed test data        |
 | `explorbot`       | `explorbot-setup`, `explorbot-fundamentals`, `explorbot-plan`        | Install, configure, run, debug and plan Explorbot autonomous AI web tests       |
