@@ -51,7 +51,7 @@ Also: `verify`, `ask`, `research`, `go`, `status <hash>`, `report`, `config`, `b
 - `ok: true` means the action you asked for landed; nothing is substituted or retried along a different route.
 - `### Steps` marks each line `ok`, `FAIL` or `??`. `??` is an instruction that ran but the run ended without confirming — the actions that ran are listed above it, judge from those. Only `FAIL` and an instruction the page could not carry out fail the command.
 - `not verified` means the run never checked that outcome — not that it is false, and not a failure.
-- **`CONFLICT` is a finding, not a verdict to argue with.** The page structure and the picture disagree: something the assertions matched is not visible on screen, or the reverse. Both sides are quoted under the outcome. Treat it as a bug in the app — hidden element, collapsed container, overlay, off-screen — and look at it before anything else.
+- **`CONFLICT` is a finding, not a verdict to argue with.** The page structure and the picture disagree: something the assertions matched is not visible on screen, or the reverse. Both sides are quoted under the outcome. Treat it as a bug in the app and look at it before anything else.
 - A `### Warning` saying the outcomes came from the run log alone means no screenshot backed them: set `ai.visionModel`, and until then do not trust a visual claim from `check`.
 - A run that could not complete says so, rather than reporting it as a failure of the app.
 - `prima config` shows which model answers for each role.
