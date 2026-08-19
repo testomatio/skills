@@ -1,8 +1,9 @@
+---
+name: user-story-requirements-specification
+description: Use this reference after an Epic is approved, and a high-level capability needs to be defined as an implementation ready User Story.
+---
+
 # User Story Requirements Specification
-
-## When to Use
-
-Use this reference after an Epic is approved, and a high-level capability needs to be defined as an implementation ready User Story.
 
 ## Inputs
 

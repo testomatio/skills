@@ -1,15 +1,12 @@
 ---
 name: epic-requirements-specification
-description: Requirements workflow for discovering and documenting approved initiative requirements ready for user story breakdown.
+description: Use this skill when a business initiative needs to be defined, scoped, and validated, and an approved specification ready for user story breakdown must be produced from it.
 license: MIT
 metadata:
   author: Testomat.io
   version: 1.0.0
 ---
 
-## When to Use
-
-Use this skill when a business initiative needs to be defined, scoped, and validated, and an approved specification ready for user story breakdown must be produced from it.
 
 ## Epic Requirements
 
