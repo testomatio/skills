@@ -52,8 +52,8 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 
 | Skill                    | Description                                                                          |
 | ------------------------ | ------------------------------------------------------------------------------------ |
-| `explorbot-setup`        | First-time install & configuration of Explorbot, including initial knowledge          |
-| `explorbot-fundamentals` | Operating reference: run, drive and debug all Explorbot commands, config and outputs   |
+| `explorbot-setup`        | Install Explorbot into a project: config, AI provider, login knowledge, verified navigation |
+| `explorbot-fundamentals` | Run, drive and debug Explorbot commands — including with nothing installed in the project |
 | `explorbot-plan`         | Author an Explorbot test plan in markdown so `explorbot test` can run it               |
 
 ---

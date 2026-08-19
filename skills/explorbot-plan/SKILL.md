@@ -1,10 +1,10 @@
 ---
 name: explorbot-plan
-description: Author an Explorbot test plan in markdown so `explorbot test` can run it. Use this skill whenever the user wants to create, write, or hand-author an Explorbot plan/test plan from a feature description, requirements, ticket, or docs — without exploring a live page. Produces a correctly formatted plan `.md` (suite, Prerequisite URL, prioritized scenarios with Steps and verifiable Expected outcomes) that Explorbot's Tester executes.
+description: Use when the user wants to write an Explorbot test plan by hand — from a feature description, requirements, ticket, or docs, without exploring a live page — so `explorbot test` can run it.
 license: MIT
 metadata:
   author: Testomat.io
-  version: 0.0.1
+  version: 0.1.0
 ---
 
 # Writing Explorbot Test Plans
@@ -19,8 +19,9 @@ Installation is only required later to *run* the plan (see Output).
 
 - The feature / requirements / user story (ask for docs or a description).
 - A suite title (the feature under test).
-- The **start URL**: a path relative to the app host in `explorbot.config.js` `web.url`
-  (e.g. `/login`), or a full absolute URL. This is mandatory.
+- The **start URL**: a path relative to the app host (e.g. `/login`), or a full absolute URL.
+  This is mandatory. Relative paths resolve against `web.url` in a project config, or against
+  the site the command names (`EXPLORBOT_URL` / a registered host) in global mode.
 - Optional per-test start URLs when a scenario begins on a different page.
 - Priority for each scenario: `critical`, `important`, `high`, `normal`, `low`.
 
@@ -90,6 +91,18 @@ priority: high
 
 ## Output
 
-Save to `output/plans/<sanitized-start-path>[_<feature>].md` (e.g. `/login` + "auth" →
-`output/plans/login_auth.md`). Then tell the user to run it with the `explorbot-fundamentals`
-skill: `explorbot test output/plans/<file>.md`.
+A hand-written plan is input only — Explorbot never rewrites it, so keep it in the repo next to
+the code it covers (`tests/plans/<feature>.md` or similar) and pass its path to `explorbot test`.
+Save it under the run's `output/plans/` only when the user wants it alongside generated plans:
+`output/plans/` in a project setup, `~/.explorbot/sites/<host>/output/plans/` in global mode.
+
+Run it (index: `1`, `1,3`, `1-5`, or `*` for all):
+
+```bash
+npx explorbot test checkout-plan.md '*'
+EXPLORBOT_URL=https://app.example.com npx explorbot test checkout-plan.md '*'
+```
+
+`test` takes no URL argument: it uses `web.url` from a project config, and needs `EXPLORBOT_URL`
+in global mode. It exits `0` whenever the session completes — read the report in
+`output/reports/`, not the exit code. See [[explorbot-fundamentals]].
