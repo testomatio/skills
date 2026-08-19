@@ -1,36 +1,17 @@
 ---
 name: epic-requirements-specification
-description: Use this skill when a business initiative needs to be defined, scoped, and validated, and an approved specification ready for user story breakdown must be produced from it.
+description: Use this skill when a business initiative or project must be defined, scoped, validated, and delivered as an Epic with User Stories in the tracking system.
 license: MIT
 metadata:
   author: Testomat.io
   version: 1.0.0
 ---
 
-
-## Epic Requirements
-
-Every specification should contain:
-
-- Problem Statement
-- Business Goal
-- Target Users / Actors
-- In Scope
-- Out of Scope
-- Business Value
-- Success Criteria
-- High-Level Capabilities
-- Dependencies
-- Constraints
-- Risks
-- Open Questions
-- Assumptions
-
 ## Discovery
 
 Ask one focused question at a time to collect the information required for the initiative.
 
-Use these topics as needed. Do not ask questions that are already answered or irrelevant to the initiative. 
+Use these topics as needed. Do not ask questions that are already answered or irrelevant to the initiative.
 
 1. Business problem
 2. Business goal
@@ -88,35 +69,15 @@ Before approval, check:
 
 Create the specification as a Markdown file in the project workspace.
 
-Use this structure:
+Use the structure defined in:
+
+`./references/requirements-structure.md`
+
+Use this document title:
 
 # Initiative / Epic / Project: <name>
 
-## Problem Statement
-
-## Business Goal
-
-## Target Users / Actors
-
-## In Scope
-
-## Out of Scope
-
-## Business Value
-
-## Success Criteria
-
-## High-Level Capabilities
-
-## Dependencies
-
-## Constraints
-
-## Risks
-
-## Open Questions
-
-## Assumptions
+After the shared structure, add:
 
 ## Approval
 
