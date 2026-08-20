@@ -13,7 +13,6 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 | ------------------------------------ | --------------------------------------------------------------------------------- |
 | `scan-automation-project`            | Scan source code to inventory languages, frameworks, and existing tests           |
 | `pull-request-diff-analyzer`         | Analyze a PR/branch diff to detect features/fixes and extract acceptance criteria |
-| `qa-explain-behavior`                | Explain what the product does — features, flows, permissions, edge cases, gaps    |
 | `qa-thinking`                        | Analyze a feature as QA — edge cases, negative flows, abuses, risk scenarios      |
 | `qa-split-testing-levels-pyramid`    | Apply the test pyramid — assign scenarios to testing levels, coverage split       |
 | `qa-write-test-cases`                | Generate new test cases and checklists from requirements                          |
@@ -34,7 +33,6 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 - Match the request to a flow below. Delegate to that flow's skill, then suggest its next actions.
 - Flows are examples, not exhaustive. Combine or extend them when a request spans several tasks.
 - When suggesting next steps, take into account the flows, context, user request, and results of previous steps.
-- **Behavior questions** ("what happens when…", "can a user…", "is X supported") ask what the product does rather than for an artifact → route to the `qa-explain-behavior` skill first, then continue with the flow the answer points to.
 - **Strategic intent** ("where do I start", "improve our QA process", "QA maturity review") → route to the `qa-lead-strategy-advisor` skill instead. It owns the high-level roadmap and delegates execution back here.
 
 ## Basic Flows

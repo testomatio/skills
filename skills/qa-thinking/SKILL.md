@@ -8,7 +8,6 @@ description: Analyze a feature a developer is building from a QA perspective —
 Think about a feature like a senior QA engineer and surface risk scenarios.
 The user can explain the idea, or take it from the current branch or PR.
 For a PR, gather intent with the `qa-pr-requirements-analyzer` skill first.
-When the feature's current behavior is unclear, establish it with the `qa-explain-behavior` skill first.
 
 ## Think
 
