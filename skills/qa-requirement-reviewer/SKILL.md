@@ -121,6 +121,11 @@ Use this exact structure:
 
 ```
 
+## Next actions
+
+- Rewrite into user stories → `write-user-story` skill.
+- Turn clarified requirements into test cases → `qa-write-test-cases` skill.
+
 ## Examples
 
 See `references/requirements_reviewer_examples.md` for two worked examples: a flawed draft BRD and a set of user stories, each with input and review output.

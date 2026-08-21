@@ -16,6 +16,8 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 | `qa-explain-behavior`                | Explain what the product does — features, flows, permissions, edge cases, gaps    |
 | `qa-thinking`                        | Analyze a feature as QA — edge cases, negative flows, abuses, risk scenarios      |
 | `qa-split-testing-levels-pyramid`    | Apply the test pyramid — assign scenarios to testing levels, coverage split       |
+| `write-user-story`                    | Write user stories and acceptance criteria (the requirements)                     |
+| `qa-requirement-reviewer`            | Review requirements for ambiguity, gaps, and testability                          |
 | `qa-write-test-cases`                | Generate new test cases and checklists from requirements                          |
 | `improve-test-cases`                 | Improve existing test cases quality                                               |
 | `detect-duplicate-test-cases`        | Find duplicate, near-duplicate, and overlapping test cases                        |
@@ -34,10 +36,24 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 - Match the request to a flow below. Delegate to that flow's skill, then suggest its next actions.
 - Flows are examples, not exhaustive. Combine or extend them when a request spans several tasks.
 - When suggesting next steps, take into account the flows, context, user request, and results of previous steps.
+- **Write / draft user stories** (requirements, spec, acceptance criteria) → route to the `write-user-story` skill. Review of existing requirements → `qa-requirement-reviewer`.
 - **Behavior questions** ("what happens when…", "can a user…", "is X supported") ask what the product does rather than for an artifact → route to the `qa-explain-behavior` skill first, then continue with the flow the answer points to.
 - **Strategic intent** ("where do I start", "improve our QA process", "QA maturity review") → route to the `qa-lead-strategy-advisor` skill instead. It owns the high-level roadmap and delegates execution back here.
 
 ## Basic Flows
+
+### User Story Writing Flow
+
+```
+User: asks to write/draft requirements, user stories, a spec, or acceptance criteria
+=>
+Use `write-user-story` skill to produce user stories with testable acceptance criteria
+=>
+After writing fully completed, suggest next actions:
+1. 🔎 Review for gaps and testability (with `qa-requirement-reviewer` skill)
+2. 🧠 Surface risk scenarios (with `qa-thinking` skill)
+3. 📝 Generate test cases from the user stories (with `qa-write-test-cases` skill)
+```
 
 ### Test Generation Flow
 
