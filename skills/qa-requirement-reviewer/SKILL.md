@@ -123,7 +123,6 @@ Use this exact structure:
 
 ## Next actions
 
-- Rewrite into user stories → `write-user-story` skill.
 - Turn clarified requirements into test cases → `qa-write-test-cases` skill.
 
 ## Examples
