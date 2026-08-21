@@ -42,19 +42,6 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 
 ## Basic Flows
 
-### User Story Writing Flow
-
-```
-User: asks to write/draft requirements, user stories, a spec, or acceptance criteria
-=>
-Use `write-user-story` skill to produce user stories with testable acceptance criteria
-=>
-After writing fully completed, suggest next actions:
-1. 🔎 Review for gaps and testability (with `qa-requirement-reviewer` skill)
-2. 🧠 Surface risk scenarios (with `qa-thinking` skill)
-3. 📝 Generate test cases from the user stories (with `qa-write-test-cases` skill)
-```
-
 ### Test Generation Flow
 
 ```
