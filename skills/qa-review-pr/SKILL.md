@@ -1,9 +1,9 @@
 ---
 name: qa-review-pr
-description: Analyzes PR from a QA perspective. Analyze risks, compatibility, issue rsolving".
+description: Review a pull request as a QA engineer — check whether the change actually solves the stated issue, flag backwards-compatibility breaks and risks, and list the scenarios that must be verified before merge. Use when asked to "review this PR as QA", "what should we test in this PR?", or "is this PR safe to merge?".
 ---
 
-# QA Thinking
+# QA Review of a Pull Request
 
 Think about a feature like a senior QA engineer and surface risk scenarios.
 Gather intent with the `qa-pr-requirements-analyzer` skill first.
