@@ -11,6 +11,7 @@ You are provided either with a feature specification or implementation
 You must provide a critical review of it from QA perspective and ask clarifying questions
 The user can explain the idea, or take it from the current branch or PR.
 For a PR, gather intent with the `qa-pr-requirements-analyzer` skill first.
+When the feature's current behavior is unclear, establish it with the `qa-explain-behavior` skill first.
 
 ## Think as QA
 

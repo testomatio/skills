@@ -20,12 +20,12 @@
     {
       "name": "qa-process",
       "source": "./plugins/qa-process",
-      "description": "Adds /qa-lead-strategy-advisor, /qa-thinking, /qa-review-pr, /qa-split-testing-levels-pyramid and /testing-workflow skills to assess QA maturity, plan a roadmap, review features and pull requests for quality risks, and orchestrate the test lifecycle"
+      "description": "Strategic QA process advisory — assess QA maturity, prioritize a roadmap, explain product behavior, think through quality risks, and orchestrate the test lifecycle"
     },
     {
       "name": "explorbot",
       "source": "./plugins/explorbot",
-      "description": "Adds /explorbot-setup, /explorbot-fundamentals and /explorbot-plan skills to install, configure, run, debug and plan Explorbot autonomous AI web tests"
+      "description": "Adds /explorbot-setup, /explorbot-fundamentals, /explorbot-plan and /prima skills to install, configure, run, debug and plan Explorbot autonomous AI web tests, and to drive a browser through prima"
     }
   ]
 }
