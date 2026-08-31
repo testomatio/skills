@@ -1,126 +1,66 @@
 ---
 name: epic-requirements-specification
-description: Use this skill when a business initiative or project must be defined, scoped, validated, and delivered as an Epic with User Stories in the tracking system.
+description: Use to interactively define and scope a project as an Epic, asking one question at a time. Generates a Markdown file, syncs via MCP, and handles the User Story handoff upon approval.
 license: MIT
 metadata:
   author: Testomat.io
   version: 1.0.0
 ---
 
-## Discovery
+## Phase 1: Interactive Discovery (CURRENT STATE)
 
-Ask one focused question at a time to collect the information required for the initiative.
+1. **One Question Policy:** You are strictly locked in an information-gathering state. Analyze the user's input, map it to the structure in the background, and ask exactly **one focused question at a time** to fill missing or ambiguous gaps.
 
-Use these topics as needed. Do not ask questions that are already answered or irrelevant to the initiative.
+2. **Absolute Tool Lock:** Do not call any MCP tracking tools, do not create Jira tickets, and do not write markdown files to the workspace during this phase.
 
-1. Business problem
-2. Business goal
-3. Target users / actors
-4. Scope (What is included)
-5. Out of scope (What is explicitly excluded)
-6. Business value
-7. High-level capabilities (Functional blocks)
-8. Dependencies (External blockers, team mappings)
-9. Constraints (Hard boundaries: deadlines, compliance, budgets, platforms)
-10. Risks (Potential threats, technical or process bottlenecks)
-11. Success criteria (Measurable metrics or validation states)
+3. **Minimal Input Handling:** If the user's input is extremely short or vague (e.g., "create blue cup"), do not assume the interview is finished. Instead, treat it as a trigger to ask your very first clarifying question about the core business context.
 
-Do not invent missing information.
+4. **Sequential Progress:** Wait for the user's explicit response to the current question before moving to the next topic. Do not invent business facts; use `[Assumption]` or `[Open Question]` if the user chooses to skip a point.
 
-Separate confirmed information, assumptions, and open questions.
+5. **Epic Scope:** Keep all questions at the business and capability level. Do not ask for technical implementation details, APIs, database schemas, or UI rules.
 
-Capture open questions and assumptions as they arise.
+## Phase 2: Draft Review & Approval Gate
 
-Reuse previously captured context. Do not ask the user to repeat confirmed information.
+1. **Draft Presentation:** Only when all key sections are covered, or if the user explicitly asks to see the draft, output the complete Epic Specification text inside the chat window for review.
 
-Do not collect implementation details, acceptance criteria, field level validation rules, or UI details. Defer them to User Stories.
+2. **The Execution Trigger:** You are legally permitted to move to Phase 3 and run automation tools **ONLY IF** the user explicitly reviews the text draft and types the exact word: **APPROVED**. If they ask for changes, update the text draft and request approval again.
 
-## Completion Criteria
+## Phase 3: Post-Approval Execution
 
-Discovery is complete when the following is documented:
+1. **File Persistence:** Once approved, write the finalized text to a Markdown file (`epic-<slug>.md` or `project-<slug>.md`) in the workspace.
 
-- Business problem and goal
-- Target users / actors
-- Scope boundaries (Explicit In/Out splits)
-- Business value
-- High-level capabilities mapped as standalone modules
-- Success criteria
-- Dependencies and constraints
-- Key risks
-- Assumptions
-- Open questions, either resolved or explicitly accepted with an assigned owner and a resolution target date
+2. **Tracking System Sync (MCP):** After creating the file, use the connected MCP tracking tool to create the Epic entity, map fields, and output the resulting item key and direct link.
 
-## Epic Review
+3. **User Story Handoff:** Proactively ask the user if they want to break down this approved Epic using the `write-user-story` skill.
 
-Before approval, check:
+## Output Specification
 
-- Problem and goal are clear.
-- Target users are identified.
-- Scope boundaries are explicit.
-- Business value is clear.
-- Major capabilities are identified.
-- Success criteria are defined.
-- Important dependencies and constraints are known.
-- Critical risks are identified.
-- No critical open questions remain. Any minor open questions must have an assigned owner and a resolution target date.
-- The specification contains no implementation-level details.
+The final document generated at the end of the loop must use the following Markdown structure:
 
-## Output
+### 1. Business Context
+* **Business Problem:**
+* **Business Goal:**
+* **Business Value:**
+* **Success Criteria / KPIs:**
 
-Create the specification as a Markdown file in the project workspace.
+### 2. Scope & Stakeholders
+* **Target Users / Actors:**
+* **End Beneficiaries:**
+* **In Scope:**
+* **Out of Scope:**
 
-Use the structure defined in:
+### 3. Constraints & Risks
+* **Dependencies:**
+* **Constraints:**
+* **Critical Risks:**
+* **Assumptions:**
+* **Open Questions:**
 
-`./references/requirements-structure.md`
+### 4. Analyst's Insights
+Include only when there are meaningful gaps, contradictions, or risks identified during the interactive loop.
 
-Use this document title:
+## Interaction Model
 
-# Initiative / Epic / Project: <name>
-
-After the shared structure, add:
-
-## Approval
-
-- Status: Draft | Approved | Changes Requested
-- Approved by:
-- Notes:
-
-## Approval Gate
-
-Do not treat the document as final until the user explicitly approves it.
-
-If changes are requested:
-
-1. Update the specification.
-2. Review it again.
-3. Request approval again.
-
-After the document is approved, create the Epic (or equivalent parent entity)
-in the connected tracking system using available MCP connections, if possible.
-Report the created item key and link to the user.
-
-After the Epic is created, offer to create the first User Story using the User Story Requirements Specification reference.
-
-Reference:
-
-`./references/user-story-requirements-specification.md`
-
-## User Story Handoff
-
-After approval, ask:
-
-> The initiative is approved. Would you like to create the first User Story?
-
-If the user agrees, use the User Story Requirements Specification reference and provide the approved specification as context.
-
-After the approved User Story has completed its tracking system duplicate check, create the User Story in the connected tracking system under or linked to the created Epic, using native platform relationship links (`Child`, `Blocks`, `Sub-issue`), when possible. Report the created item key and link to the user.
-
-Then offer to create the next User Story for the same initiative. If the user declines, do not create another User Story and continue to the final delivery step.
-
-## Final Epic Delivery
-
-When the Epic/Project and all selected User Stories are approved and created, present a final delivery summary to the user: the list of created item keys, titles, and direct links in the tracking system.
-
-If no tracking-system MCP connection was available, use the approved specification Markdown file from the Output step and add all approved User Stories to it (or to a combined `epic-<slug>.md` / `project-<slug>.md`), retaining the structures from this skill and its User Story reference. Present the file path as the delivery summary.
-
-Do not create tracking-system items before the Epic/Project and selected User Stories have explicit approval.
+* **During Phase 1 (Discovery):** State what you have captured from the user's last message, and present your **single next question**. Do not output the markdown document structure or code blocks yet.
+* **During Phase 2 (Review):** Present the complete text draft inside the chat and explicitly ask the user for confirmation.
+* **During Phase 3 (Execution):** Report the saved file path, provide the tracking system link, and ask: *"The initiative is approved. Would you like to create the first User Story using the `write-user-story` skill?"*
