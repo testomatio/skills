@@ -20,22 +20,44 @@ Gather intent with the `qa-pr-requirements-analyzer` skill first.
 
 ## Output
 
-Your output should be readable by person who doesn't understand or doesn't look into code.
-Use QA language, avoid coding jargon
-Avoid mentioning internal variable names, syntax, queries, not relevant for QAs.
-Use high-level business domain specific terms and not low level coding details
-If needed mention class names, file names, but never get into deeper internal details
-Explain risks and ambiguities from terms of persona using the software
-Try to resolve ambiguities based on your code and requirements understanding
+- Your output should be readable by person who doesn't understand or doesn't look into code.
+- Use QA language, avoid coding jargon
+- Avoid mentioning internal variable names, syntax, queries, not relevant for QAs.
+- Use high-level business domain specific terms and not low level coding details
+- If needed mention class names, file names, but never get into deeper internal details
+- Explain risks and ambiguities from terms of persona using the software. Do not put coding terms in it.
+- Try to resolve ambiguities based on your code and requirements understanding
+- You can use bold and italics to emphasize points important for reviewer to take decision
+- Reply with **Only requested section named exactly they are provided provided**. No prephrase, no conclusions, only session.
+- Prefer simple wording and short sentences.
 
-Only requested section named exactly the way we provide
-Information in section written as numbered lists
+## Requested sections
 
-Requested sections:
+- Section `Is it done`: does the code meet the original request (pr title, issue description, etc). Include brief (1 line) original issue summary in it. Avoid details, your goal is to detect unmatched or wrongly understood issues. 1-3 sentances max.
+- Section `Backwards Compatibility`: how this change is aligned with our existsing features, is there a significant behavior changes we need to be aware of (if no compatibility issues present, just say so).
+- Section `Merge Risks`: what are potential problems can be introduced by merging this PR.
+- Section `What must be verified`: up to 5 most risk usage scenarios for end-users. Start in form: "**What if {persona} {verb}**". Avoid scenarios that are technical and can be unit tested.
 
-- Section `👷‍♀️ Is it done`: does the code meet the original request (pr title, issue description, etc). Include brief (1 line) original issue summary in it. Avoid details, your goal is to detect unmatched or wrongly understood issues.
-- Section `🦕 Backwards Compatibility`: how this change is aligned with our existsing features, is there a significant behavior changes we need to be aware of
-- Section `🌋 Potential Risks`: what are potential problems can be introduced by merging this PR
-- Section `🔬 What must be verified`: up to 5 most risk scenarios, no more. Start in form: "What if"
+## Output Format
 
-Prefer simple wording and short sentences.
+```
+### 👷‍♀️ Is it done
+
+<Yes, no, partially; few words>
+
+<Reasoning for decision, references>
+
+### 🦕 Backwards Compatibility
+
+<reasoning>
+<if no breaking changes -> 'No breaking changes'> 
+<if no change behavior -> 'No behavior changes'> 
+
+### 🌋 Merge Risks
+
+<numbered list. 1 to 5 points>
+
+### 🔬 What must be verified
+
+<bullet list in 'What if' format>
+```
