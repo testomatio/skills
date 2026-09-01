@@ -33,7 +33,31 @@ Gather intent with the `qa-pr-requirements-analyzer` skill first.
 
 ## Requested sections
 
-- Section `👷‍♀️ Is it done`: does the code meet the original request (pr title, issue description, etc). Include brief (1 line) original issue summary in it. Avoid details, your goal is to detect unmatched or wrongly understood issues. 1-3 sentances max.
-- Section `🦕 Backwards Compatibility`: how this change is aligned with our existsing features, is there a significant behavior changes we need to be aware of (if no compatibility issues present, just say so).
-- Section `🌋 Merge Risks`: what are potential problems can be introduced by merging this PR. Up to 5 items, if found, format as numbered list.
-- Section `🔬 What must be verified`: up to 5 most risk usage scenarios for end-users. Start in form: "What if {persona} {verb}". Write as numbered list. Avoid scenarios that are technical and can be unit tested.
+- Section `Is it done`: does the code meet the original request (pr title, issue description, etc). Include brief (1 line) original issue summary in it. Avoid details, your goal is to detect unmatched or wrongly understood issues. 1-3 sentances max.
+- Section `Backwards Compatibility`: how this change is aligned with our existsing features, is there a significant behavior changes we need to be aware of (if no compatibility issues present, just say so).
+- Section `Merge Risks`: what are potential problems can be introduced by merging this PR.
+- Section `What must be verified`: up to 5 most risk usage scenarios for end-users. Start in form: "**What if {persona} {verb}**". Avoid scenarios that are technical and can be unit tested.
+
+## Output Format
+
+```
+### 👷‍♀️ Is it done
+
+<Yes, no, partially; few words>
+
+<Reasoning for decision, references>
+
+### 🦕 Backwards Compatibility
+
+<reasoning>
+<if no breaking changes -> 'No breaking changes'> 
+<if no change behavior -> 'No behavior changes'> 
+
+### 🌋 Merge Risks
+
+<numbered list. 1 to 5 points>
+
+### 🔬 What must be verified
+
+<bullet list in 'What if' format>
+```
