@@ -56,6 +56,7 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 | `explorbot-setup`        | Install Explorbot into a project: config, AI provider, login knowledge, verified navigation |
 | `explorbot-fundamentals` | Run, drive and debug Explorbot commands — including with nothing installed in the project |
 | `explorbot-plan`         | Author an Explorbot test plan in markdown so `explorbot test` can run it               |
+| `prima`                  | Drive a browser through described behaviour instead of locators, on top of playwright-cli   |
 
 ---
 
@@ -114,7 +115,7 @@ Skills are also bundled as [Claude Code plugins](https://docs.testomat.io) via t
 | `qa-process`      | `qa-lead-strategy-advisor`, `qa-explain-behavior`, `qa-thinking`, `testing-workflow` | Assess QA maturity, prioritize a quality roadmap, explain product behavior, and orchestrate the test lifecycle |
 | `test-management` | `qa-write-test-cases`, `improve-test-cases`, `sync-test-cases-with-tms`, coverage & more | Manage the test case lifecycle: generate, improve, sync to Testomat.io          |
 | `test-automation` | `automate-manual-test-cases`, `debug-fix-failed-flaky-autotests`, `qa-data-seeder` | Create automated tests, heal failing/flaky autotests, and seed test data        |
-| `explorbot`       | `explorbot-setup`, `explorbot-fundamentals`, `explorbot-plan`        | Install, configure, run, debug and plan Explorbot autonomous AI web tests       |
+| `explorbot`       | `explorbot-setup`, `explorbot-fundamentals`, `explorbot-plan`, `prima` | Install, configure, run, debug and plan Explorbot autonomous AI web tests, and drive a browser with prima |
 
 ## Links
 
