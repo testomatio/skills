@@ -61,6 +61,6 @@ Include only when there are meaningful gaps, contradictions, or risks identified
 
 * **During Phase 1 (Discovery):** State what you have captured from the user's last message and present your **single next question**. Do not output the markdown document structure or code blocks yet.
 * **During Phase 2 (Review):** Present the complete text draft inside the chat and explicitly ask the user for confirmation.
-* **During Phase 3 (Execution):** Report the saved file path and present the "Next Actions" choices at the bottom. Ask: *"The initiative is saved as a file. What would you like to do next?*
+* **During Phase 3 (Execution):** Report the saved file path and present the "Next Actions" choices at the bottom. Ask: *"The Epic is saved as a file. What would you like to do next?*
     * *1. Sync this Epic to the tracking system (MCP)*
     * *2. Break down this approved Epic into the first User Story using the `write-user-story` skill*
