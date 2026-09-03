@@ -7,7 +7,7 @@ metadata:
   version: 1.0.0
 ---
 
-## Phase 1: Interactive Discovery (CURRENT STATE)
+## Phase 1: Interactive Discovery
 
 1. **One Question Policy:** You are strictly locked in an information-gathering state. Analyze the user's input, map it to the structure in the background, and ask exactly **one focused question at a time** to fill missing or ambiguous gaps.
 
@@ -29,9 +29,7 @@ metadata:
 
 1. **File Persistence:** Once approved, write the finalized text to a Markdown file (`epic-<slug>.md` or `project-<slug>.md`) in the workspace.
 
-2. **Tracking System Sync (MCP):** After creating the file, use the connected MCP tracking tool to create the Epic entity, map fields, and output the resulting item key and direct link.
-
-3. **User Story Handoff:** Proactively ask the user if they want to break down this approved Epic using the `write-user-story` skill.
+2. **Next Actions Offering:** Do not automatically sync to tracking systems. Instead, report the saved file path and present a "Next Actions" section at the bottom asking the user to explicitly confirm which follow-up steps they want to trigger next.
 
 ## Output Specification
 
@@ -61,6 +59,8 @@ Include only when there are meaningful gaps, contradictions, or risks identified
 
 ## Interaction Model
 
-* **During Phase 1 (Discovery):** State what you have captured from the user's last message, and present your **single next question**. Do not output the markdown document structure or code blocks yet.
+* **During Phase 1 (Discovery):** State what you have captured from the user's last message and present your **single next question**. Do not output the markdown document structure or code blocks yet.
 * **During Phase 2 (Review):** Present the complete text draft inside the chat and explicitly ask the user for confirmation.
-* **During Phase 3 (Execution):** Report the saved file path, provide the tracking system link, and ask: *"The initiative is approved. Would you like to create the first User Story using the `write-user-story` skill?"*
+* **During Phase 3 (Execution):** Report the saved file path and present the "Next Actions" choices at the bottom. Ask: *"The initiative is saved as a file. What would you like to do next?*
+    * *1. Sync this Epic to the tracking system (MCP)*
+    * *2. Break down this approved Epic into the first User Story using the `write-user-story` skill*
