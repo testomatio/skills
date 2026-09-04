@@ -46,6 +46,7 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 | `improve-test-cases`   | Analyze and improve existing markdown test cases for clarity                                         |
 | `detect-duplicate-test-cases` | Find duplicate, near-duplicate, and overlapping test cases                                           |
 | `sync-test-cases-with-tms`           | Synchronize Markdown test scenarios between local project and Testomat.io                            |
+| `migrate-to-testomatio` | Migrate tests to Testomat.io from TestRail, XRay, Testmo, QMetry, Allure, TestCaseLabs, or CSV/XLSX |
 | `qa-test-code-coverage`      | Map manual & automated tests to source files; generate `coverage.tests.yml` to run only the tests affected by a diff |
 | `testing-workflow`      | Tactical orchestrator of the test case lifecycle: generate, improve, analyze coverage, upload to TMS |
 | `qa-lead-strategy-advisor`         | Strategic QA advisor: interview & scan to build context, assess QA maturity, deliver a prioritized roadmap, and delegate execution to `testing-workflow` |
