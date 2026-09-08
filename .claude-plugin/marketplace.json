@@ -1,12 +1,17 @@
 {
   "name": "testomatio-plugins",
   "metadata": {
-    "description": "Testomatio.io plugins and skills for managing tests, test cases, test automation, results, coverage etc"
+    "description": "Testomatio.io plugins and skills for requirements, tests, test cases, test automation, results, coverage etc"
   },
   "owner": {
     "name": "Testomatio.io"
   },
   "plugins": [
+    {
+      "name": "requirements",
+      "source": "./plugins/requirements",
+      "description": "Write, review, and analyze product requirements and features — user stories, acceptance criteria, gaps, risks, and PR intent"
+    },
     {
       "name": "test-management",
       "source": "./plugins/test-management",
