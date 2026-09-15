@@ -1,6 +1,6 @@
 ---
 name: scan-automation-project
-description: Scan a project and inventory what is available for QA work: project type, languages, frameworks, manual `*.test.md` cases, automated tests and automated references, and how Testomat.io is reachable (token, MCP, project settings). Use this skill whenever analyzing a codebase for test planning, detecting test frameworks, counting tests, or preparing for test automation. Specifically, when the user mentions "scan project", "what tests exist", "how many tests", "analyze codebase", "detect frameworks", "test matrix", or needs an inventory before a QA workflow.
+description: Scan a project and inventory what is available for QA work - project type, languages, frameworks, manual `*.test.md` cases, automated tests and automated references, and how Testomat.io is reachable (token, MCP, project settings). Use this skill whenever analyzing a codebase for test planning, detecting test frameworks, counting tests, or preparing for test automation. Specifically, when the user mentions "scan project", "what tests exist", "how many tests", "analyze codebase", "detect frameworks", "test matrix", or needs an inventory before a QA workflow.
 license: MIT
 metadata:
   author: Testomat.io
