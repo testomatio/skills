@@ -1,7 +1,7 @@
 ---
 name: wiki-from-code
 description: >-
-  Builds and refreshes a product wiki from implemented code (implicit requirements).
+  Builds and refreshes a product wiki from the application source code (implicit requirements).
   Optionally attaches issue-tracker task/issue/story links.
   Use when the user asks to build or refresh the wiki/requirements/specification/docs from code, or to catalog existing functionality.
 metadata:
