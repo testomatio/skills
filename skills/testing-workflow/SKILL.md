@@ -17,6 +17,7 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 | `qa-thinking`                        | Analyze a feature as QA — edge cases, negative flows, abuses, risk scenarios      |
 | `qa-split-testing-levels-pyramid`    | Apply the test pyramid — assign scenarios to testing levels, coverage split       |
 | `write-user-story`                    | Write user stories and acceptance criteria (the requirements)                     |
+| `wiki-from-code`                      | Build or refresh a product wiki from implemented code (implicit requirements)     |
 | `qa-requirement-reviewer`            | Review requirements for ambiguity, gaps, and testability                          |
 | `qa-write-test-cases`                | Generate new test cases and checklists from requirements                          |
 | `improve-test-cases`                 | Improve existing test cases quality                                               |
@@ -37,10 +38,24 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 - Flows are examples, not exhaustive. Combine or extend them when a request spans several tasks.
 - When suggesting next steps, take into account the flows, context, user request, and results of previous steps.
 - **Write / draft user stories** (requirements, spec, acceptance criteria) → route to the `write-user-story` skill. Review of existing requirements → `qa-requirement-reviewer`.
+- **Wiki / spec from code** (build or refresh wiki, implicit requirements, as-implemented docs) → route to the `wiki-from-code` skill.
 - **Behavior questions** ("what happens when…", "can a user…", "is X supported") ask what the product does rather than for an artifact → route to the `qa-explain-behavior` skill first, then continue with the flow the answer points to.
 - **Strategic intent** ("where do I start", "improve our QA process", "QA maturity review") → route to the `qa-lead-strategy-advisor` skill instead. It owns the high-level roadmap and delegates execution back here.
 
 ## Basic Flows
+
+### Wiki from Code Flow
+
+```
+User: asks to build/refresh a wiki, requirements, or spec from the codebase
+=>
+Use `wiki-from-code` skill to bootstrap or refresh `wiki/` from implemented code
+=>
+After the wiki is written, suggest next actions:
+1. 🧠 Risk scenarios from a capability (with `qa-thinking` skill)
+2. 📝 Test cases from a capability (with `qa-write-test-cases` skill)
+3. 📘 User stories from a capability (with `write-user-story` skill)
+```
 
 ### Test Generation Flow
 

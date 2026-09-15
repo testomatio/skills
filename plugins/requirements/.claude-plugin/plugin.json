@@ -1,7 +1,7 @@
 {
   "name": "requirements",
   "version": "1.0.0",
-  "description": "Write, review, and analyze product requirements and features — user stories, acceptance criteria, gaps, risks, PR intent, and existing behavior",
+  "description": "Write, review, and analyze product requirements and features — user stories, acceptance criteria, wiki from code, gaps, risks, PR intent, and existing behavior",
   "author": {
     "name": "Testomat.io",
     "url": "https://testomat.io"
@@ -9,6 +9,6 @@
   "homepage": "https://docs.testomat.io",
   "repository": "https://github.com/testomatio/skills",
   "license": "MIT",
-  "keywords": ["qa", "requirements", "features", "user-stories", "acceptance-criteria", "testomat"],
+  "keywords": ["qa", "requirements", "features", "user-stories", "acceptance-criteria", "wiki", "testomat"],
   "skills": "./skills/"
 }

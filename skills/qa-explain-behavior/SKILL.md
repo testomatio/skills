@@ -105,6 +105,7 @@ Offer after the answer:
 - Turn the behavior into risk scenarios → `qa-thinking` skill.
 - Turn it into test cases or a checklist → `qa-write-test-cases` skill.
 - Map which tests already cover it → `qa-test-code-coverage` skill.
+- Persist current behavior as a product wiki → `wiki-from-code` skill.
 
 ## Final reminder
 
