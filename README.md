@@ -50,7 +50,7 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 | `qa-test-code-coverage`      | Map manual & automated tests to source files; generate `coverage.tests.yml` to run only the tests affected by a diff |
 | `testing-workflow`      | Tactical orchestrator of the test case lifecycle: generate, improve, analyze coverage, upload to TMS |
 | `qa-lead-strategy-advisor`         | Strategic QA advisor: interview & scan to build context, assess QA maturity, deliver a prioritized roadmap, and delegate execution to `testing-workflow` |
-| `scan-automation-project` | Scan project source code to inventory languages, frameworks, and existing tests |
+| `scan-automation-project` | Inventory what a project has for QA: type, languages, frameworks, manual and automated tests, and Testomat.io access |
 
 ### Automation
 
