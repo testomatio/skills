@@ -31,6 +31,7 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 | Skill                  | Description                                                                                          |
 | ---------------------- | ---------------------------------------------------------------------------------------------------- |
 | `write-user-story` | Write user stories and acceptance criteria (the requirements) from a feature idea, ticket, or notes |
+| `wiki-from-code` | Build or refresh a product wiki from implemented code (implicit requirements), with optional tracker links |
 | `qa-requirement-reviewer` | Review requirements for ambiguity, gaps, contradictions, and testability before development |
 | `qa-explain-behavior`  | Answer QA questions about product behavior — features, flows, rules, edge cases, and what is not implemented |
 | `qa-thinking`          | Analyze a feature from a QA perspective — edge cases, negative flows, abuses, unobvious scenarios |
@@ -125,7 +126,7 @@ Skills are also bundled as [Claude Code plugins](https://docs.testomat.io) via t
 
 | Plugin            | Bundled skills                                                       | Use it to                                                                       |
 | ----------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `requirements`    | `write-user-story`, `qa-requirement-reviewer`, `qa-thinking`, `qa-explain-behavior`, `qa-pr-requirements-analyzer`, `pull-request-diff-analyzer` | Write, review, and analyze requirements and features before and during development |
+| `requirements`    | `write-user-story`, `wiki-from-code`, `qa-requirement-reviewer`, `qa-thinking`, `qa-explain-behavior`, `qa-pr-requirements-analyzer`, `pull-request-diff-analyzer` | Write, review, and analyze requirements and features before and during development |
 | `qa-process`      | `qa-lead-strategy-advisor`, `qa-explain-behavior`, `qa-thinking`, `testing-workflow` | Assess QA maturity, prioritize a quality roadmap, explain product behavior, and orchestrate the test lifecycle |
 | `test-management` | `qa-write-test-cases`, `improve-test-cases`, `sync-test-cases-with-tms`, coverage & more | Manage the test case lifecycle: generate, improve, sync to Testomat.io          |
 | `test-automation` | `automate-manual-test-cases`, `debug-fix-failed-flaky-autotests`, `qa-data-seeder` | Create automated tests, heal failing/flaky autotests, and seed test data        |

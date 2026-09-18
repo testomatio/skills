@@ -10,7 +10,7 @@
     {
       "name": "requirements",
       "source": "./plugins/requirements",
-      "description": "Write, review, and analyze product requirements and features — user stories, acceptance criteria, gaps, risks, and PR intent"
+      "description": "Write, review, and analyze product requirements and features — user stories, acceptance criteria, wiki from code, gaps, risks, and PR intent"
     },
     {
       "name": "test-management",
