@@ -1,6 +1,8 @@
 # CSV Migration (Testmo, QMetry, TestCaseLabs, Allure, Others)
 
-Two paths: converter script (normalizes export to Testomat.io CSV), or direct UI import.
+> CSV/XLSX migrates test cases only. It cannot migrate run results/history, attachments/screenshots, automation runs, or milestones. If the user needs any of these, stop and switch to the API migration path (TestRail: [TESTRAIL_MIGRATION.md](./TESTRAIL_MIGRATION.md), Testmo: [TESTMO_MIGRATION.md](./TESTMO_MIGRATION.md), other/unsupported: [CUSTOM_MIGRATION.md](./CUSTOM_MIGRATION.md)).
+
+Two paths: converter script (normalizes export to Testomat.io CSV), or direct UI import. Use only for cases-only scope with no attachments.
 
 Docs: https://docs.testomat.io/project/import-export/import/import-tests-from-csv-xlsx
 
