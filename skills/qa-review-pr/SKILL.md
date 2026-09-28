@@ -25,6 +25,7 @@ Gather intent with the `qa-pr-requirements-analyzer` skill first.
 - Anything not proven by the code goes to `What must be verified` as a scenario, or is dropped.
 - Order every list by impact on end-users, most severe first.
 - Limits are maximums, not targets. Fewer points are better than padded ones.
+- Whole review: at most 180 words. If over, drop the lowest-severity item.
 
 ## Output
 
@@ -46,15 +47,16 @@ Gather intent with the `qa-pr-requirements-analyzer` skill first.
 - Section `Is it done`: does the code meet the original request (PR title, issue description, etc).
   - Verdict is `Yes`, `No`, or `Partially`.
   - If the reported problem still reproduces on any path, verdict is `Partially` — never "Yes, with a caveat".
-  - One line for original issue summary, one to two sentences for reasoning.
+  - If any `Merge Risks` point says the original problem still happens somewhere, verdict is `Partially`.
+  - Issue summary: at most 15 words. Reasoning: at most 30 words.
 - Section `Backwards Compatibility`: does the change alter behavior of existing features for existing users.
   - If not, write one sentence and stop.
   - New optional inputs and their new errors are not compatibility issues.
 - Section `Merge Risks`: problems merging this PR introduces, proven by the code.
   - At most 3 points. Empty section is allowed: write `No risks found`.
-  - Each point is one line: **impact on user** — who hits it and when.
+  - Each point: **impact on user, at most 8 words** — who hits it and when, at most 15 words.
 - Section `What must be verified`: at most 4 riskiest usage scenarios for end-users.
-  - Start in form: "**What if {persona} {verb}**", then the expected outcome in one short sentence.
+  - Each scenario: **What if {persona} {action}** — expected result, at most 10 words.
   - Avoid scenarios that are technical and can be unit tested.
 
 ## Output Format
@@ -62,19 +64,23 @@ Gather intent with the `qa-pr-requirements-analyzer` skill first.
 ```
 ### 👷‍♀️ Is it done
 
-**<Yes | No | Partially>.** <one-line original issue summary>
+**<Yes | No | Partially>.** <original issue summary, ≤ 15 words>
 
-<1-2 sentences of reasoning>
+<reasoning, ≤ 30 words>
 
 ### 🦕 Backwards Compatibility
 
-<'No breaking changes.' + one sentence why, OR each changed existing behavior in one line>
+<'No breaking changes.' + why, ≤ 15 words — OR one line per changed existing behavior>
 
 ### 🌋 Merge Risks
 
-<numbered list, 0 to 3 points, most severe first>
+1. **<impact on user, ≤ 8 words>** — <who hits it and when, ≤ 15 words>
+
+<0 to 3 points, most severe first>
 
 ### 🔬 What must be verified
 
-<bullet list in 'What if' format, up to 4, most risky first>
+- **What if <persona> <action>** — <expected result, ≤ 10 words>
+
+<up to 4 scenarios, most risky first>
 ```
