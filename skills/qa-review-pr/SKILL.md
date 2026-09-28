@@ -25,19 +25,7 @@ Gather intent with the `qa-pr-requirements-analyzer` skill first.
 - Anything not proven by the code goes to `What must be verified` as a scenario, or is dropped.
 - Order every list by impact on end-users, most severe first.
 - Limits are maximums, not targets. Fewer points are better than padded ones.
-- Whole review: at most 180 words.
-
-## Cut before writing
-
-Delete from every item:
-
-- How the code works: "because…", "unlike…", "only checks…".
-- Examples in parentheses and "e.g.".
-- "Either… or…" alternatives. Pick the expected result.
-- Anything already said in another section.
-- Mentions of tests.
-
-If still over the word budget, drop the lowest-severity item.
+- Whole review: at most 180 words. If over, drop the lowest-severity item.
 
 ## Output
 
