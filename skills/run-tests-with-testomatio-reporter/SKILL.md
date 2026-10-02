@@ -1,6 +1,6 @@
 ---
 name: run-tests-with-testomatio-reporter
-description: Create and launch Testomat.io test runs with the `@testomatio/reporter` CLI. Covers manual runs for testers, mixed manual+automated runs, local test execution with reported results, and remote launches through a Testomat.io CI profile (`--remote`). Runs can include the whole suite or be filtered by tag, plan, label, Jira ticket, or changed source files. Use when the user asks to start or create a test run from the command line, run a filtered group of tests, launch tests remotely, or report results into an existing run.
+description: Create and launch Testomat.io test runs with the `@testomatio/reporter` CLI. Covers manual runs for testers, mixed manual+automated runs, local test execution with reported results, and remote launches through a Testomat.io CI profile (`--remote`), and looking up existing runs (`fetch`). Runs can include the whole suite or be filtered by tag, plan, label, Jira ticket, or changed source files. Use when the user asks to start or create a test run from the command line, run a filtered group of tests, launch tests remotely, report results into an existing run, or find/list existing runs.
 license: MIT
 metadata:
   author: Testomat.io
@@ -20,6 +20,7 @@ metadata:
 | Launch tests remotely via a Testomat.io CI profile  | `run --remote <profile-name>`               |
 | List which tests a filter matches, run nothing      | `run --filter-list "<filter>" --format ids` |
 | Close a run created earlier                         | `finish` (run id via `TESTOMATIO_RUN`)      |
+| Look up existing runs, create or change nothing     | `fetch --project <project-slug>`            |
 
 ## Run kinds
 
@@ -96,6 +97,30 @@ Cannot be combined with `--remote`.
 - `TESTOMATIO_RUNGROUP_TITLE` — groups related runs (per week / release / milestone).
 - `TESTOMATIO_DESCRIPTION` — free-form run description, shown on the run and in PR/MR comments; put the link to the change here (a generated coverage scope is appended after it).
 - `TESTOMATIO_ENV` — optional environment labels.
+
+## Find existing runs (`fetch`)
+
+`fetch` returns the project's existing runs, newest first. It is read-only.
+
+The project slug is required: pass `--project <project-slug>` or set `TESTOMATIO_PROJECT`. Without either it exits 1. Neither given → ask the user for the project slug; never guess it. `TESTOMATIO_URL` overrides the server (default `https://app.testomat.io`).
+
+| Option              | Effect                                                             |
+| ------------------- | ------------------------------------------------------------------ |
+| `--title <text>`    | partial match on the run title                                     |
+| `--tql <query>`     | Testomat Query Language filter (e.g. `"status = failed"`)          |
+| `--rungroup <uid>`  | runs in that rungroup, nested rungroups included                   |
+| `--limit <number>`  | max runs returned, newest first; default `30`, capped at `100`     |
+| `--latest`          | only the most recent run (same as `--limit 1`); combines with filters |
+
+Output:
+
+- No `--format`: a readable list with id, title, start/finish time, passed/failed/skipped counts, env, and CI build URL for each run.
+- `--format id`: only run ids, one per line.
+- `--format json`: a JSON array with every field of each run.
+
+```bash
+RUN_ID=$(npx @testomatio/reporter fetch --project <project-slug> --title "<title>" --latest --format id)
+```
 
 ## Report into an existing run
 

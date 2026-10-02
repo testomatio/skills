@@ -10,54 +10,77 @@ Gather intent with the `qa-pr-requirements-analyzer` skill first.
 
 ## Think
 
-- Does the provided implementation represent original task or requirement.
-- Possible ambiguities in implementation
-- Possible contradictions with existing practices, features
-- Possible duplication of existing features or patterns
+- Does the provided implementation represent the original task or requirement.
+- Possible ambiguities in implementation.
+- Possible contradictions with existing practices, features.
+- Possible duplication of existing features or patterns.
 - Unobvious usage: edge cases, repeated actions, boundary values, cancellations.
 - Combinations: how this feature interacts with other features.
 - Security vulnerabilities.
 
+## Prioritize facts
+
+- Every finding appears in exactly one section. Never restate a finding in another section.
+- A defect proven by the code goes to `Is it done` or `Merge Risks`, not both.
+- Anything not proven by the code goes to `What must be verified` as a scenario, or is dropped.
+- Order every list by impact on end-users, most severe first.
+- Limits are maximums, not targets. Fewer points are better than padded ones.
+- Whole review: at most 180 words. If over, drop the lowest-severity item.
+
 ## Output
 
-- Your output should be readable by person who doesn't understand or doesn't look into code.
-- Use QA language, avoid coding jargon
+- Your output should be readable by a person who doesn't understand or doesn't look into code.
+- Use QA language, avoid coding jargon.
 - Avoid mentioning internal variable names, syntax, queries, not relevant for QAs.
-- Use high-level business domain specific terms and not low level coding details
-- If needed mention class names, file names, but never get into deeper internal details
-- Explain risks and ambiguities from terms of persona using the software. Do not put coding terms in it.
-- Try to resolve ambiguities based on your code and requirements understanding
-- You can use bold and italics to emphasize points important for reviewer to take decision
-- Reply with **Only requested section named exactly they are provided provided**. No prephrase, no conclusions, only session.
+- Never mention HTTP status codes, test coverage, or unit tests.
+- Use high-level business domain specific terms and not low level coding details.
+- If needed mention class names, file names, but never get into deeper internal details.
+- Explain risks and ambiguities in terms of the persona using the software.
+- Try to resolve ambiguities based on your code and requirements understanding.
+- State facts directly. No hedging words: "may", "might", "possibly", "should be sanity-checked", "unverified".
+- Use bold only for the key point of each item.
+- Reply with **only the requested sections, named exactly as provided**. No preface, no conclusions.
 - Prefer simple wording and short sentences.
 
 ## Requested sections
 
-- Section `Is it done`: does the code meet the original request (pr title, issue description, etc). Include brief (1 line) original issue summary in it. Avoid details, your goal is to detect unmatched or wrongly understood issues. 1-3 sentances max.
-- Section `Backwards Compatibility`: how this change is aligned with our existsing features, is there a significant behavior changes we need to be aware of (if no compatibility issues present, just say so).
-- Section `Merge Risks`: what are potential problems can be introduced by merging this PR.
-- Section `What must be verified`: up to 5 most risk usage scenarios for end-users. Start in form: "**What if {persona} {verb}**". Avoid scenarios that are technical and can be unit tested.
+- Section `Is it done`: does the code meet the original request (PR title, issue description, etc).
+  - Verdict is `Yes`, `No`, or `Partially`.
+  - If the reported problem still reproduces on any path, verdict is `Partially` — never "Yes, with a caveat".
+  - If any `Merge Risks` point says the original problem still happens somewhere, verdict is `Partially`.
+  - Issue summary: at most 15 words. Reasoning: at most 30 words.
+- Section `Backwards Compatibility`: does the change alter behavior of existing features for existing users.
+  - If not, write one sentence and stop.
+  - New optional inputs and their new errors are not compatibility issues.
+- Section `Merge Risks`: problems merging this PR introduces, proven by the code.
+  - At most 3 points. Empty section is allowed: write `No risks found`.
+  - Each point: **impact on user, at most 8 words** — who hits it and when, at most 15 words.
+- Section `What must be verified`: at most 4 riskiest usage scenarios for end-users.
+  - Each scenario: **What if {persona} {action}** — expected result, at most 10 words.
+  - Avoid scenarios that are technical and can be unit tested.
 
 ## Output Format
 
 ```
 ### 👷‍♀️ Is it done
 
-<Yes, no, partially; few words>
+**<Yes | No | Partially>.** <original issue summary, ≤ 15 words>
 
-<Reasoning for decision, references>
+<reasoning, ≤ 30 words>
 
 ### 🦕 Backwards Compatibility
 
-<reasoning>
-<if no breaking changes -> 'No breaking changes'> 
-<if no change behavior -> 'No behavior changes'> 
+<'No breaking changes.' + why, ≤ 15 words — OR one line per changed existing behavior>
 
 ### 🌋 Merge Risks
 
-<numbered list. 1 to 5 points>
+1. **<impact on user, ≤ 8 words>** — <who hits it and when, ≤ 15 words>
+
+<0 to 3 points, most severe first>
 
 ### 🔬 What must be verified
 
-<bullet list in 'What if' format>
+- **What if <persona> <action>** — <expected result, ≤ 10 words>
+
+<up to 4 scenarios, most risky first>
 ```
