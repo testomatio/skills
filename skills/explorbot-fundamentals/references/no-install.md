@@ -29,7 +29,10 @@ EXPLORBOT_AI_PROVIDER=<name> \
 ```
 
 - `npx explorbot --help` lists every `EXPLORBOT_*` variable of the installed version — read it there rather than copying a list.
-- `EXPLORBOT_KNOWLEDGE="Log in as …"` applies knowledge to every page without a file; `EXPLORBOT_KNOWLEDGE_FILE` points at one.
+- `EXPLORBOT_KNOWLEDGE="Log in as …"` applies plain text to every page without a file. It cannot be scoped: frontmatter inside it is not read. `EXPLORBOT_KNOWLEDGE_FILE` points at a knowledge file, which can carry `url:` frontmatter. The `--knowledge` flag takes the same frontmatter inline.
+- `EXPLORBOT_OUTPUT` sets where reports and state are written. Without it they go to `~/.explorbot/sites/<host>/`, not the working directory. Set it when CI must upload the report.
+- With inline knowledge the output root holds `knowledge/global.md` with the resolved text. Upload `reports/` only, never the whole root.
+- A fresh runner has no browser. Install it first: `npx playwright install --with-deps chromium`. CI recipes: `docs/workflow/ci.md`.
 - Model variables take a provider name for its recommendation, or `provider/model-id` to pin one.
 - These variables win over `~/.explorbot/config.js`; a project `explorbot.config.js` wins over them.
 - `EXPLORBOT_EPHEMERAL=1` keeps nothing between runs.
