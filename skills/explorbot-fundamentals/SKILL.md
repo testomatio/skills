@@ -33,13 +33,11 @@ Installing into the project instead — config, knowledge, and generated tests i
 
 ## What a run needs
 
-Explorbot does not bring these itself. Check them before the first command on any new machine or CI runner:
+Explorbot does not bring these itself. Check them before the first command on any new machine:
 
 - **A browser.** `npx playwright install --with-deps chromium`. Without it every command that opens a page fails.
 - **A provider key** in the environment, and a provider chosen by config or `EXPLORBOT_AI_PROVIDER`.
 - **A known output folder** when something must collect the report. Set `EXPLORBOT_OUTPUT`; without a project config the default is `~/.explorbot/sites/<host>/`, not the working directory.
-
-CI recipes for each platform: `docs/workflow/ci.md`.
 
 ## Knowledge for one run
 
