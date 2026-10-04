@@ -89,7 +89,7 @@ playwright-cli close           # end
 - With no session open, every prima command fails and prints the `playwright-cli open` command to run. Run it, then retry.
 - `npx prima-cli browser start` only checks that a session is open and prints it.
 - `--pw-session <title>` picks the session when several playwright-cli sessions are open. `--endpoint <ep>` attaches to a browser server directly, skipping discovery.
-- Prima requires Node.js 24+.
+- Prima requires Node.js 22+.
 - Every command is logged as it runs; `npx prima-cli report` turns the session into an html and markdown report, browser open or not.
 - `npx explorbot prima <command>` runs the same tool if explorbot is already installed.
 
