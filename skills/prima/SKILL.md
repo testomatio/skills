@@ -4,7 +4,7 @@ description: Use for any browser work — driving a web app, checking a behaviou
 license: MIT
 metadata:
   author: Testomat.io
-  version: 0.4.3
+  version: 0.5.0
 ---
 
 # Prima
@@ -78,18 +78,18 @@ Screenshot analysis needs a vision model:
 
 ## Session
 
-Start the browser ONLY via playwright-cli. Prima never launches a browser itself — it attaches to the session playwright-cli already has open and disconnects when done, never closing it:
+Prima never launches a browser. It attaches to the session playwright-cli has open and disconnects when done, never closing it:
 
 ```bash
-playwright-cli open http://localhost:3000    # start — required first step
-npx prima-cli <command> ...                  # drive
-playwright-cli close                         # end
+playwright-cli open <url>      # start
+npx prima-cli <command> ...    # drive
+playwright-cli close           # end
 ```
 
-- If no session is open, every command fails with `No browser to drive for instance "default". Open one first`. `--url <url>` does NOT fix this: it only opens a page when the session already exists and has none. When you see that error, run `playwright-cli open <url>` first, then retry the prima command.
-- Do NOT use `npx prima-cli browser start` to open the browser. It launches prima's own bundled Playwright, which can demand a different chromium build than the machine has cached (e.g. `Executable doesn't exist at ~/.cache/ms-playwright/chromium_headless_shell-1243/...` while the cache tops out at an older build), a dead end that needs a fresh browser download. `playwright-cli open` reuses the already-installed `@playwright/cli` browser that is known to exist — always prefer it. `browser status` / `browser list` remain read-only diagnostics.
-- `--pw-session <title>` picks the session when several playwright-cli sessions are open. `--endpoint <ep>` attaches to a browser server directly, skipping discovery. `--instance <name>` only separates prima-owned browsers, so you do not need it when the browser comes from playwright-cli.
-- Prima requires Node.js 24+. Do NOT run a separate `npx playwright install chromium` for prima — reuse the browser playwright-cli already drives; installing for prima's bundled Playwright is what creates the chromium version mismatch above.
+- With no session open, every prima command fails and prints the `playwright-cli open` command to run. Run it, then retry.
+- `npx prima-cli browser start` only checks that a session is open and prints it.
+- `--pw-session <title>` picks the session when several playwright-cli sessions are open. `--endpoint <ep>` attaches to a browser server directly, skipping discovery.
+- Prima requires Node.js 24+.
 - Every command is logged as it runs; `npx prima-cli report` turns the session into an html and markdown report, browser open or not.
 - `npx explorbot prima <command>` runs the same tool if explorbot is already installed.
 
@@ -129,7 +129,9 @@ npx prima-cli status <hash>
 - `ok: true` means the action you asked for landed; nothing is substituted or retried along a different route.
 - `### Steps` marks each line `ok`, `FAIL` or `??`. `??` is an instruction that ran but the run ended without confirming — the actions that ran are listed above it, judge from those. Only `FAIL` and an instruction the page could not carry out fail the command.
 - `not verified` means the run never checked that outcome — not that it is false, and not a failure.
-- **`CONTRADICTION` is a finding, not a verdict to argue with.** The run and the picture disagree: something the assertions matched is not visible on screen, or the reverse. Both sides are quoted under the outcome, and `### Artifacts` names the html, aria and screenshot on disk — read those and judge the page yourself instead of taking the verdict on trust. Treat it as a bug in the app and look at it before anything else.
+- **When the run and the picture disagree, the page structure breaks the tie.** An outcome followed by a `resolved:` line was disputed and settled: the accessibility tree sided with the screenshot, so the run log was wrong and the PASSED or FAILED stands. Trust it like any other verdict; both sides stay quoted beneath it.
+- **`CONTRADICTION` is a finding, not a verdict to argue with.** It remains only when the tie could not be broken, or when the tree sided with the run: the page holds something it does not display, and its `resolved:` line names that as a likely rendering bug. Both sides are quoted under the outcome, and `### Artifacts` names the html, aria and screenshot on disk — read those and judge the page yourself. Treat it as a bug in the app and look at it before anything else.
+- **`go` to a url does not chase redirects.** `(redirected: <target> → <url>)` under `### Page` is the result: a login wall or an access rule sent the browser elsewhere. When that is not what you are testing, sign in with `do` first and go again.
 - A `### Warning` saying the outcomes came from the run log alone means no screenshot backed them: set `PRIMA_CLI_VISION_MODEL` (or pass `--vision-model`), and until then do not trust a visual claim from `check`.
 - A run that could not complete says so, rather than reporting it as a failure of the app.
 - `npx prima-cli config` shows which model answers for each role.
@@ -169,4 +171,4 @@ Layout, position, colour, overlap, whether something is cut off — an accessibi
 
 - `check` settles its outcomes against a screenshot of the final page. What a user can see is the proof; the run log only says what was done.
 - `ask "<question>"` — reads a screenshot, answers in prose. Use for anything open-ended about appearance.
-- `verify` proves claims with assertions; each comes back PASSED or FAILED with its playwright form, no overall verdict — read the lines and decide. When no assertion can express a claim it reports "none ran" instead of judging it failed.
+- `verify` proves claims with assertions; each comes back PASSED or FAILED with its playwright form, no overall verdict — read the lines and decide. A FAILED line carries its error beneath it: a missing text or element settles the claim as false, but a syntax or locator error means the assertion never ran, so the claim is still open. When no assertion can express a claim it reports "none ran" instead of judging it failed.
