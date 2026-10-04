@@ -82,23 +82,12 @@ priority: high
 
 ## Validate
 
-After the plan is written, check its structure with `npx mdq-cli` before handing it over.
-Exit `0` = matched, `1` = nothing matched, `2` = bad selector or file.
+Before handing the plan over, check it has test cases and a `URL: /path` or `URL: https://…`
+Prerequisite. Exit `0` passes; fix the plan and re-run on anything else:
 
 ```bash
-# 1. test cases exist — must exit 0
-npx mdq-cli 'comment(/^test/)' --count <plan-file>
-
-# 2. suite start URL is the first Prerequisite item, as `URL: /path` or `URL: https://…` — must exit 0
-npx mdq-cli 'section("Prerequisite") list[0] item[0]' --text <plan-file> | grep -E '^URL: (/|https?://)[^ ]*$'
+npx -y mdq-cli@latest 'comment(/^test/) && section("Prerequisite") item(/^URL: (\/|https?:\/\/)\S*$/)' <plan-file>
 ```
-
-- Check 1 prints the number of test cases; it must equal the number of scenarios written.
-  `--count` exits `0` even for zero, so read the number.
-- Check 2 fails when the Prerequisite is missing, the URL is not its first list item, or the
-  value is prose instead of a path / absolute URL. Explorbot reads only that first item.
-
-Fix the plan and re-run until both hold.
 
 ## Output
 
