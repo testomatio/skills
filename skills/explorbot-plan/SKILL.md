@@ -4,7 +4,7 @@ description: Use when the user wants to write an Explorbot test plan by hand —
 license: MIT
 metadata:
   author: Testomat.io
-  version: 0.1.0
+  version: 0.2.0
 ---
 
 # Writing Explorbot Test Plans
@@ -22,7 +22,6 @@ Installation is only required later to *run* the plan (see Output).
 - The **start URL**: a path relative to the app host (e.g. `/login`), or a full absolute URL.
   This is mandatory. Relative paths resolve against `web.url` in a project config, or against
   the site the command names (`EXPLORBOT_URL` / a registered host) in global mode.
-- Optional per-test start URLs when a scenario begins on a different page.
 - Priority for each scenario: `critical`, `important`, `high`, `normal`, `low`.
 
 ## Format
@@ -40,9 +39,6 @@ priority: critical
 -->
 # User signs in with valid credentials
 
-## Requirements
-/login
-
 ## Steps
 * Enter a registered email in the email field
 * Enter the matching password
@@ -56,9 +52,6 @@ priority: critical
 priority: high
 -->
 # Sign-in is rejected for an unknown account
-
-## Requirements
-/login
 
 ## Steps
 * Enter an unregistered email and any password
@@ -78,16 +71,23 @@ priority: high
   `playwright.url`; absolute URLs work too.
 - Each test: a `<!-- test` … `priority: <level>` … `-->` block, then `# Scenario` (h1).
   Missing priority defaults to `normal`.
-- **Give every test its own `## Requirements` line with the start URL** (same value as the
-  Prerequisite, unless the scenario starts elsewhere). Execution reads the per-test
-  `## Requirements` URL; a test with no `## Requirements` may have no start URL and fail to
-  run. The canonical generated plans repeat the URL in every test for this reason.
+- The Prerequisite URL is the start page for every test in the suite. A scenario that starts
+  on a different page goes in its own suite with its own Prerequisite URL.
 - `## Steps` and `## Expected` use `* ` bullets; wrap a long bullet by indenting continuation
   lines two spaces.
 - Steps are **guidance** — the Tester adapts them; keep each step atomic and free of brittle
   selectors. Every `## Expected` bullet must be **independently verifiable** (a data change,
   state change, or UI change with a real side effect), not a restated step.
 - Scenario titles describe a **business outcome**, not a click path.
+
+## Validate
+
+Before handing the plan over, check it has test cases and a `URL: /path` or `URL: https://…`
+Prerequisite. Exit `0` passes; fix the plan and re-run on anything else:
+
+```bash
+npx -y mdq-cli@latest 'comment(/^test/) && section("Prerequisite") item(/^URL: (\/|https?:\/\/)\S*$/)' <plan-file>
+```
 
 ## Output
 
