@@ -1,12 +1,10 @@
 # Wiki layout
 
-Product-agnostic. Name `{area}` / `{feature}` (and any extra group folders) from **what the product does**, not from the stack. Follow naming rules according to code/language used (kebab-case by default). Same relative path in `capabilities/` and `catalog/`.
-
-Default tree is multiple levels under `capabilities/`. Add sub-folders (with required depth) when the project is complex enough that an area needs a named group. Each with a README.
+Product-agnostic. `capabilities/` mirrors `catalog/`: same areas, groups, and features, same relative paths. Naming and grouping are decided in the catalog (`catalog-features`). Every folder has a README.
 
 ```
 wiki/
-  README.md                        # front door → roots
+  README.md                        # front door → roots, baseline commit
   capabilities/                    # Wiki > Capabilities
     README.md                      # areas index
     {area}/                        # Wiki > Capabilities > {Area}
@@ -15,29 +13,22 @@ wiki/
       {group}/                     # optional extra nesting
         README.md
         {feature}.md
-  catalog/                         # Wiki > Catalog  — list of functionalities
-    README.md                      # areas index
-    {area}/
-      README.md                    # YAML index
-      {feature}.yaml
-      {group}/
-        README.md
-        {feature}.yaml
+  catalog/                         # code catalog, written by catalog-features; read-only here
+    {area}/{feature}.yaml          # same relative path as the feature page
   mismatches/                      # optional — create when a disagreement exists
-    README.md
+    README.md                      # index by kind
+    {mismatch}.md                  # one behavior, every source that disagrees
 ```
 
-Create `mismatches/` when code disagrees with comments, infra, docs, issues etc.
+Create `mismatches/` when code disagrees with comments, infra, docs etc. in the repo. Issues, requirements, and user docs outside the repo are compared by `wiki-cross-check`.
 
 ## Rules
 
 | Rule | Do |
 | --- | --- |
 | Default | `capabilities/{area}/{feature}.md` |
-| Extra depth | New group folder when the area (or group) is too crowded or a cluster needs a name. Any depth. |
-| Split | New sibling `{feature}.md`, a new group folder, or a new `{area}/`. |
 | Share | One page owns a shared rule; others link. Same behavior, two entries → one page. |
-| Growth | New behavior → new leaf + catalog entry + one new index line. Do not thicken an existing leaf into a mega-page. |
+| Growth | New catalog item → new leaf + one new index line. Do not thicken an existing leaf into a mega-page. |
 | Overview first | Indexes exist before any leaf is written. |
 
 ## Formatting
@@ -48,47 +39,34 @@ Every page: `# Title`, then a breadcrumb that matches folders, then the body. Om
 
 | File | Body |
 | --- | --- |
-| `wiki/README.md` | Roots (`capabilities/`, `catalog/`, `changes/` / `mismatches/` (if present)) |
+| `wiki/README.md` | Every root folder in `wiki/`: link + purpose. Baseline: commit (`git rev-parse HEAD`) and date the wiki reflects |
 | `capabilities/README.md` | Every area: link + purpose (markdown indexes only — not catalog YAML) |
 | `capabilities/{area}/README.md` | Every child feature (or group): link + purpose |
 | Extra group `README.md` | Every child feature (or deeper group): link + purpose |
-| `catalog/README.md` | Every area: link to that area’s catalog README |
-| `catalog/{area}/README.md` | Every child YAML: link + purpose (YAML indexes only — not feature pages) |
 
-**Leaf** (`{feature}.md`): headings in this order only — Requirement, Acceptance. After the breadcrumb, a relative link to the paired catalog YAML. Intended-but-unwired behavior is not a feature heading — it goes in `mismatches/` only. Code and tracker references live in catalog YAML (`sources`, `tests`, `issues`), never on the feature page.
+**Leaf** (`{feature}.md`): headings in this order only — Requirement, Acceptance. After the breadcrumb, a relative link to the paired catalog YAML. Claimed but unwired behavior is not a feature heading — it goes in `mismatches/` only. Code references live in catalog YAML (`sources`, `tests`), never on the feature page.
 
-## Catalog YAML
+## Catalog
 
-```yaml
-wiki_path: capabilities/{area}/{feature}.md
-entry:
-  - POST /api/v1/orders
-  - UI /checkout
-  - Job SettlePayments
-sources:
-  - path/to/code
-tests:
-  - TestOrSpecFile
-issues:                    # optional; omit the key when none
-  - key: PROJ-123
-    url: https://example.com/browse/PROJ-123
-behaviors:
-  - One as-implemented fact (observable outcome).
-```
+`catalog/` is the code catalog from the `catalog-features` skill: one YAML per feature with `entry`, `sources`, `tests`, and actual behaviors.
 
-`entry` is whatever a human would use to *find* the behavior. Catalog is **implicit** current state. One YAML per feature. If the feature sits in extra folders, the YAML uses the same folders.
+Repo paths are written only in catalog YAML and mismatch pages.
 
-`wiki_path` is the pointer from catalog to the feature page. `sources` is the implementation (and product docs that describe it). `issues` is optional tracker links (tasks, issues, stories). `url` is required on each item; `key` when the tracker has a display key. Ask before adding. Omit `issues` when the user declined or nothing matched.
+## Mismatches
 
-Repo paths (implementation, tests, docs) and tracker links are written only in catalog YAML.
+Create `mismatches/` when code disagrees with a **claim**: anything else in the repo that describes behavior (comment, docstring, README, developer docs, API spec, config, infra, test).
 
-## Mismatch page
+| Kind | Meaning | Example |
+| --- | --- | --- |
+| Not implemented | A claim describes behavior the code lacks | README lists CSV export; no export code exists |
+| Differs | Code has the behavior, but its details contradict the claim | Docstring says sessions expire after 30 min; code uses 60 |
+| Unwired | Stub, flag, config, or route for behavior users cannot reach | `bulk_export` flag defined; nothing reads it |
 
-Create `mismatches/` when code disagrees with comments, infra, docs, issues/tasks. Index: `mismatches/README.md`.
+`mismatches/README.md`: title + breadcrumb + one section per kind; each item links its page.
 
-Every mismatch must link every source that justifies it (omit none that exist):
+Mismatch page: `# {Behavior}`, breadcrumb, kind, link to the feature page (when one exists), then one row per source. Link every source that justifies it (omit none that exist); Code row always.
 
-| Link | What to point at |
-| --- | --- |
-| Implemented | Always — current behavior based on code |
-| Intended | Always — the non-wiki source that disagrees with those files (comment, doc, infra, issue, unused config, or stub) |
+| Source | Says | Link |
+| --- | --- | --- |
+| Code (actual) | … | Implementing files, or `not found` + where searched |
+| Comment, docstring, docs, API spec, config, infra, or test | … | Repo path |
