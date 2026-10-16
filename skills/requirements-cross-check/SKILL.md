@@ -50,7 +50,7 @@ Read [references/layout.md](references/layout.md) and [references/behaviors.md](
 ## Rules
 
 - **Never edit snapshots**: catalogs (`catalog/`, `sources/{name}/`), `capabilities/`, `mismatches/`. A snapshot error goes in the report (→ re-sync).
-- **Report, don't decide.** A gap shows what each source says; `Likely cause` is a hint, not a verdict.
+- **Report, don't decide.** A gap shows what each source says.
 - Compare claims, not wording. Same behavior in other words agrees; a coarse claim consistent with a detailed one agrees. Different values, conditions, roles, or labels differ.
 - Catalogs hold only key, title, and link: read each item at its link and state its behaviors as [references/behaviors.md](references/behaviors.md) describes.
 - Unread is not silence: content that cannot be read (images, restricted pages) gives no Missing gap. List it as an open question.
