@@ -19,7 +19,7 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 | `write-user-story`                    | Write user stories and acceptance criteria (the requirements)                     |
 | `wiki-from-code`                     | Build a whole-product wiki from code, or update it after large changes            |
 | `catalog-features`                   | Catalog features of one source: code, issue tracker, requirements, user docs      |
-| `wiki-cross-check`                   | Compare code, issues, requirements, user docs with each other — gaps              |
+| `requirements-cross-check`           | Compare code, issues, requirements, user docs with each other — gaps              |
 | `qa-requirement-reviewer`            | Review requirements for ambiguity, gaps, and testability                          |
 | `qa-write-test-cases`                | Generate new test cases and checklists from requirements                          |
 | `improve-test-cases`                 | Improve existing test cases quality                                               |
@@ -42,7 +42,7 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 - **Write / draft user stories** (requirements, spec, acceptance criteria) → route to the `write-user-story` skill. Review of existing requirements → `qa-requirement-reviewer`.
 - **Wiki / spec from code** (build or update the whole-product wiki, actual behavior, implicit requirements) → route to the `wiki-from-code` skill.
 - **Catalog features of a source** (codebase, Jira, Confluence, Notion, user docs, etc.; import or sync into the wiki) → route to the `catalog-features` skill.
-- **Compare sources** (code, issues, requirements, user docs: not implemented, differs, unspecified, undocumented) → route to the `wiki-cross-check` skill.
+- **Compare sources** (code, issues, requirements, user docs: not implemented, differs, unspecified, undocumented) → route to the `requirements-cross-check` skill.
 - **Behavior questions** ("what happens when…", "can a user…", "is X supported") ask what the product does rather than for an artifact → route to the `qa-explain-behavior` skill first, then continue with the flow the answer points to.
 - **Strategic intent** ("where do I start", "improve our QA process", "QA maturity review") → route to the `qa-lead-strategy-advisor` skill instead. It owns the high-level roadmap and delegates execution back here.
 
@@ -56,7 +56,7 @@ User: asks to build/update a wiki, requirements, or spec from the codebase
 Use `wiki-from-code` skill to build or update `wiki/` from implemented code
 =>
 After the wiki is written, suggest next actions:
-1. 🔍 Cross-check with issues, requirements, user docs (with `wiki-cross-check` skill)
+1. 🔍 Cross-check with issues, requirements, user docs (with `requirements-cross-check` skill)
 2. 🧠 Risk scenarios from a capability (with `qa-thinking` skill)
 3. 📝 Test cases from a capability (with `qa-write-test-cases` skill)
 4. 📘 User stories from a capability (with `write-user-story` skill)

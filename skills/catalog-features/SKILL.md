@@ -1,9 +1,9 @@
 ---
 name: catalog-features
 description: >-
-  Parses the source of product features into a catalog of features.
+  Builds a catalog of product features from one source: a tree that mirrors the source, each feature as a key, title, and link to the source. Any source that describes the product (code, issues, requirements, docs, or other sources) is supported.
   Intended to be used by other skills (or directly by the user).
-  Use when asked to catalog features or existing functionality, or to import, sync, parse, or snapshot code, tickets, issues, features, epics, requirements, specs, PRDs, or user docs into a catalog/list of features.
+  Use when asked to catalog features or existing functionality, or to import, sync, or snapshot code, tickets, issues, features, epics, requirements, specs, PRDs, or user docs into a catalog/list of features.
 metadata:
   author: Testomat.io
   version: 1.0.0
@@ -11,115 +11,125 @@ metadata:
 
 # Catalog features
 
-Catalog of **the source's features and their behaviors**: a tree that mirrors the source, one YAML item per feature, issue, page, or section.
+Catalog of **the source's features**: a tree that mirrors the source, each feature with its key, title, and link. No details: the source stays the place to read them. Catalog exists for quick search and reference.
 
-## Sources
-
-| Type          | Examples                                                       | Reference                                         |
-| ------------- | -------------------------------------------------------------- | ------------------------------------------------- |
-| Code          | Repository                                                     | [code.md](references/code.md)                     |
-| Issue tracker | Jira, Linear, GitHub Issues, YouTrack, Azure Boards            | [issue-tracker.md](references/issue-tracker.md)   |
-| Requirements  | Confluence, Notion, Google Docs, Word, PDF, repo specs, PRDs   | [requirements.md](references/requirements.md)     |
-| User docs     | Docs site, help center, in-app help                            | [user-docs.md](references/user-docs.md)           |
-| Other         | Test cases, release notes, partner API contracts, design files | [Other sources](#other-sources)                   |
-
-Any other source is also supported.
-
-Output folder: given by the calling skill or the user. Write only inside it.
-
-## Steps
-
-```
-- [ ] 1. Define the source
-- [ ] 2. Inventory and tree (indexes)
-- [ ] 3. Parse items (one subagent per group)
-- [ ] 4. Validate
-- [ ] 5. Report
-```
-
-Read [references/layout.md](references/layout.md) and the reference for the source type before writing files.
+Output folder: given by the calling skill or the user. Write only inside it (default: `features-catalog/`).
 
 ## Rules
 
 - **Read-only on the source.** Never create, edit, comment on, or transition issues, pages, or code, even when the MCP offers it.
-- Store distilled claims, never the source text. **Never store people, comments, attachments, or customer data.**
-- Keep exact values in claims: numbers, limits, roles, plans, UI labels, conditions. The cross-check compares them.
-- Content that cannot be read (images, diagrams, restricted pages) goes in `unread`. It is not silence.
+- Catalog only: key, title, link. Never store behaviors, descriptions, comments, or other source content.
+- Never store people or customer data.
 - Write only keys, URLs, and paths that exist in the source. Never guess or build them.
+- Follow the source tree structure.
+- One catalog per source.
 
-## 1. Define the source
+## Sources
 
-Ask the user, unless given:
+Defaults per source type; the user may override them. Record type, role, coverage, and history in the catalog README. Coverage applies within the scope.
+
+| Type          | Examples                                            | Role     | Coverage | History |
+| ------------- | --------------------------------------------------- | -------- | -------- | ------- |
+| Code          | Repository, local files                             | Actual   | Complete | No      |
+| Issue tracker | Jira, Linear, GitHub Issues, YouTrack, Azure Boards | Intended | Partial  | Yes     |
+| Requirements  | Confluence, Notion, Google Docs, Word, PDF, PRDs    | Intended | Complete | No      |
+| User docs     | Docs site or repo folder, help center, in-app help  | Expected | Complete | No      |
+| Other         | Test cases, release notes, API contracts, designs   | Ask      | Ask      | Ask     |
+
+Read info only for required source(s), ignore the rest.
+
+### Code
+
+- Tree: areas → features, named from what the product does for its users, not from the stack or code folders.
+- Item: one per feature, not per file; same feature in two places → one item. Link: repo paths of the main implementation (route, screen, job), not every file.
+- Sync: features users can reach now. Not stubs, routes users cannot reach, or features behind disabled flags; comments, docs, and tests do not make a feature.
+- Re-sync: `git diff --name-status -M {baseline}..HEAD`; check the items whose paths changed. Renamed or moved files → update the paths. Changed paths no item covers → check whether they add a feature. Every path of an item deleted → remove the item. No baseline or no git → rebuild. Keep titles and folder names unless the product changed; renames break links.
+
+### Issue tracker
+
+- Scope: a query (JQL, `gh` search, Linear filter); ask the user for it and store it verbatim.
+- Tree: the tracker's hierarchy: initiatives, epics, parent issues. No parent → ungrouped. Sub-tasks fold into the parent; tasks, spikes, and chores users cannot see → skip.
+- Sync: done issues only: Done, Closed, Resolved as Done / Fixed / Released; GitHub `completed`. Skip Won't Do, Duplicate, Obsolete, Invalid; GitHub `not_planned`. Open, In Progress, In Review → skip, unless the user includes planned work.
+
+### Requirements
+
+- Word, PDF: extract the text first (`docx`, `pdf` skills).
+- Tree: page tree; parent page → group. Database (Notion, Airtable) → item per row, groups by its grouping property. One long document → group, item per top-level heading that describes a feature (not intro, goals, glossary, appendix).
+- Sync: Approved, Current, Published, or no status. Skip Draft, Proposed, In review (unless the user includes them); Deprecated, Archived, Superseded; old copies ("Copy of …", v1 next to v2). Status lives in a page status, labels, a properties table, a title prefix, or a banner: find the convention, ask when there is none.
+
+### User docs
+
+- Access: repo docs → nav from the docs config (`sidebars.js`, `mkdocs.yml`, `SUMMARY.md`, `_toc.yml`, `docs.json`); docs site → its nav or `sitemap.xml`.
+- Tree: docs nav as readers see it, not files or URLs. Item per page.
+- Sync: one version (the release being cataloged) and one language. Skip generated API reference (covered by code), changelog and release notes (a separate source), drafts and hidden pages; blog, marketing, legal (unless the user includes them).
+
+### Other
+
+Any source that describes the product. Agree on role, coverage, history, tree, and align with the user before syncing. Example: test cases in Testomat.io (`testomatio-mcp`): tree = suites, role = expected.
+
+## Steps
+
+```
+- [ ] 1. Define the source and domain
+- [ ] 2. Inventory
+- [ ] 3. Write the tree
+- [ ] 4. Validate
+- [ ] 5. Report
+```
+
+Read [references/layout.md](references/layout.md) before writing files.
+
+## 1. Define the source and domain
+
+Catalog README exists in the output folder → re-sync: take type, access, scope, and domain from it; ask nothing.
+
+Otherwise ask the user in one message, unless given:
 
 - Type and access: repository, MCP, CLI, URL, export, or file path. No access → stop and ask for an MCP connection or an export.
-- Scope as a concrete, repeatable filter: repo paths, tracker query (JQL, project + epic / version / label), root page or space, docs root + version + language.
-- Status filter, coverage, and history, only when the source's convention differs from the type reference defaults.
+- Scope as a concrete, repeatable filter (depending on the source type): repo paths, tracker query (JQL, project, label), root page or space, docs root + version + language.
+- Domain: what the product does and for whom, user roles and plans, key terms.
 
-Several sources in one run: one output folder each; define all of them first, then run steps 2–4 per source.
+Domain not given → infer it from the source. Name groups and items in the domain terms.
 
-`update`: take all of these from the catalog README.
+Several sources in one run → one catalog (output folder) each; define all of them first, then run steps 2–4 per source.
 
-## 2. Inventory and tree
+## 2. Inventory
 
-1. List every unit in scope with key or URL, title, status, group (code area, epic, parent page, nav section), last update. Paginate to the end.
-2. Drop units that fail the status filter. Count them by reason.
-3. Build the tree. Groups mirror the source structure (type reference).
-4. Write the indexes before any item: the catalog README and group READMEs.
+List every unit in scope with key or URL, title, status, group. Paginate to the last page; search APIs cap the page size. (Do not invent keys, URLs, or paths; use only existing ones.)
 
-`update`: rerun the stored scope. Changed `updated` → re-parse; new → add; moved to another group → move the file; gone from scope → remove the item and its index lines. Keep folder names unless the source renamed the group.
+Drop units that fail the source type's Sync rule; count them by reason.
 
-## 3. Parse items
+Re-sync: compare with the existing catalog. New → add; gone from scope → remove the item and its index lines; moved to another group → move it; title or link changed → update it. Keep folder names unless the source renamed the group. Code: [Code](#code) re-sync.
 
-One subagent per group (code area, epic, page subtree, docs section); split large groups into batches. Small sources (a few dozen units): no subagents.
+## 3. Write the tree
 
-Each subagent gets: its units (keys, URLs, or paths), the type reference, [references/layout.md](references/layout.md), the rules above.
-
-Subagent returns: item paths written, units skipped with reason (no observable behavior, out of scope), unread content, glossary terms.
-
-Main agent fills the catalog README: counts, unread, terms.
-
-## Other sources
-
-Any source that makes claims about product behavior. Before syncing one, agree with the user and record in its README:
-
-- Role: intended (what should be built), expected (what users are told), or actual (what runs).
-- Unit and tree: what one item is, how the source groups items.
-- Status filter: which states count.
-- Coverage: complete (silence is a gap) or partial.
-- History: whether a newer item overrides an older one.
-
-Examples:
-
-- Test cases (Testomat.io via `testomatio-mcp`, other TMS): tree = suites; behaviors from expected results; role expected.
-- Release notes, changelog: tree = versions; history; coverage partial.
-- Design files (Figma): only annotations and text; the rest is `unread`.
+Groups mirror the source structure. Write the catalog README and the group READMEs as [references/layout.md](references/layout.md) describes.
 
 ## 4. Validate
 
 ```markdown
 Structure
-- [ ] Catalog README states type, role, access, scope, status filter, coverage, history, synced, counts; indexes every group
-- [ ] Every group README lists its items; the tree mirrors the source
+- [ ] Catalog README states type, role, coverage, history, access, scope, date, domain, counts; indexes every group
+- [ ] Every group README lists its subgroups and items; the tree mirrors the source
 - [ ] Nothing written outside the output folder
 - [ ] No invented keys, URLs, or paths
 
 Content
-- [ ] Every item has at least one behavior, or its unit is counted as skipped with a reason
-- [ ] Behaviors are observable claims with exact values; no copied source text
-- [ ] Items hold no people, comments, attachments, or customer data
+- [ ] Every item has a title and a link (code: paths); a key when the source has one
+- [ ] No behaviors, descriptions, people, or customer data
 - [ ] Code: areas and features named from the product, not the stack
-- [ ] update: items gone from scope removed
+- [ ] Re-sync: items gone from scope removed
 ```
 
 ## 5. Report
 
-Where to start. Items synced, skipped by reason. Unread content to check by hand. Huge sources: those only.
+Where to start. Items synced, skipped by reason. Be concise.
 
-To a calling skill: items added, changed, and removed (code: their areas).
+To a calling skill: items added, changed, and removed.
 
 ## Next actions
 
-- Compare with code or other sources → `wiki-cross-check`
+- Compare with code or other sources → `requirements-cross-check`
 - Feature pages from the code catalog → `wiki-from-code`
 - Review requirements for ambiguity and gaps → `qa-requirement-reviewer`
 - Test cases from requirements → `qa-write-test-cases`

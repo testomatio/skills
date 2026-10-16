@@ -39,12 +39,14 @@ area: Checkout
 features:
   - name: Pay with saved card
     aliases: [One-click pay]        # names other sources use; omit when none
-    items:                          # wiki-root-relative; items of every compared source
-      - catalog/checkout/pay.yaml
-      - sources/jira/PROJ-100/PROJ-123.yaml
-      - sources/confluence/checkout/saved-cards.yaml
-      - sources/user-docs/payments/pay.yaml
+    items:                          # per source: item keys, else URLs; code: the feature page
+      code: [capabilities/checkout/pay-with-saved-card.md]
+      jira: [PROJ-123]
+      confluence: [https://example.atlassian.net/wiki/spaces/PROD/pages/123]
+      user-docs: [https://docs.example.com/payments/pay]
 ```
+
+Source names: `code`, and the folder names under `sources/`. Keys, URLs, and paths exactly as in the catalogs.
 
 Links go one way: map → items. Catalogs never link to the map.
 
@@ -62,11 +64,13 @@ Gap page: `# {Behavior}`, breadcrumb, kind, likely cause, feature (name + map li
 
 | Source | Says | Updated | Link |
 | --- | --- | --- | --- |
-| Code (actual) | Expired cards are listed and disabled | 2026-08-30 | Catalog YAML + implementing files, or `not found` + where searched |
-| Jira (intended) | Expired cards are listed and disabled | 2026-08-28 | Item + its URL |
-| Confluence (intended) | Expired cards are hidden | 2026-01-10 | Item + its URL or path |
+| Code (actual) | Expired cards are listed and disabled | 2026-08-30 | Feature page + implementing files, or `not found` + where searched |
+| Jira (intended) | Expired cards are listed and disabled | 2026-08-28 | Key + URL |
+| Confluence (intended) | Expired cards are hidden | 2026-01-10 | Title + URL or path |
 | User docs (expected) | silent | | Where searched |
 
+- `Says`: the source's behavior as [behaviors.md](behaviors.md) describes; `silent` when it has none.
+- `Updated`: the item's date, read at the source (SKILL.md › Likely cause).
 - Code row always, when code is compared.
 - Superseded items of a source with history: omit, or mark `superseded by {key}` when it explains the gap.
 - A matching `mismatches/` page (code vs repo claims): link it below the table; do not restate it.

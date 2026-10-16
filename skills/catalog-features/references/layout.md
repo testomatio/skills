@@ -4,53 +4,45 @@ One catalog per source, in the output folder the caller gives. The tree mirrors 
 
 ```
 {catalog}/                   # output folder
-  README.md                  # source facts, counts, unread, terms, group index
+  README.md                  # source facts, counts, groups, ungrouped items
   {group}/                   # code area, epic, parent page, nav section; any depth
-    README.md                # item and subgroup index
-    index.yaml               # the group's own content (epic, parent page); omit when none
-    {item}.yaml
+    README.md                # the group's own link, subgroups, items
 ```
 
 ## Formatting
 
-Every page: `# Title`, then a breadcrumb that matches folders, then the body. Relative links only.
+Every page: `# Title`, then a breadcrumb that matches folders, then the body. Relative links between catalog pages.
 
-| File                | Body                                                                                                                                             |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `README.md`         | Facts table (below); counts: synced, skipped by reason; unread; terms (source term → meaning) when found; every group: link + title + item count |
-| `{group}/README.md` | Every item and subgroup: link + title                                                                                                            |
+| File                | Body                                                                                                                     |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `README.md`         | Facts table (below); counts: synced, skipped by reason; every group: link + title + item count; ungrouped items          |
+| `{group}/README.md` | The group's own key and link (epic, parent page), when it has one; every subgroup: link + title + item count; every item |
 
 Catalog facts:
 
-| Fact          | Value                                                                    |
-| ------------- | ------------------------------------------------------------------------ |
-| Type          | Code, issue tracker, requirements, user docs, or the other source's kind |
-| Access        | Repository, MCP server and tools, CLI, URL, or path used                 |
-| Scope         | Repo paths, exact query, root page, docs root + version + language       |
-| Date          | Date of this sync; code: baseline commit and its date                     |
+| Fact     | Value                                                                                   |
+| -------- | --------------------------------------------------------------------------------------- |
+| Type     | Code, issue tracker, requirements, user docs, or the other source's kind                |
+| Role     | Intended (what should be built), expected (what users expect), or actual (how it works) |
+| Coverage | Complete (silence within the scope is a gap) or partial                                 |
+| History  | Yes (newer items supersede older ones) or no                                            |
+| Access   | Repository, MCP server and tools, CLI, URL, or path used                                |
+| Scope    | Repo paths, exact query, root page, docs root + version + language                      |
+| Date     | Date of this sync; code: baseline commit and its date                                   |
+| Domain   | What the product does and for whom, roles, plans; `inferred` when not from the user     |
 
 ## Item
 
-One YAML per unit. Common fields below; type references add their own.
+One line per feature in its group README:
 
-```yaml
-# sources/jira/PROJ-100/PROJ-123.yaml
-key: PROJ-123                  # source id; omit when none
-url: https://example.atlassian.net/browse/PROJ-123   # omit when none
-path: specs/checkout.md        # repo file; omit for external sources and code
-title: Pay with saved card
-status: Done                   # source status as is
-updated: 2026-09-01            # last change at the source
-behaviors:
-  - Saved card is preselected at checkout.
-  - Expired cards are hidden.
-refs:                          # links to other sources found in the item; omit when none or not applicable
-  - https://example.atlassian.net/wiki/spaces/PROD/pages/123
-unread:                        # content not parsed; omit when none
-  - Checkout flow diagram (image)
+```markdown
+- [PROJ-123](https://example.atlassian.net/browse/PROJ-123) Pay with saved card
+- [Saved cards](https://example.atlassian.net/wiki/spaces/PROD/pages/123)
+- Pay with saved card: `src/checkout/cards.ts`, `src/api/cards.ts`
+- Saved cards: `specs/checkout-prd.pdf` § Saved cards
 ```
 
-- `behaviors`: one observable claim per line.
-- Negative claims count: "Viewer cannot delete a project."
-- Conditions belong to the claim: "Enterprise plan: SSO via SAML."
-- File and folder names: the key when the source has one (`PROJ-123.yaml`), else kebab-case title.
+- Key: the source id as the link text (`PROJ-123`, `REQ-12`). No key → the title is the link text.
+- Title: short description of the feature. The source title as is; rewrite it only when it is missing, unclear, or names people or customers.
+- Link: the unit's URL or repo path. Code: repo paths of the feature's main implementation. Section of a long document: the document's URL or path + `§ {heading}` as written.
+- Folder names: the key when the group has one (`PROJ-100/`), else kebab-case title.
