@@ -4,7 +4,7 @@ description: Investigate a project's CI and deploy new automated QA workflows in
 license: MIT
 metadata:
   author: Testomat.io
-  version: 1.0.0
+  version: 1.1.0
 ---
 
 # Setup CI Automation
@@ -38,6 +38,7 @@ When the environment renders Mermaid, present a workflow — existing or propose
 - Pin down the triggering event, the task to run, and where its result goes.
 - The task's commands come from the skill that owns it (ideas below); this skill contributes only the CI wiring.
 - A task performed by an AI agent needs that agent runnable in CI — ❓ ask how the project runs its agent there; never fabricate an install.
+- When the agent is Testeiya, deploy a **pipeline**, one `npx testeiya@latest pipeline <name>` job per flow — see [Testeiya pipelines](references/testeiya-pipelines.md).
 - Confirm the design with its diagram (Step 2) before writing config.
 
 ### Step 4 — Author the workflow
@@ -70,6 +71,10 @@ Tasks worth wiring to CI events — the named skill owns each task's content:
 | Issue opened  | QA-analyze the feature — edge cases, acceptance criteria    | `qa-thinking`                                        |
 | Deploy done   | Create a scoped test run, launch affected tests             | `setup-change-aware-pr-testing`                      |
 | Schedule      | Detect duplicate or overlapping test cases                  | `detect-duplicate-test-cases`                        |
+| PR opened     | Review, write test cases, sync them to Testomat.io         | `testeiya pipeline pr-review`                        |
+| Deploy done   | Test the change in a browser with Explorbot                 | `testeiya pipeline web-testing`                      |
+| Deploy done   | Test the changed API endpoints with Explorbot               | `testeiya pipeline api-testing`                      |
+| PR opened     | Run the tests a change can break, explain failures          | `testeiya pipeline regression`                       |
 
 ## Related skills
 

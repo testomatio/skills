@@ -60,6 +60,7 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 | ---------------- | ---------------------------------------------------------------------------------------------------- |
 | `qa-e2e-tests-reporting` | Set up Testomat.io test reporting for your automation framework (Playwright, CodeceptJS, Jest, etc.) |
 | `qa-data-seeder` | Analyze a feature's implementation and seed a balanced test dataset (regular + edge cases) into a target environment |
+| `pipeline-report` | Write the one final report of a testeiya pipeline run from every stage's results |
 
 ### Explorbot
 
@@ -130,7 +131,7 @@ Skills are also bundled as [Claude Code plugins](https://docs.testomat.io) via t
 | `requirements`    | `write-user-story`, `wiki-from-code`, `qa-requirement-reviewer`, `qa-thinking`, `qa-explain-behavior`, `qa-pr-requirements-analyzer`, `pull-request-diff-analyzer` | Write, review, and analyze requirements and features before and during development |
 | `qa-process`      | `qa-lead-strategy-advisor`, `qa-explain-behavior`, `qa-thinking`, `testing-workflow` | Assess QA maturity, prioritize a quality roadmap, explain product behavior, and orchestrate the test lifecycle |
 | `test-management` | `qa-write-test-cases`, `improve-test-cases`, `sync-test-cases-with-tms`, coverage & more | Manage the test case lifecycle: generate, improve, sync to Testomat.io          |
-| `test-automation` | `automate-manual-test-cases`, `debug-fix-failed-flaky-autotests`, `qa-data-seeder` | Create automated tests, heal failing/flaky autotests, and seed test data        |
+| `test-automation` | `automate-manual-test-cases`, `debug-fix-failed-flaky-autotests`, `qa-data-seeder`, `pipeline-report` | Create automated tests, heal failing/flaky autotests, and seed test data        |
 | `explorbot`       | `explorbot-setup`, `explorbot-fundamentals`, `explorbot-plan`, `prima` | Install, configure, run, debug and plan Explorbot autonomous AI web tests, and drive a browser with prima |
 
 ## Links
