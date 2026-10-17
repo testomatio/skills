@@ -1,65 +1,43 @@
 # Wiki layout
 
-Product-agnostic. `capabilities/` mirrors `catalog/`: same areas and groups, same relative paths, one feature page per catalog item. Naming and grouping are decided in the catalog (`catalog-features`). Every folder has a README.
+`features/` mirrors `catalog/`: same folders, one feature page and one feature YAML per catalog item. Naming and grouping are decided in the catalog (`catalog-features`). Every folder has a README.
 
 ```
-wiki/
-  README.md                        # front door → roots, baseline commit
-  capabilities/                    # Wiki > Capabilities
-    README.md                      # areas index
-    {area}/                        # Wiki > Capabilities > {Area}
-      README.md                    # features index
-      {feature}.md                 # Wiki > … > {Feature}  — leaf
-      {feature}.yaml               # the leaf's code references
-      {group}/                     # optional extra nesting
-        README.md
-        {feature}.md
-        {feature}.yaml
-  catalog/                         # code catalog, written by catalog-features; read-only here
-    README.md                      # areas, baseline commit
-    {area}/README.md               # one line per feature: title + main code paths
-  mismatches/                      # optional — create when a disagreement exists
-    README.md                      # index by kind
-    {mismatch}.md                  # one behavior, every source that disagrees
+{output}/                    # output folder
+  README.md                  # sitemap, baseline commit
+  catalog/                   # code catalog (catalog-features)
+  features/
+    README.md                # areas
+    {area}/                  # any depth, as in the catalog
+      README.md              # groups and features
+      {feature}.md           # feature page
+      {feature}.yaml         # its code references
+  mismatches/                # shared with detect-product-mismatches
+    README.md                # index; this skill owns its Code vs repo section
+    {mismatch}.md            # one behavior, every source that disagrees
 ```
 
-Create `mismatches/` when code disagrees with comments, infra, docs etc. in the repo. Issues, requirements, and user docs outside the repo are compared by `requirements-cross-check`.
+## Names
 
-## Rules
-
-| Rule | Do |
-| --- | --- |
-| Default | `capabilities/{area}/{feature}.md` |
-| Names | Folders reuse the catalog's folder names. `{feature}`: kebab-case of the catalog item title. Catalog title changed → rename the page and its feature YAML, fix every link to them. |
-| Share | One page owns a shared rule; others link. Same behavior, two entries → one page. |
-| Growth | New catalog item → new leaf + its feature YAML + one new index line. Do not thicken an existing leaf into a mega-page. |
-| Overview first | Indexes exist before any leaf is written. |
+- Folders reuse the catalog's folder names. `{feature}`: kebab-case of the catalog item title. Catalog title changed → rename the page and its feature YAML, fix every link to them.
+- One page owns a shared rule; others link.
 
 ## Formatting
 
 Every page: `# Title`, then a breadcrumb that matches folders, then the body. Omit empty sections. Relative links only.
 
-**Index** (any `README.md`): title + breadcrumb + a bullet list. No Requirement or Acceptance.
+| File                           | Body                                                                                                                                     |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `README.md`                    | Every folder: link + purpose. Baseline: commit (`git rev-parse HEAD`) and date the wiki reflects                                         |
+| `README.md` in `features/`     | Every child area, group, or feature: link + purpose                                                                                      |
+| `{feature}.md`                 | Link to its feature YAML; then headings Requirement, Acceptance only. Acceptance: one behavior per bullet ([behaviors.md](behaviors.md)) |
 
-| File | Body |
-| --- | --- |
-| `wiki/README.md` | Every root folder in `wiki/`: link + purpose. Baseline: commit (`git rev-parse HEAD`) and date the wiki reflects |
-| `capabilities/README.md` | Every area: link + purpose (markdown indexes only — not feature YAML) |
-| `capabilities/{area}/README.md` | Every child feature (or group): link + purpose |
-| Extra group `README.md` | Every child feature (or deeper group): link + purpose |
-
-**Leaf** (`{feature}.md`): headings in this order only — Requirement, Acceptance. Acceptance: one behavior per bullet, as [behaviors.md](behaviors.md) describes. After the breadcrumb, a relative link to its feature YAML. Claimed but unwired behavior is not a feature heading — it goes in `mismatches/` only. Code references live in the feature YAML, never on the feature page.
-
-## Catalog
-
-`catalog/` is the code catalog from the `catalog-features` skill: areas, features, and each feature's main code paths. No behaviors: they live on feature pages, under Acceptance.
+Repo paths only in the catalog, feature YAML, and mismatch pages.
 
 ## Feature YAML
 
-`{feature}.yaml` next to each leaf, written by this skill: the feature's code references.
-
 ```yaml
-# capabilities/checkout/pay-with-saved-card.yaml
+# features/checkout/pay-with-saved-card.yaml
 entry:          # what a human would use to find the behavior
   - POST /api/v1/orders
   - UI /checkout
@@ -70,18 +48,16 @@ tests:
   - test/checkout/cards.spec.ts
 ```
 
-Repo paths are written only in the catalog, feature YAML, and mismatch pages.
-
 ## Mismatches
 
-Create `mismatches/` when code disagrees with a **claim**: anything else in the repo that describes behavior (comment, docstring, README, developer docs, API spec, config, infra, test).
+Code disagrees with a **claim**: anything else in the repo that describes behavior (comment, docstring, README, developer docs, API spec, config, infra, test). Pages listed in the Cross-check section of `mismatches/README.md` belong to `detect-product-mismatches`: never edit them.
 
-| Kind | Meaning | Example |
-| --- | --- | --- |
-| Not implemented | A claim describes behavior the code lacks | README lists CSV export; no export code exists |
-| Differs | Code has the behavior, but its details contradict the claim | Docstring says sessions expire after 30 min; code uses 60 |
-| Unwired | Stub, flag, config, or route for behavior users cannot reach | `bulk_export` flag defined; nothing reads it |
+| Kind            | Meaning                                                      | Example                                                   |
+| --------------- | ------------------------------------------------------------ | --------------------------------------------------------- |
+| Not implemented | A claim describes behavior the code lacks                    | README lists CSV export; no export code exists            |
+| Differs         | Code has the behavior, but its details contradict the claim  | Docstring says sessions expire after 30 min; code uses 60 |
+| Unwired         | Stub, flag, config, or route for behavior users cannot reach | `bulk_export` flag defined; nothing reads it              |
 
-`mismatches/README.md`: title + breadcrumb + one section per kind; each item links its page.
+`mismatches/README.md` missing → create it: `# Mismatches`, breadcrumb. Write one `## Code vs repo` section: one list per kind, page link + sources.
 
-Mismatch page: `# {Behavior}`, breadcrumb, kind, link to the feature page (when one exists), then one row per source. Link every source that justifies it.
+Page: file name kebab-case of the behavior. `# {Behavior}`, breadcrumb, kind, feature page link (when one exists), then a table `Source | Says | Link` with one row per source.

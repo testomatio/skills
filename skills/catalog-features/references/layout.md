@@ -1,9 +1,9 @@
 # Catalog layout
 
-One catalog per source, in the output folder the caller gives. The tree mirrors how the source groups its content (code areas, epics, page tree, docs nav etc.), so the catalog is the source's own helicopter view.
+One catalog per source, in the output folder. The tree mirrors how the source groups its content: code areas, epics, page tree, docs nav.
 
 ```
-{catalog}/                   # output folder
+{output}/                    # output folder
   README.md                  # source facts, counts, groups, ungrouped items
   {group}/                   # code area, epic, parent page, nav section; any depth
     README.md                # the group's own link, subgroups, items
@@ -24,7 +24,7 @@ Catalog facts:
 | -------- | --------------------------------------------------------------------------------------- |
 | Type     | Code, issue tracker, requirements, user docs, or the other source's kind                |
 | Role     | Intended (what should be built), expected (what users expect), or actual (how it works) |
-| Coverage | Complete (silence within the scope is a gap) or partial                                 |
+| Coverage | Complete (silence within the scope is a mismatch) or partial                            |
 | History  | Yes (newer items supersede older ones) or no                                            |
 | Access   | Repository, MCP server and tools, CLI, URL, or path used                                |
 | Scope    | Repo paths, exact query, root page, docs root + version + language                      |
