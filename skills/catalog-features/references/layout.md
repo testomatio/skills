@@ -1,16 +1,16 @@
 # Catalog layout
 
-One catalog per source, in the output folder. The tree mirrors how the source groups its content: code areas, epics, page tree, docs nav.
+The tree mirrors how the source groups its content: code areas, epics, page tree, docs nav.
 
 ```
 {features-catalog}/                    # output folder
-  README.md                  # source facts, counts, areas, ungrouped items
+  README.md                  # source facts, counts, areas, ungrouped features
   {area}/                    # code area, epic, parent page, nav section; any depth
-    README.md                # the area own link, subarea if any, its items
+    README.md                # the area's own link/path, subarea if any, its features
     {feature}.yaml           # feature page
     {subarea}/               # subarea (optional)
-      README.md              # the subarea own link, its items
-      {feature}.yaml         # feature page
+      README.md              # the subarea own link/path, name, its features; breadcrumbs
+      {feature}.yaml         # feature page; breadcrumbs; feature info (below)
     ...
 ```
 
@@ -20,21 +20,25 @@ Every `.md` should include info about its entity and child entities list (if any
 
 README.md in catalog root:
 
-| Fact    | Value                                                     |
-| ------- | --------------------------------------------------------- |
-| Type    | Code, issue tracker, requirements, user docs or any other |
-| Role    | Intended , documented or actual                           |
-| Scope   | Defined by user (or inferred)                             |
-| History | Important for sources like issue tracker                  |
-| Access  | MCP, CLI, URL, files                                      |
-| Date    | Date of this sync; code: baseline commit and its date     |
-| Domain  | What the product does and for whom; infer if not given    |
+| Fact    | Value                                                                                                 |
+| ------- | ----------------------------------------------------------------------------------------------------- |
+| Type    | Code, issue tracker, requirements, user docs or any other                                             |
+| Role    | Expected , documented or actual                                                                       |
+| Scope   | Defined by user (or inferred)                                                                         |
+| History | Important for sources like issue tracker                                                              |
+| Access  | MCP, CLI, URL, files                                                                                  |
+| Date    | Date of this sync; code: baseline commit and its date; issue tracker: date of creation and resolution |
+| Domain  | What the product does and for whom; infer if not given                                                |
 
 ## Feature YAML
 
+Name: {feature-name}.md.
+
 Feature YAML should include:
 
-- Key [optional]: the source id. Do not invent. Use only if the source provides it.
+- Key [optional]. Do not invent. Use only if the source provides it.
 - Title: short description of the feature.
-- Sources: link(s) to source that describe the feature (url, repo path, etc.).
-- Entry: words which human will use to find the feature.
+- Links/headings: link(s) to sources that describe the feature (url, repo path, etc.); headings in case source is a document.
+- Entry: words which humans would use to find the feature.
+
+No description, requirements or other details.

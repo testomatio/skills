@@ -1,8 +1,8 @@
 ---
 name: catalog-features
 description: >-
-  Builds a catalog of product features from one source: a tree that mirrors the source, each feature as a key, title, and link to the source. Any source that may describe the product (code, issues, requirements, docs, or other sources) is supported.
-  Use when asked to catalog/list features, existing functionality, tickets, issues, requirements, specs, PRDs, user docs or similar sources.
+  Builds a catalog of product features from one source: a tree that mirrors the source, each feature as a key, title, and link to the source. Code, issues, requirements, docs, etc. are supported.
+  Use when asked to catalog/list features, existing functionality, issues, requirements, specs, PRDs, user docs or similar sources.
 metadata:
   author: Testomat.io
   version: 1.0.0
@@ -24,13 +24,11 @@ Output folder: given by the calling skill or the user. Default: `features-catalo
 | ---------- | ----------------------------------------------------------- |
 | Actual     | Actual behavior of the product. Code, configs, etc.         |
 | Intended   | What we attempted to implement. Requirements, tickets, etc. |
-| Documented | How users think the product should work. User docs, etc.    |
+| Documented | What the product says it does. User docs, etc.              |
 
 ## Rules
 
 - **Read-only on the source.** Do NOT edit the source even when the tools offer it.
-- Catalog only: key, title, link. No details.
-- Write only keys, URLs, and paths that exist in the source. Never guess or build them.
 - One catalog per source.
 
 ## Sources
@@ -39,35 +37,32 @@ Output folder: given by the calling skill or the user. Default: `features-catalo
 
 - Tree: areas → features, named from what the product does for its users, not from the stack or code folders, classes, files, or functions.
 - Feature: one per feature, not per file; same feature in two places → one feature. Link: repo paths of the main implementation (route, screen, job), not every file.
-- Sync: features users can reach now. Not stubs, routes users cannot reach, or features behind disabled flags; comments, docs, and tests do not make a feature.
+- Scope: features users can reach now. Not stubs, routes users cannot reach, or features behind disabled flags; comments, docs, and tests do not make a feature.
 - `update`: `git diff --name-status -M {baseline}..HEAD`; take into account renamed, moved, deleted files.
 - Role: Actual.
-- Coverage: Complete (unless user specified).
 - History: No.
 
 ### Issue tracker
 
 - Scope: a query (JQL, `gh` search, Linear filter, etc.); ask the user for it and store it.
-- Tree: the tracker's hierarchy: initiatives, epics, parent issues, sub-tasks.
-- Sync: done issues only (refer to typical resolved statuses). Ask user if have doubts.
+- Tree: the tracker's hierarchy: initiatives, epics, parent issues, issues, sub-tasks, etc.
 - Role: Intended.
-- Coverage: Partial.
-- History: Yes (unless user specified). Cause different issues may be related to the same feature. Need to store date of creation and resolution to determine which issue overrides the other.
+- Scope: done issues only (refer to typical successfully resolved statuses). Ask user if have doubts.
+- History: Yes (unless user specified). Because different issues may be related to the same feature. Need to store date of creation and resolution to determine which issue overrides the other.
 
 ### Requirements
 
 - Word, PDF: extract the text first.
-- Tree: area by heading or any other logical structure.
-- Scope: ask user for the scope and other crucial filters.
+- Tree: area by heading or other logical structure.
+- Scope: ask user for the scope and other crucial filters. Take into account that there could be drafts, deprecated pages, copies. Process them accordingly.
 - Role: Intended.
-- Coverage: Complete.
 - History: No.
 
 ### User docs
 
 - Tree: keep the original structure with required hierarchy levels.
 - Role: Documented.
-- Coverage: Complete.
+- Scope: ask user.
 - History: No.
 
 ### Other
@@ -100,9 +95,9 @@ Several sources in one run → one output folder each; define all of them first,
 
 ## 2. Inventory
 
-List every feature in scope with key or URL, title, status. Navigate all the pages. Take scope into account.
+List every feature in scope with key or URL, title, status. Navigate all the pages.
 
-When `update`: take into account renamed, moved, deleted files.
+When `update`: take into account renamed, moved, deleted files. Process them accordingly.
 
 If source is code create areas and features based on features and logic, not just files, classes, functions.
 
@@ -118,9 +113,10 @@ Structure
 - [ ] Every area README lists its subareas and features; the tree mirrors the source
 
 Content
-- [ ] Every feature has a title and a link (code: paths); a key when the source has one
+- [ ] Every feature yml is according to the `references/layout.md`
 - [ ] Code: areas and features named from the product, not the stack
 - [ ] Update: features gone from scope removed
+- [ ] Only existing keys and urls are used in the catalog
 ```
 
 ## 5. Report
