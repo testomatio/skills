@@ -38,7 +38,7 @@ Output folder: given by the calling skill or the user. Default: `features-catalo
 ### Code
 
 - Tree: areas → features, named from what the product does for its users, not from the stack or code folders, classes, files, or functions.
-- Item: one per feature, not per file; same feature in two places → one item. Link: repo paths of the main implementation (route, screen, job), not every file.
+- Feature: one per feature, not per file; same feature in two places → one feature. Link: repo paths of the main implementation (route, screen, job), not every file.
 - Sync: features users can reach now. Not stubs, routes users cannot reach, or features behind disabled flags; comments, docs, and tests do not make a feature.
 - `update`: `git diff --name-status -M {baseline}..HEAD`; take into account renamed, moved, deleted files.
 - Role: Actual.
@@ -57,7 +57,7 @@ Output folder: given by the calling skill or the user. Default: `features-catalo
 ### Requirements
 
 - Word, PDF: extract the text first.
-- Tree: group by heading or any other logical structure.
+- Tree: area by heading or any other logical structure.
 - Scope: ask user for the scope and other crucial filters.
 - Role: Intended.
 - Coverage: Complete.
@@ -94,40 +94,40 @@ Ask the user in one message, unless given:
 - Scope as a concrete, repeatable filter: repo paths, tracker query (JQL, project, label), root page or space, docs root.
 - Domain: what the product does and for whom, key terms. Not given → infer it from the source.
 
-Name groups and items in the domain terms.
+Name area and features in the domain terms.
 
 Several sources in one run → one output folder each; define all of them first, then run steps 2–4 per source.
 
 ## 2. Inventory
 
-List every unit in scope with key or URL, title, status. Navigate all the pages. Take scope into account.
+List every feature in scope with key or URL, title, status. Navigate all the pages. Take scope into account.
 
 When `update`: take into account renamed, moved, deleted files.
 
-If source is code create groups and items based on features and logic, not just files, classes, functions.
+If source is code create areas and features based on features and logic, not just files, classes, functions.
 
 ## 3. Write the tree
 
-Catalog README and group READMEs, as [references/layout.md](references/layout.md) describes.
+Catalog README and area READMEs, as [references/layout.md](references/layout.md) describes.
 
 ## 4. Validate
 
 ```markdown
 Structure
-- [ ] Catalog README has every fact and the counts; indexes every group
-- [ ] Every group README lists its subgroups and items; the tree mirrors the source
+- [ ] Catalog README has every fact and the counts; indexes every area
+- [ ] Every area README lists its subareas and features; the tree mirrors the source
 
 Content
-- [ ] Every item has a title and a link (code: paths); a key when the source has one
+- [ ] Every feature has a title and a link (code: paths); a key when the source has one
 - [ ] Code: areas and features named from the product, not the stack
-- [ ] Update: items gone from scope removed
+- [ ] Update: features gone from scope removed
 ```
 
 ## 5. Report
 
-Where to start. Items synced, skipped by reason.
+Where to start. Features synced, skipped by reason.
 
-To a calling skill: items added, changed, and removed.
+To a calling skill: features added, changed, and removed.
 
 ## Next actions
 

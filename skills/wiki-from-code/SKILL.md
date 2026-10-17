@@ -22,8 +22,6 @@ Output folder: given by the calling skill or the user. Not given → ask; sugges
 | `build`  | No `features/` yet, or the user asks to rebuild                              |
 | `update` | `features/` exists: change only what the code changed since its baseline     |
 
-Before picking the mode: `capabilities/` instead of `features/` (wiki from an older version) → move it to `features/` (`git mv` when tracked), fix every link to it (`README.md` sitemap, `mismatches/`), then `update`.
-
 ## Steps
 
 ```
