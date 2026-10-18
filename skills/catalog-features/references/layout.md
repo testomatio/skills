@@ -32,13 +32,12 @@ README.md in catalog root:
 
 ## Feature YAML
 
-Name: {feature-name}.md.
+Name: {feature-name}.yaml
 
 Feature YAML should include:
 
 - Key [optional]. Do not invent. Use only if the source provides it.
 - Title: short description of the feature.
 - Links/headings: link(s) to sources that describe the feature (url, repo path, etc.); headings in case source is a document.
-- Entry: words which humans would use to find the feature.
 
 No description, requirements or other details.
