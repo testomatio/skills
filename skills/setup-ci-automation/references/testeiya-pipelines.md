@@ -7,7 +7,7 @@ A pipeline runs several stages from one YAML file: agent tasks and shell command
 - `npx testeiya@latest pipeline` lists the bundled pipelines.
 - Pick by the user's goal: `pr-review`, `web-testing`, `api-testing`, `regression`.
 - A flow none of them fits: copy the closest from the package's `pipelines/` into the repo, e.g. `.github/testeiya/<name>.yml`, and pass the path. Never into `.testeiya/`: it ignores itself in git.
-- **Read the pipeline file before wiring it.** Its `gates:` list every variable, file and tool a stage needs.
+- **Read the pipeline file before wiring it.** Its `gates:` list every variable, file and tool a stage needs; each stage names the ones it needs in `when:`. The format is in the testeiya package's `PIPELINES.md`.
 
 ## Wire the job
 
@@ -20,6 +20,20 @@ A pipeline runs several stages from one YAML file: agent tasks and shell command
 - Add `--exit-zero`, so a negative verdict never blocks a merge.
 - Variables a pipeline reads, like `TEST_COMMAND` or `BASE_BRANCH`, go in with `--set KEY=VALUE` or the job's env.
 - A condition only the job knows goes in as `--gate 'name:<shell check>'`. When it fails the run is skipped and exits 0. Use it instead of an `if … exit 0` block around the command.
+- Look up what the job knows once, in a step before the run, and write it to `$GITHUB_ENV`. The gate, `--set` and `-o` then read the same variables:
+
+```yaml
+- run: |
+    gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
+      --jq '.[0] // empty | "PR_NUMBER=\(.number)\nPR_TITLE=\(.title)"' >> "$GITHUB_ENV"
+  env:
+    GH_TOKEN: ${{ github.token }}
+- run: |
+    npx -y testeiya@latest pipeline regression \
+      --gate 'pr:test -n "$PR_NUMBER"' \
+      --set "TESTOMATIO_TITLE=PR #$PR_NUMBER $PR_TITLE" \
+      -o "gh:pr#$PR_NUMBER"
+```
 
 ## Keep rounds between pushes
 
