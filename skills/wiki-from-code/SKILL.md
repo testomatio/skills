@@ -83,7 +83,7 @@ Subagent returns: files added, changed, and removed; mismatches (`update`: also 
 3. Write the mismatch pages subagents returned. Same disagreement from several areas → one mismatch page.
 4. Two terms for one concept → keep one, fix the pages that use the other.
 5. `update`: remove resolved mismatches.
-6. In `mismatches/README.md`, write the `## Code` section ([layout.md](references/layout.md) › Mismatches).
+6. In `mismatches/README.md`, write the ([layout.md](references/layout.md) › Mismatches).
 
 ## 5. Validate
 

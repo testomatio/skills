@@ -10,12 +10,12 @@ Behavior is similar to requirement or acceptance criteria, but those terms descr
 
 Per source:
 
-1. Catalog: title, entry, the area it sits in. Links in the feature YAML to other sources help.
+1. Catalog: key, title, the area it sits in. Links in the feature YAML to other sources help.
 2. Not in the catalog → search the source, within the catalog's Scope:
 
 | Source        | Search                                                                                 |
 | ------------- | -------------------------------------------------------------------------------------- |
-| Code          | Domain terms, UI labels, messages, routes; start next to related catalog links         |
+| Code          | Domain terms, UI labels, messages, routes; start next to related features' code        |
 | Issue tracker | Text search inside the catalog's Scope query (JQL `text ~ "term"`, `gh search issues`) |
 | Requirements  | Search under the root page or space (CQL `text ~ "term"`); headings of long documents  |
 | User docs     | Docs site search or nav; `grep` in the docs repo                                       |
@@ -29,14 +29,15 @@ Per source:
 
 Read every matching feature at its links (documents: under its headings). Behaviors come from:
 
-| Source        | Behaviors from                                                                                                                                              | Not behaviors                                                                                            |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Code          | The code at the feature's catalog links; Acceptance on its wiki page in `features/`, when present, as a start                                               | Comments, docstrings, developer docs, tests, configs; stubs, flags, routes users cannot reach            |
-| Issue tracker | Stories and feature issues: acceptance criteria, then the description. Epics: their scope. Bugs: the expected result                                        | A bug's reported actual result; tasks, spikes, chores, tech debt                                         |
-| Requirements  | Functional requirements, business rules, acceptance criteria, flows; one behavior per table row and per meaningful matrix cell; exclusions as negative ones | Future phases, nice-to-have, MoSCoW Could and Won't; goals, rationale, personas, metrics, open questions |
-| User docs     | Guides, how-tos, limits, notes and warnings; badges (plan, edition, role, platform) as conditions; navigation steps                                         | Screenshots and videos                                                                                   |
-| Test cases    | Expected results                                                                                                                                            | Steps, test data                                                                                         |
+| Source        | Behaviors from                                                                                                                                              | Not behaviors                                                                                                                                     |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Code          | The code at the feature's `code` paths (else its links); Behaviors on its feature page in `features/`, when present, as a start                             | Claims (comments, docstrings, developer docs, API specs, configs, tests); stubs, routes users cannot reach; internal steps with no visible effect |
+| Issue tracker | Stories and feature issues: acceptance criteria, then the description. Epics: their scope. Bugs: the expected result                                        | A bug's reported actual result; tasks, spikes, chores, tech debt                                                                                  |
+| Requirements  | Functional requirements, business rules, acceptance criteria, flows; one behavior per table row and per meaningful matrix cell; exclusions as negative ones | Future phases, nice-to-have, MoSCoW Could and Won't; goals, rationale, personas, metrics, open questions                                          |
+| User docs     | Guides, how-tos, limits, notes and warnings; badges (plan, edition, role, platform) as conditions; navigation steps                                         | Screenshots and videos                                                                                                                            |
+| Test cases    | Expected results                                                                                                                                            | Steps, test data                                                                                                                                  |
 
+- Code behind a flag or setting that can be turned on → a behavior with that condition (as `wiki-from-code`).
 - Comments and later edits may change the body ("dropped", "moved to PROJ-456", "decided: 3 retries, not 5"): state the final behavior, never the comment.
 - Acceptance criteria may sit in a custom field, a description heading, a checklist, or sub-tasks: find the convention in the first issues.
 
@@ -56,8 +57,9 @@ Read every matching feature at its links (documents: under its headings). Behavi
 ### Values and words
 
 - Values as the source states them, with units. No value in the source → none in the behavior. Never round, convert, or fill one in; a vague behavior stays vague (open question).
+- Code: exact values from the code that runs; a value read from config or environment: its default, marked `(configurable)` (as `wiki-from-code`).
 - UI labels and messages verbatim, in quotes; navigation paths with `›`.
-- Domain terms, one per concept across sources.
+- Domain terms (prefer the user docs' terms), one per concept across sources and `features/`.
 - No class, function, table, file, flag, or library names. Protocol details (endpoints, status codes, fields) only when the API is what users use.
 - Keep the source's level of detail: a coarse behavior stays coarse. Never merge behaviors and drop values or conditions.
 - Restate, never paste. Never people, comments, or customer data.

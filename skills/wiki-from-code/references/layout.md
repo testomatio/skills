@@ -35,9 +35,7 @@ tests:                          # tests that cover the feature
 
 ## Mismatches
 
-This skill's pages are the ones its `## Code` section lists. Pages listed in the `## Cross-check` section belong to `detect-product-mismatches`: do not edit or remove them.
-
-`mismatches/README.md` missing → create it: `# Mismatches`, breadcrumb. Write one `## Code` section with list of mismaches and links to their pages (with details).
+`mismatches/README.md` missing → create it: `# Mismatches`, breadcrumb. Write list of mismaches and links to their pages (with details).
 
 ### Mismatch page
 

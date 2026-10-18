@@ -1,21 +1,21 @@
-# Cross-check layout
+# Mismatches layout
 
-Reads catalogs (layout owned by `catalog-features`); never edits them. Writes mismatch pages into `mismatches/`, shared with `wiki-from-code`.
+Reads catalogs (layout owned by `catalog-features`) and feature pages (owned by `wiki-from-code`); changes them only through those skills (SKILL.md › 2. Catalogs). Writes mismatch pages into `mismatches/`, shared with `wiki-from-code`.
 
 ```
-{output}/                    # output folder
-  README.md                  # sitemap, when present; one line for mismatches/
-  features-catalog/          # code catalog (wiki-from-code), when present
-  features/                  # code wiki (wiki-from-code), when present
+{output}/                    # output folder, the same as wiki-from-code (default wiki/)
+  README.md                  # sitemap (wiki-from-code), when present; one line each for sources/ and mismatches/
+  features-catalog/          # code catalog (catalog-features); wiki-from-code adds code, tests
+  features/                  # feature pages (wiki-from-code), when present
   sources/
     README.md                # every catalog here: name, type, role, link, Date
-    {name}/                  # one features catalog per source, code too when there is no features-catalog/ (catalog-features)
+    {name}/                  # one features catalog per non-code source (catalog-features)
   mismatches/                # shared with wiki-from-code
-    README.md                # index; this skill owns its Cross-check section
+    README.md                # index; this skill owns its mismatches list
     {mismatch}.md            # one behavior, every compared source
 ```
 
-This skill's pages are the ones its Cross-check section lists. Other pages belong to `wiki-from-code`: never edit them.
+This skill's pages are the ones its mismatches list lists.
 
 ## Formatting
 
@@ -31,7 +31,7 @@ Every page: `# Title`, then a breadcrumb that matches folders, then the body. Re
 
 ## README
 
-`mismatches/README.md` missing → create it: `# Mismatches`, breadcrumb. Write one `## Cross-check` section; leave the rest to `wiki-from-code`.
+`mismatches/README.md` missing → create it: `# Mismatches`, breadcrumb. Write the mismatches list.
 
 1. Compared: one row per source: name, role, scope, history, catalog link, Date (code: baseline commit). Product version. Check date.
 2. Differs, Not implemented: page link + sources + likely cause.
@@ -40,17 +40,23 @@ Every page: `# Title`, then a breadcrumb that matches folders, then the body. Re
 
 ## Page
 
-File name: kebab-case of the behavior. `# {Behavior}`, breadcrumb, kind, likely cause, feature name, then one row per compared source.
+File name: kebab-case of the behavior. `# {Behavior}`, breadcrumb, then:
 
-| Source                 | Says                                  | Updated    | Link                                                                  |
-| ---------------------- | ------------------------------------- | ---------- | --------------------------------------------------------------------- |
-| Code (actual)          | Expired cards are listed and disabled | 2026-08-30 | Catalog feature + implementing files, or `not found` + where searched |
-| Jira (intended)        | Expired cards are listed and disabled | 2026-08-28 | Key + URL                                                             |
-| Confluence (intended)  | Expired cards are hidden              | 2026-01-10 | Title + URL or path                                                   |
-| User docs (documented) | silent                                |            | Where searched                                                        |
+- `Kind`: Differs or Not implemented.
+- `Title`: the feature area and title; link to its feature page in `features/`, when present.
+- `Difference`: one line, what disagrees.
+- `Likely cause`: SKILL.md › Likely cause.
+- `Impact`: who is affected and how; the Report orders mismatches by it.
+- `Sources`: one row per compared source.
+
+| Source                 | Says                                  | Updated    | Link                                                                |
+| ---------------------- | ------------------------------------- | ---------- | ------------------------------------------------------------------- |
+| Code (actual)          | Expired cards are listed and disabled | 2026-08-30 | Catalog feature + its `code` paths, or `not found` + where searched |
+| Jira (intended)        | Expired cards are listed and disabled | 2026-08-28 | Key + URL                                                           |
+| Confluence (intended)  | Expired cards are hidden              | 2026-01-10 | Title + URL or path                                                 |
+| User docs (documented) | silent                                |            | Where searched                                                      |
 
 - `Says`: the source's behavior, as [features.md](features.md) › Behaviors describes; `silent` when it has none.
 - `Updated`: the date read at the source (SKILL.md › Likely cause).
-- Code row always, when code is compared.
+- Code row always, first, when code is compared.
 - Superseded issues of a source with history: omit, or mark `superseded by {key}` when it explains the mismatch.
-- A `wiki-from-code` page on the same behavior: link it below the table; do not restate it.
