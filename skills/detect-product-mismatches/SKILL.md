@@ -14,9 +14,11 @@ metadata:
 Checks each feature in every source and records where the sources disagree.
 
 Output folder:
-  - default: `requirements-mismatches/`
-  - or given by calling skill or the user
+  - given by calling skill or the user
   - all paths are relative inside the output folder
+  - default: `mismatches/`
+
+> `wiki/mismatches/` is result of running `wiki-from-code` skill. Its results of finding mismatches inside the single source – code. Thus, don't use it as the output folder and don't use its results as sources.
 
 ## Modes
 
@@ -111,7 +113,7 @@ Content
 
 ## 6. Report
 
-Where to start. Mismatches by likely cause (Bug, Stale requirement, Stale docs, Decide), highest user impact first. Missing features per source. Catalog errors (→ `catalog-features`; code catalog with `features/` → `wiki-from-code`). Open questions.
+Where to start. Mismatches by highest user impact first. Missing features per source. Catalog errors (→ `catalog-features`; code catalog with `features/` → `wiki-from-code`). Open questions.
 
 ## Next actions
 

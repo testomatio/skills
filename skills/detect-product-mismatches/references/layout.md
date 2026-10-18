@@ -3,19 +3,17 @@
 Reads catalogs (layout owned by `catalog-features`) and feature pages (owned by `wiki-from-code`); changes them only through those skills (SKILL.md › 2. Catalogs). Writes mismatch pages into `mismatches/`, shared with `wiki-from-code`.
 
 ```
-{output}/                    # output folder, the same as wiki-from-code (default wiki/)
-  README.md                  # sitemap (wiki-from-code), when present; one line each for sources/ and mismatches/
-  features-catalog/          # code catalog (catalog-features); wiki-from-code adds code, tests
-  features/                  # feature pages (wiki-from-code), when present
+mismatches/                  # output folder, the same as wiki-from-code (default wiki/)
+  README.md                  # sitemap; one line each for mismatch
   sources/
     README.md                # every catalog here: name, type, role, link, Date
-    {name}/                  # one features catalog per non-code source (catalog-features)
-  mismatches/                # shared with wiki-from-code
-    README.md                # index; this skill owns its mismatches list
-    {mismatch}.md            # one behavior, every compared source
+    {name}/                  # source name
+      features-catalog/      # `catalog-features` skill output
+      features/              # [optional] feature pages (wiki-from-code), when present
+  mismatches/
+    README.md                # index
+    {mismatch}.md            # one mismatch per disagreement, every compared source
 ```
-
-This skill's pages are the ones its mismatches list lists.
 
 ## Formatting
 
