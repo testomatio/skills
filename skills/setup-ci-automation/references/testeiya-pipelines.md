@@ -19,6 +19,7 @@ A pipeline runs several stages from one YAML file: agent tasks and shell command
 - Give each pipeline its own `--thread <name>` when several post to one pull request.
 - Add `--exit-zero`, so a negative verdict never blocks a merge.
 - Variables a pipeline reads, like `TEST_COMMAND` or `BASE_BRANCH`, go in with `--set KEY=VALUE` or the job's env.
+- A condition only the job knows goes in as `--gate 'name:<shell check>'`. When it fails the run is skipped and exits 0. Use it instead of an `if … exit 0` block around the command.
 
 ## Keep rounds between pushes
 
