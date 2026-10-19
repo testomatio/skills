@@ -23,7 +23,7 @@ README.md in catalog root:
 | Fact    | Value                                                                                                 |
 | ------- | ----------------------------------------------------------------------------------------------------- |
 | Type    | Code, issue tracker, requirements, user docs or any other                                             |
-| Role    | Expected , documented or actual                                                                       |
+| Role    | Actual, Intended, or Documented (SKILL.md › Source roles)                                             |
 | Scope   | Defined by user (or inferred)                                                                         |
 | History | Important for sources like issue tracker                                                              |
 | Access  | MCP, CLI, URL, files                                                                                  |

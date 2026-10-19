@@ -18,7 +18,7 @@ Output folder:
   - all paths are relative inside the output folder
   - default: `mismatches/`
 
-> `wiki/mismatches/` is result of running `wiki-from-code` skill. Its results of finding mismatches inside the single source – code. Thus, don't use it as the output folder and don't use its results as sources.
+> `wiki/mismatches/` is the output of `wiki-from-code`: mismatches inside a single source, the code. Don't use it as the output folder and don't use its results.
 
 ## Modes
 
@@ -42,6 +42,15 @@ Per feature, what each source says is rewritten as behaviors in one shape ([feat
 - Another source has a behavior the code lacks → Not implemented. Code is the product: it must do what the other sources say.
 - Several intended sources: a feature is specified when any of them has it.
 - `History: Yes` (issue tracker by default): the newest issue wins (resolution date, else creation date); older contradicting issues are superseded, not mismatches.
+
+## Likely cause
+
+From dates read at the source: issue resolution date (else creation date), page last version, docs "last updated" (else `git log -1 --format=%cs -- {path}`); code: `git log -1 --format=%cs -- {paths}` for the feature's code paths. The same dates decide the newest issue for `History: Yes`.
+
+- Code differs from the newest intended behavior, and nothing newer explains it → Bug.
+- Requirement older than the issue or code change that set the current behavior → Stale requirement.
+- User docs older than that change → Stale docs.
+- Otherwise → Decide (product owner).
 
 ## Steps
 

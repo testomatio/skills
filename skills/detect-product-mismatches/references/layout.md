@@ -1,10 +1,10 @@
 # Mismatches layout
 
-Reads catalogs (layout owned by `catalog-features`) and feature pages (owned by `wiki-from-code`); changes them only through those skills (SKILL.md › 2. Catalogs). Writes mismatch pages into `mismatches/`, shared with `wiki-from-code`.
+Reads catalogs (layout owned by `catalog-features`) and feature pages (owned by `wiki-from-code`); changes them only through those skills (SKILL.md › 2. Catalogs). Writes mismatch pages into `mismatches/`
 
 ```
-mismatches/                  # output folder, the same as wiki-from-code (default wiki/)
-  README.md                  # sitemap; one line each for mismatch
+mismatches/                  # output folder
+  README.md                  # sitemap; one line each
   sources/
     README.md                # every catalog here: name, type, role, link, Date
     {name}/                  # source name

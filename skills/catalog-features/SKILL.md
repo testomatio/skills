@@ -44,10 +44,9 @@ Output folder: given by the calling skill or the user. Default: `features-catalo
 
 ### Issue tracker
 
-- Scope: a query (JQL, `gh` search, Linear filter, etc.); ask the user for it and store it.
 - Tree: the tracker's hierarchy: initiatives, epics, parent issues, issues, sub-tasks, etc.
+- Scope: a query (JQL, `gh` search, Linear filter, etc.); ask the user for it and store it. "Done" issues only (typical successfully resolved statuses); ask the user when in doubt.
 - Role: Intended.
-- Scope: done issues only (refer to typical successfully resolved statuses). Ask user if have doubts.
 - History: Yes (unless user specified). Because different issues may be related to the same feature. Need to store date of creation and resolution to determine which issue overrides the other.
 
 ### Requirements

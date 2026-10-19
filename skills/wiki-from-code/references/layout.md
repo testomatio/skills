@@ -14,8 +14,8 @@
       {subarea}/             # as in the catalog
         README.md            # subareas and features
         {feature}.md         # feature page
-  mismatches/                # shared with detect-product-mismatches
-    README.md                # index; this skill owns its `Code` section
+  mismatches/                # code vs claims in the repo
+    README.md                # index
     {mismatch}.md            # one behavior, every source that disagrees
 ```
 
@@ -35,7 +35,7 @@ tests:                          # tests that cover the feature
 
 ## Mismatches
 
-`mismatches/README.md` missing → create it: `# Mismatches`, breadcrumb. Write list of mismaches and links to their pages (with details).
+`mismatches/README.md` missing → create it: `# Mismatches`, breadcrumb. Write the list of mismatches with links to their pages.
 
 ### Mismatch page
 

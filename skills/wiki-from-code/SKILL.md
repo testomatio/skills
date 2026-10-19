@@ -78,12 +78,12 @@ Subagent returns: files added, changed, and removed; mismatches (`update`: also 
 
 ## 4. Merge
 
-1. Apply the changes subagents returned outside their areas, including links to renamed or moved pages ([layout.md](references/layout.md) › Names). Terms the Domain lacks → add to the Domain in `features-catalog/README.md`.
+1. Apply the changes subagents returned outside their areas, including links to renamed or moved pages. Terms the Domain lacks → add to the Domain in `features-catalog/README.md`.
 2. Update every `README.md` in `features/` to list the feature pages that now exist. Write the root `README.md`: a link and purpose for each folder, plus the baseline commit.
 3. Write the mismatch pages subagents returned. Same disagreement from several areas → one mismatch page.
 4. Two terms for one concept → keep one, fix the pages that use the other.
 5. `update`: remove resolved mismatches.
-6. In `mismatches/README.md`, write the ([layout.md](references/layout.md) › Mismatches).
+6. In `mismatches/README.md`, write the mismatches list ([layout.md](references/layout.md) › Mismatches).
 
 ## 5. Validate
 
