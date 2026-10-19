@@ -38,18 +38,18 @@ Downloads test scenarios from Testomat.io and saves them as local Markdown files
 
 Directory selection — if the `testDir` input is provided or the user passes `-d <path>`, use that path. Otherwise:
 - Workspace is empty or for manual tests only: pull to root.
-- End-to-end testing project: pull to the `testcases` directory.
-- Any other case: pull to `.testeiya/testcases` (ensure `.testeiya/` exists and is gitignored).
+- End-to-end testing project: pull to the `test-cases` directory.
+- Any other case: pull to `.testeiya/test-cases` (ensure `.testeiya/` exists and is gitignored).
 
 Cache-folder rules:
-- Default pull target is the gitignored cache `.testeiya/testcases/`. Add `.testeiya/` to the project `.gitignore` if it is not there yet.
-- **Pulled cases must never land in a tracked folder** (`testcases/`, etc.) — that pollutes the repo.
+- Default pull target is the gitignored cache `.testeiya/test-cases/`. Add `.testeiya/` to the project `.gitignore` if it is not there yet.
+- **Pulled cases must never land in a tracked folder** (`test-cases/`, etc.) — that pollutes the repo.
 - Being gitignored does not block editing the files or pushing them back.
 - If the repo already keeps its `*.test.md` files in a tracked folder, don't pull — work with them in place, or pass `-d <that folder>` for an in-place refresh.
 - This matches `scan-automation-project`, which pulls the *code* into `.testeiya/code/` when it runs inside a manual-tests repo.
 
 ```bash
-npx check-tests pull -d .testeiya/testcases
+npx check-tests pull -d .testeiya/test-cases
 ```
 
 - To pull only specific suites (user names a suite or gives suite IDs): `npx check-tests pull --suite-ids "@S12345678,@S87654321"`.
@@ -62,7 +62,7 @@ Uploads local Markdown tests to Testomat.io.
 Pre-push file filtering — push only test case files, never project docs or requirements:
 - Include files matching `*.test.md`, or Markdown files with valid `<!-- test ... -->` blocks.
 - Ignore all other Markdown (`README.md`, `CHANGELOG.md`, documentation).
-- If test cases live alongside other files, copy or move the test files into `.testeiya/testcases/` first.
+- If test cases live alongside other files, copy or move the test files into `.testeiya/test-cases/` first.
 
 Pre-push validation:
 1. At least one `*.test.md` file exists.
@@ -85,13 +85,13 @@ labels: ...
 npx check-tests push --files login.test.md checkout.test.md
 
 # Testeiya cache folder
-npx check-tests push -d .testeiya/testcases
+npx check-tests push -d .testeiya/test-cases
 ```
 
 - **When the files to push are known** (e.g. just produced by `qa-write-test-cases` / `improve-test-cases`), **pass them explicitly via `--files`** (alias `-f`). Without `--files` the CLI falls back to the default glob `**/*.test.md`, which may pick up unrelated files.
 - Quote glob patterns. Paths resolve relative to `--dir`.
-- Use `-d` when `.testeiya` or `testcases` directories exist.
-- **Push only the test cases directory** (e.g. `.testeiya/testcases`, not `.testeiya/`).
+- Use `-d` when `.testeiya` or `test-cases` directories exist.
+- **Push only the test cases directory** (e.g. `.testeiya/test-cases`, not `.testeiya/`).
 - More push options and examples: [TESTOMATIO_CLI.md](./references/TESTOMATIO_CLI.md).
 
 ## Summary Output

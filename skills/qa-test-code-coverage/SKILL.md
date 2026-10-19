@@ -36,7 +36,7 @@ Analyze the project's tests — manual markdown cases and automated e2e tests �
   - Project Overview — languages, frameworks, complexity (drives the subagent split in Step 4).
 - Map whatever exists: both kinds go into one coverage file; a single kind is fine too.
 - ❓ If the scan finds no tests at all (it checks the `.testeiya/` cache too), ask the user:
-  1. Pull manual cases from Testomat.io — have `sync-test-cases-with-tms` pull into the cache: `npx check-tests pull -d .testeiya/testcases`, add `.testeiya/` to `.gitignore` if missing, re-run the scan.
+  1. Pull manual cases from Testomat.io — have `sync-test-cases-with-tms` pull into the cache: `npx check-tests pull -d .testeiya/test-cases`, add `.testeiya/` to `.gitignore` if missing, re-run the scan.
   2. Clone the automated tests repo: `git clone <url> .testeiya/e2e-tests`, add `.testeiya/` to `.gitignore` if missing, re-run the scan.
   3. Point to a directory the scan missed, then re-run the scan there.
   4. Stop.
@@ -165,7 +165,7 @@ npx @testomatio/reporter run --kind manual \
 - Coverage gaps — source features no test maps to. On approval, propose new cases (delegate to `qa-write-test-cases`).
 - Dead tests — tests whose features no longer exist in source.
 - Answer questions like "do we have tests for X?" from the inventory.
-- Editing pulled manual cases: edit them in `.testeiya/testcases/` and push back with `sync-test-cases-with-tms`.
+- Editing pulled manual cases: edit them in `.testeiya/test-cases/` and push back with `sync-test-cases-with-tms`.
 
 ## References
 
