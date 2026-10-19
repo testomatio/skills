@@ -61,7 +61,7 @@ Information sources:
 - Design mockups (Figma, Miro, etc.)
 - Existing test cases (TestRail, Testomat.io, etc.)
 - Source code:
-  - manual test files: `.test.md` or `.md` in folders like `testcases`, `tests`, `manual`, `qa`, `spec`
+  - manual test files: `.test.md` or `.md` in folders like `test-cases`, `tests`, `manual`, `qa`, `spec`
   - automated test files (spec, test, cy files, etc.)
   - project structure
 
@@ -218,8 +218,8 @@ If the user originally asked only for a checklist, first ask: "Do you want to ge
 Where to store test cases:
 
 - Empty or manual-tests-only workspace → project root
-- End-to-end testing project → `testcases/` directory
-- Any other case → `.testeiya/testcases/` (ensure `.testeiya/` exists and is git-ignored)
+- End-to-end testing project → `test-cases/` directory
+- Any other case → `.testeiya/test-cases/` (ensure `.testeiya/` exists and is git-ignored)
 
 Generation rules:
 
