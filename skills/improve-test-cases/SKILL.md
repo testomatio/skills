@@ -24,7 +24,7 @@ Analyze and improve existing markdown manual test cases to make them clearer for
 
 ## Step 1: Locate Test Files
 
-- Find markdown test files (`.test.md` or `.md`) in common locations: `./manual-tests`, `./tests/manual`, `./docs/tests`.
+- Find markdown test files (`.test.md` or `.md`) in common locations: `./test-cases`, `./tests/manual`, `./docs/tests`.
 - If none found, scan the whole project for `.md` files with test case content.
 - If still none, ask the user for the test directory path.
 

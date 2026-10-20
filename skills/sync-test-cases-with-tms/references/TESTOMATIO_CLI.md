@@ -85,11 +85,11 @@ npx check-tests pull [options]
 # Export tests to current directory
 npx check-tests pull
 
-# Export tests to manual-tests folder
-npx check-tests pull -d manual-tests
+# Export tests to test-cases folder
+npx check-tests pull -d test-cases
 
 # Keep source structure
-npx check-tests pull -d manual-tests --keep-structure
+npx check-tests pull -d test-cases --keep-structure
 
 # Pull specific suites only
 npx check-tests pull --suite-ids "@S12345678,@S87654321"
@@ -117,7 +117,7 @@ npx check-tests push
 npx check-tests push -f docs/login.test.md docs/checkout.test.md
 
 # Glob (quoted)
-npx check-tests push --files "manual-tests/**/*.test.md"
+npx check-tests push --files "test-cases/**/*.test.md"
 
 # Multiple globs
 npx check-tests push -f "smoke/**/*.test.md" "regression/**/*.test.md"
