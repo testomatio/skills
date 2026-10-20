@@ -17,7 +17,7 @@ mismatches/                  # output folder
 
 ## Formatting
 
-Every page: `# Title`, then a breadcrumb that matches folders, then the body. Relative links to pages in the output folder and to repo paths; source features as key + URL.
+Every page: `# Title`, then a breadcrumb that matches folders (links to the parent pages only), then the body. Mismatch pages: no breadcrumb. Relative links to pages in the output folder and to repo paths; source features as key + URL.
 
 ## Kinds
 
@@ -32,29 +32,60 @@ Every page: `# Title`, then a breadcrumb that matches folders, then the body. Re
 `mismatches/README.md` missing → create it: `# Mismatches`, breadcrumb. Write the mismatches list.
 
 1. Compared: one row per source: name, role, scope, history, catalog link, Date (code: baseline commit). Product version. Check date.
-2. Differs, Not implemented: page link + sources + likely cause.
+2. Differs, Not implemented: one list per kind, highest impact first: page link + impact level + sources + likely cause.
 3. Missing features: one list per silent source (Not implemented, Unspecified, Undocumented, Missing in {source}): feature + where found (catalog feature links) + where searched.
 4. Open questions: vague behaviors, unread content, or unclear Scope that blocks a comparison.
 
 ## Page
 
-File name: kebab-case of the behavior. `# {Behavior}`, breadcrumb, then:
+A reader learns what disagrees from the first lines, without opening the sources.
 
-- `Kind`: Differs or Not implemented.
-- `Title`: the feature area and title; link to its feature page in `features/`, when present.
-- `Difference`: one line, what disagrees.
-- `Likely cause`: SKILL.md › Likely cause.
-- `Impact`: who is affected and how; the Report orders mismatches by it.
-- `Sources`: one row per compared source.
+File name: follow existing file name pattern or kebab-case of the title by default.
 
-| Source                 | Says                                  | Updated    | Link                                                                |
-| ---------------------- | ------------------------------------- | ---------- | ------------------------------------------------------------------- |
-| Code (actual)          | Expired cards are listed and disabled | 2026-08-30 | Catalog feature + its `code` paths, or `not found` + where searched |
-| Jira (intended)        | Expired cards are listed and disabled | 2026-08-28 | Key + URL                                                           |
-| Confluence (intended)  | Expired cards are hidden              | 2026-01-10 | Title + URL or path                                                 |
-| User docs (documented) | silent                                |            | Where searched                                                      |
+- `# Title`: the behavior in question, as the user meets it.
+- `Feature:` the feature area › title; link to its feature page in `features/`, when present.
+- `## Difference`: one bullet per side, code first when compared; sources that agree grouped on one bullet. Each bullet: the sources (key or name), then their behavior. Write each side so it is clear alone: the condition, then what the user gets. Not implemented: the code bullet says what is missing and where it was searched.
+- `## Impact`: level first: **High** (users blocked, data or money wrong), **Medium** (a workaround exists), **Low** (wording, cosmetic). Then who meets it, when, and what they see or cannot do.
+- `## Likely cause`: SKILL.md › Likely cause, with the dates that decide it.
+- `## Solution`: suggested fix, from the likely cause: Bug → change the code; Stale requirement → update the requirement; Stale docs → update the docs; Decide → the options for the product owner.
+- `## Sources`: evidence, one row per compared source; Code row always, first, when code is compared.
+- Other info required to explain the mismatch.
+
+### Example
+
+```markdown
+# Expired cards at checkout
+
+Feature: [Checkout › Pay with saved card](../sources/code/features/checkout/pay-with-saved-card.md)
+
+## Difference
+
+- **Code, PAY-112:** Expired saved cards are listed at checkout, greyed out and not selectable.
+- **Confluence "Saved cards":** Expired saved cards are not listed at checkout.
+
+## Impact
+
+Low. A customer with an expired card sees it greyed out at checkout. Support answers based on Confluence say it should not appear.
+
+## Likely cause
+
+Stale requirement: PAY-112 (2026-08-28) changed the behavior after the Confluence page (2026-01-10).
+
+## Solution
+
+Update the Confluence page "Saved cards": expired saved cards are listed at checkout, greyed out and not selectable.
+
+## Sources
+
+| Source                 | Says                                                  | Link                                             | Updated    |
+| ---------------------- | ----------------------------------------------------- | ------------------------------------------------ | ---------- |
+| Code (actual)          | Expired saved cards are listed, greyed out            | `src/checkout/cards.ts:48-61`                    | 2026-08-30 |
+| Jira (intended)        | PAY-112: Expired saved cards are listed, not selectable | [PAY-112](https://example.atlassian.net/...)   | 2026-08-28 |
+| Confluence (intended)  | Expired saved cards are not listed                    | [Saved cards](https://example.atlassian.net/...) | 2026-01-10 |
+| User docs (documented) | silent                                                | Searched: docs/payments/, site search "expired"  |            |
+```
 
 - `Says`: the source's behavior, as [features.md](features.md) › Behaviors describes; `silent` when it has none.
+- `Link`: repo file: `path:lines`; issue: key + URL; page: title + URL, with the heading when the page is long; silent: where searched.
 - `Updated`: the date read at the source (SKILL.md › Likely cause).
-- Code row always, first, when code is compared.
 - Superseded issues of a source with history: omit, or mark `superseded by {key}` when it explains the mismatch.

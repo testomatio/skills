@@ -70,7 +70,7 @@ Subagent, per feature, starting from its catalog links:
 
 1. In its catalog feature YAML: adds implementation files to `code`, and adds `tests`.
 2. Writes the feature page: Requirement, then Behaviors ([behaviors.md](references/behaviors.md)).
-3. Returns one mismatch per disagreement, with every field of a mismatch page ([layout.md](references/layout.md) › Mismatches).
+3. Returns one mismatch per disagreement: its kind and every section of a mismatch page ([layout.md](references/layout.md) › Mismatches).
 
 Subagent writes only inside its area, in `features/` and `features-catalog/`. Catalog features found missing, misnamed, or misplaced → fix them in the area's catalog files. Anything outside the area (mismatch pages, catalog README, other areas) → return it.
 

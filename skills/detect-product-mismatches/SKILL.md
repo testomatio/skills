@@ -43,6 +43,14 @@ Per feature, what each source says is rewritten as behaviors in one shape ([feat
 - Several intended sources: a feature is specified when any of them has it.
 - `History: Yes` (issue tracker by default): the newest issue wins (resolution date, else creation date); older contradicting issues are superseded, not mismatches.
 
+**Not a mismatch:**
+
+- Same behavior in other words.
+- **Silence on a detail.** A coarser source agrees with a finer one unless it contradicts it (`Customer can save a card.` agrees with `Customer can save up to 5 cards.`).
+- A behavior only the code has, inside a feature the other sources have.
+- Superseded issues; behaviors of another version; content outside a catalog Scope (open issues, drafts, deprecated pages).
+- Can't tell (vague behavior, unreadable content) → open question.
+
 ## Likely cause
 
 From dates read at the source: issue resolution date (else creation date), page last version, docs "last updated" (else `git log -1 --format=%cs -- {path}`); code: `git log -1 --format=%cs -- {paths}` for the feature's code paths. The same dates decide the newest issue for `History: Yes`.
@@ -58,9 +66,10 @@ From dates read at the source: issue resolution date (else creation date), page 
 - [ ] 1. Sources and access
 - [ ] 2. Catalogs: create missing, update stale
 - [ ] 3. Check each feature (one subagent each)
-- [ ] 4. Merge
-- [ ] 5. Validate
-- [ ] 6. Report
+- [ ] 4. Verify (subagents)
+- [ ] 5. Merge
+- [ ] 6. Validate
+- [ ] 7. Report
 ```
 
 Read [references/features.md](references/features.md) and [references/layout.md](references/layout.md) before writing files.
@@ -69,8 +78,8 @@ Read [references/features.md](references/features.md) and [references/layout.md]
 
 - **Read-only on sources.** Never edit issues, pages, or code.
 - Catalogs and `features/` change only by running their skills.
-- **Report, don't decide.** A mismatch page shows what each source says.
-- Compare behaviors, not wording. Same behavior in other words agrees, different values, conditions, roles, labels, or flows differ.
+- **Report, don't decide.** A mismatch page shows what each source says; its Solution only suggests a fix.
+- Compare behaviors, not wording: different values, conditions, roles, labels, or flows differ.
 - Write only paths, keys, and URLs that exist in the catalogs, the sources, or the repo. Do not invent them.
 
 ## 1. Sources and access
@@ -95,18 +104,22 @@ Subagent:
 1. Per source: finds the feature in the catalog, else searches the source ([features.md](references/features.md) › Find).
 2. Reads every matching feature at its links and states its behaviors ([features.md](references/features.md) › Read, Behaviors).
 3. Aligns the same behavior across sources.
-4. Returns one mismatch per disagreement, with every field of a mismatch page ([layout.md](references/layout.md) › Page).
+4. Returns one mismatch per disagreement: its kind (Differs or Not implemented) and every section of a mismatch page ([layout.md](references/layout.md) › Page), with code evidence as `path:lines`.
 
 Subagent writes nothing. Returns: matched catalog features per source (or `not found` + where searched), mismatches, sources silent on the whole feature, open questions, catalog errors.
 
-## 4. Merge
+## 4. Verify
 
-1. Write the mismatch pages subagents returned ([layout.md](references/layout.md) › Page). Same disagreement from several features → one mismatch page, every disagreeing source on it.
+One fresh subagent per batch of mismatches, with the same inputs as step 3. It re-reads each mismatch at its Links and returns it as confirmed, corrected, or dropped (with why). Can't confirm → open question.
+
+## 5. Merge
+
+1. Write the confirmed mismatch pages ([layout.md](references/layout.md) › Page). Same disagreement from several features → one mismatch page, every disagreeing source on it.
 2. `update`: remove resolved mismatches.
 3. In `mismatches/README.md`, write the mismatches list ([layout.md](references/layout.md) › README).
 4. New `sources/` or `mismatches/` → add a link and purpose for it to the root `README.md`.
 
-## 5. Validate
+## 6. Validate
 
 ```markdown
 Structure
@@ -114,13 +127,14 @@ Structure
 - [ ] Mismatches list states compared sources (catalog Date or baseline), version, check date; indexes every page and missing feature
 
 Content
-- [ ] Each page has every field of [layout.md](references/layout.md) › Page and one row per compared source; silent sources marked silent with where searched
+- [ ] Each page has every section of [layout.md](references/layout.md) › Page and one row per compared source; silent sources marked silent with where searched
+- [ ] Each Difference bullet is clear alone: sources, condition, what the user gets; the title doesn't say which side is right
+- [ ] Every page was confirmed in Verify; nothing from Not a mismatch is a page
 - [ ] Every behavior on the pages passes the check in [references/features.md](references/features.md)
-- [ ] Superseded issues and behaviors of other versions are not mismatches
 - [ ] update: resolved pages removed
 ```
 
-## 6. Report
+## 7. Report
 
 Where to start. Mismatches by highest user impact first. Missing features per source. Catalog errors (→ `catalog-features`; code catalog with `features/` → `wiki-from-code`). Open questions.
 
