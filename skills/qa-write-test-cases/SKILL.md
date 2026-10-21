@@ -40,7 +40,7 @@ References:
 
 1. Gather context and show sources — approval gate
 2. Ask for coverage scope — approval gate
-3. Ask for role — approval gate; skipped for smoke
+3. Ask for role if any test cases for the feature exist; always skipped for smoke
 4. Generate checklist — approval gate
 5. Generate detailed test cases
 6. Show summary
@@ -132,13 +132,20 @@ Happy path, key negative and common edge cases
 Full coverage incl. error states, boundaries, and security/perf/i18n where relevant
 
 **4. ✏️ Other**
-Proceed to specific role selection, type a number of tests, or describe scope in your own words
+Type a number of tests, or describe scope in your own words
 ```
 
 ### Step 3: Ask for role
 
-- If the user picked 🚀 Smoke in Step 2: **skip this step** — auto-apply ⚙️ default and go straight to Step 4. A smoke suite is too small to benefit from a specialized role.
-- Otherwise show the roles (markdown table with name and short description) and ask the user to pick one. Recommend a role based on context.
+Ask for a role only when Step 1 found existing test cases for the feature under test. The basics are already covered, so the user may want a specific angle.
+
+Also skip this step for "smoke" scope.
+
+If the user already named a role or focus (in the prompt or via ✏️ Other in Step 2, e.g. "security edge cases"), apply the matching role without asking.
+
+When ask for a role:
+
+- Show the roles (markdown table with name and short description) and ask the user to pick one. Recommend a role based on context and on what the existing test cases don't cover yet.
 - Use ⚙️ default if the user does not specify a role.
 - If the user selects 🔧 other, ask them to define a custom role.
 - If you show only some roles, add a "Show all available roles" option:
