@@ -49,6 +49,7 @@ Read [references/behaviors.md](references/behaviors.md) and [references/layout.m
 - Name areas and features from the product and user's perspective, NOT from the code/stack/files/classes/etc.
 - Domain terms (prefer the docs' terms), one term per concept across the wiki.
 - Update catalog file names and content as you get more info about the features.
+- Treat and describe features as end-to-end flows or use cases, not just "actions" from code.
 
 ## 1. Catalog
 
