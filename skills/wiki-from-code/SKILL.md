@@ -69,7 +69,7 @@ One subagent per area, in parallel (`update`: affected areas only). Each subagen
 Subagent, per feature, starting from its catalog links:
 
 1. In its catalog feature YAML: adds implementation files to `code`, and adds `tests`.
-2. Writes the feature page: Requirement, then Behaviors ([behaviors.md](references/behaviors.md)).
+2. Writes the feature page ([layout.md](references/layout.md) › Feature page): Description, then Behaviors ([behaviors.md](references/behaviors.md)).
 3. Returns one mismatch per disagreement: its kind and every section of a mismatch page ([layout.md](references/layout.md) › Mismatches).
 
 Subagent writes only inside its area, in `features/` and `features/.catalog/`. Catalog features found missing, misnamed, or misplaced → fix them in the area's catalog files. Anything outside the area (mismatch pages, catalog README, other areas) → return it.
@@ -94,7 +94,7 @@ Structure
 - [ ] Every `links`, `code`, and `tests` path exists in the repo
 
 Content
-- [ ] Every feature page has at least one behavior under Behaviors; every behavior passes the check in [references/behaviors.md](references/behaviors.md)
+- [ ] Every feature page has a Description and at least one behavior under Behaviors; every behavior passes the check in [references/behaviors.md](references/behaviors.md)
 - [ ] Every disagreement between code and claims has a mismatch page
 - [ ] update: resolved mismatches removed; nothing left for deleted code
 ```

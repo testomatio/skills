@@ -20,6 +20,12 @@
     {mismatch}.md            # one behavior, every source that disagrees
 ```
 
+## Feature page
+
+- Breadcrumb that matches folders.
+- Feature description.
+- `## Behaviors`: [behaviors.md](behaviors.md).
+
 ## Catalog feature YAML
 
 - No key (cause does not exist in code).
