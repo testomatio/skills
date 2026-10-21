@@ -1,13 +1,14 @@
 # Wiki layout
 
-`features/` mirrors `features-catalog/`: same areas and subareas, one feature page per catalog feature. Every folder has a README.
+`features/` mirrors `features/.catalog/`: same areas and subareas, one feature page per catalog feature. Every folder has a README. Tree may be updated while the wiki is built.
+
 
 ```
 {output}/                    # output folder
   README.md                  # sitemap, baseline commit
-  features-catalog/          # code catalog (catalog-features)
   features/
     README.md                # areas
+    .catalog/                # internal: code catalog (catalog-features)
     {area}/                  # any depth, as in the catalog
       README.md              # subareas and features
       {feature}.md           # feature page
@@ -25,7 +26,7 @@
 - `links` become `code` paths.
 
 ```yaml
-# features-catalog/checkout/pay-with-saved-card.yaml
+# features/.catalog/checkout/pay-with-saved-card.yaml
 title: Pay with saved card      # catalog-feature
 code:                           # implementation files
   - src/api/cards.ts
@@ -45,7 +46,7 @@ File name: follow existing file name pattern or kebab-case of the title by defau
 
 - `# Title`: the behavior in question, as the user meets it.
 - `Feature:` the feature area › title, linked to its feature page.
-- `## Difference`: one bullet for the code, first, then one per claim; claims that agree grouped on one bullet. Each bullet: the source, then its behavior. Write each side so it is clear alone: the condition, then what the user gets.
+- `## Difference`: first a one-sentence summary of how they differ, then one bullet for the code, first, then one per claim; claims that agree grouped on one bullet. Each bullet: the source, then its behavior. Write each side so it is clear alone: the condition, then what the user gets.
 - `## Impact`: level first: **High** (users blocked, data or money wrong), **Medium** (a workaround exists), **Low** (wording, cosmetic). Then who meets it, when, and what they see or cannot do.
 - `## Solution`: suggested fix: change the code, or correct the claim.
 - `## Sources`: evidence, one row per source; Code row always, first. Code, Comment, Docstring, README, Developer docs, API spec, Config, Infra, Test, etc.
@@ -59,6 +60,8 @@ File name: follow existing file name pattern or kebab-case of the title by defau
 Feature: [Reports › Upload results](../features/reports/upload-results.md)
 
 ## Difference
+
+The code retries a failed upload 3 times; the docstring and developer docs say 5.
 
 - **Code:** A failed upload is retried 3 times, then the run shows "Upload failed".
 - **Docstring, developer docs:** A failed upload is retried 5 times.

@@ -17,7 +17,7 @@ Output folder:
   - default: `wiki/` (in the repo root)
   - or given by calling skill or the user
   - all paths are relative inside the output folder
-  - if there is `features-catalog/` dir → move it into the output folder
+  - if there is `features-catalog/` dir → move it to `features/.catalog/`
 
 **Mismatch** is a disagreement between code and a claim about it (comment, docstring, developer docs, API spec, config, infra, test). They could differ, be not implemented, not used, etc.
 
@@ -52,7 +52,7 @@ Read [references/behaviors.md](references/behaviors.md) and [references/layout.m
 
 ## 1. Catalog
 
-Run `catalog-features` skill on the repo, same mode, output folder `features-catalog/`.
+Run `catalog-features` skill on the repo, same mode, output folder `features/.catalog/`.
 
 `update`: get the baseline commit > `git diff --name-status -M {baseline}..HEAD` > process updated/removed files accordingly.
 
@@ -64,7 +64,7 @@ Write the `features/` indexes before any feature page.
 
 ## 3. Feature pages
 
-One subagent per area, in parallel (`update`: affected areas only). Each subagent gets: the area, its subareas and catalog features (feature YAMLs), allowed code paths, the Domain from `features-catalog/README.md`, the rules above, [references/behaviors.md](references/behaviors.md), [references/layout.md](references/layout.md). `update` also: the area's existing pages and mismatches, and its changed features.
+One subagent per area, in parallel (`update`: affected areas only). Each subagent gets: the area, its subareas and catalog features (feature YAMLs), allowed code paths, the Domain from `features/.catalog/README.md`, the rules above, [references/behaviors.md](references/behaviors.md), [references/layout.md](references/layout.md). `update` also: the area's existing pages and mismatches, and its changed features.
 
 Subagent, per feature, starting from its catalog links:
 
@@ -72,14 +72,14 @@ Subagent, per feature, starting from its catalog links:
 2. Writes the feature page: Requirement, then Behaviors ([behaviors.md](references/behaviors.md)).
 3. Returns one mismatch per disagreement: its kind and every section of a mismatch page ([layout.md](references/layout.md) › Mismatches).
 
-Subagent writes only inside its area, in `features/` and `features-catalog/`. Catalog features found missing, misnamed, or misplaced → fix them in the area's catalog files. Anything outside the area (mismatch pages, catalog README, other areas) → return it.
+Subagent writes only inside its area, in `features/` and `features/.catalog/`. Catalog features found missing, misnamed, or misplaced → fix them in the area's catalog files. Anything outside the area (mismatch pages, catalog README, other areas) → return it.
 
 Subagent returns: files added, changed, and removed; mismatches (`update`: also resolved ones); changes outside its area; open questions; catalog errors; terms the Domain lacks.
 
 ## 4. Merge
 
-1. Apply the changes subagents returned outside their areas, including links to renamed or moved pages. Terms the Domain lacks → add to the Domain in `features-catalog/README.md`.
-2. Update every `README.md` in `features/` to list the feature pages that now exist. Write the root `README.md`: a link and purpose for each folder, plus the baseline commit.
+1. Apply the changes subagents returned outside their areas, including links to renamed or moved pages. Terms the Domain lacks → add to the Domain in `features/.catalog/README.md`.
+2. Update every `README.md` in `features/` to list the feature pages that now exist. Write the root `README.md`: a link and purpose for each folder (not `.catalog/`), plus the baseline commit.
 3. Write the mismatch pages subagents returned. Same disagreement from several areas → one mismatch page.
 4. Two terms for one concept → keep one, fix the pages that use the other.
 5. `update`: remove resolved mismatches.

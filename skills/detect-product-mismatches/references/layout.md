@@ -8,8 +8,8 @@ mismatches/                  # output folder
   sources/
     README.md                # every catalog here: name, type, role, link, Date
     {name}/                  # source name
-      features-catalog/      # `catalog-features` skill output
-      features/              # [optional] feature pages (wiki-from-code), when present
+      features/              # feature pages (wiki-from-code), when present
+        .catalog/            # internal: `catalog-features` skill output
   mismatches/
     README.md                # index
     {mismatch}.md            # one mismatch per disagreement, every compared source
@@ -44,7 +44,7 @@ File name: follow existing file name pattern or kebab-case of the title by defau
 
 - `# Title`: the behavior in question, as the user meets it.
 - `Feature:` the feature area › title; link to its feature page in `features/`, when present.
-- `## Difference`: one bullet per side, code first when compared; sources that agree grouped on one bullet. Each bullet: the sources (key or name), then their behavior. Write each side so it is clear alone: the condition, then what the user gets. Not implemented: the code bullet says what is missing and where it was searched.
+- `## Difference`: first a one-sentence summary of how they differ, then one bullet per side, code first when compared; sources that agree grouped on one bullet. Each bullet: the sources (key or name), then their behavior. Write each side so it is clear alone: the condition, then what the user gets. Not implemented: the code bullet says what is missing and where it was searched.
 - `## Impact`: level first: **High** (users blocked, data or money wrong), **Medium** (a workaround exists), **Low** (wording, cosmetic). Then who meets it, when, and what they see or cannot do.
 - `## Likely cause`: SKILL.md › Likely cause, with the dates that decide it.
 - `## Solution`: suggested fix, from the likely cause: Bug → change the code; Stale requirement → update the requirement; Stale docs → update the docs; Decide → the options for the product owner.
@@ -59,6 +59,8 @@ File name: follow existing file name pattern or kebab-case of the title by defau
 Feature: [Checkout › Pay with saved card](../sources/code/features/checkout/pay-with-saved-card.md)
 
 ## Difference
+
+The code lists expired saved cards at checkout, greyed out; Confluence says they are not listed.
 
 - **Code, PAY-112:** Expired saved cards are listed at checkout, greyed out and not selectable.
 - **Confluence "Saved cards":** Expired saved cards are not listed at checkout.

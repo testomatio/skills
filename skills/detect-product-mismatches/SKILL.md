@@ -128,7 +128,7 @@ Structure
 
 Content
 - [ ] Each page has every section of [layout.md](references/layout.md) › Page and one row per compared source; silent sources marked silent with where searched
-- [ ] Each Difference bullet is clear alone: sources, condition, what the user gets; the title doesn't say which side is right
+- [ ] Difference opens with a one-sentence summary; each bullet is clear alone: sources, condition, what the user gets; the title doesn't say which side is right
 - [ ] Every page was confirmed in Verify; nothing from Not a mismatch is a page
 - [ ] Every behavior on the pages passes the check in [references/features.md](references/features.md)
 - [ ] update: resolved pages removed
