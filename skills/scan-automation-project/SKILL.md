@@ -36,7 +36,7 @@ All persistent QA metadata lives in `.testeiya/` in the project root.
 - `<name>/`: a linked or cloned external project, named after its source. Read-only reference.
 - `requirements/`: user stories and acceptance criteria (pdfs, docs, images).
 - `docs/`: feature explanations, test planning and strategy files. Prose for humans, never data dumps.
-- `manual-tests/`: markdown test cases pulled from Testomat.io.
+- `test-cases/`: markdown test cases pulled from Testomat.io.
 - `auto-tests/`: references to the relevant automated (e2e) tests.
 - `exploratory/`: explorbot setup.
 - `project-info.json`: the project's settings as Testomat.io reports them, when cached.
@@ -53,13 +53,13 @@ Rules:
 | This project has | Store pulled data in |
 | ------------------ | ---------------------- |
 | **Source code** (`src/` folder) or **big project** | `.testeiya/…` |
-| **Only test infrastructure** (e2e dirs like `tests/`, `playwright/`, `cypress/` but no `src/`) | `manual-tests/` or `e2e-tests/` |
-| **Empty / manual-only** | `manual-tests/` |
+| **Only test infrastructure** (e2e dirs like `tests/`, `playwright/`, `cypress/` but no `src/`) | `test-cases/` or `e2e-tests/` |
+| **Empty / manual-only** | `test-cases/` |
 
 Detection logic:
 1. Has `src/` folder or is a monorepo? → Use `.testeiya/`
-2. Has e2e test dirs (`tests/`, `playwright/`, `cypress/`, `e2e/`)? → Use tracked folder (`manual-tests/`, `e2e-tests/`)
-3. Otherwise → Default to `manual-tests/`
+2. Has e2e test dirs (`tests/`, `playwright/`, `cypress/`, `e2e/`)? → Use tracked folder (`test-cases/`, `e2e-tests/`)
+3. Otherwise → Default to `test-cases/`
 
 - The rule covers *pulled* data only. Output a skill *produces* and the user wants — a `coverage.*.yml`, new `*.test.md` files — goes in the repo as normal.
 - On a source repo with no manual tests, this skill changes no tracked file: it only creates the self-ignored `.testeiya/` directory.
@@ -107,7 +107,7 @@ A `*.test.md` file is a suite. Each test inside it is a `<!-- test ... -->` bloc
 - `type: automated`: a **reference** to an automated test (see below).
 - No `type:` line at all: treat as manual. This is common, so never count manual tests by grepping for `type: manual`; it silently undercounts.
 
-Know the counts before you answer anything about project scope, coverage or progress. Read them straight from the files; this mirrors how Testomat.io parses them. `find .` also looks inside `.testeiya/manual-tests/`, so a re-run after a pull finds the cached cases instead of reporting "no manual tests":
+Know the counts before you answer anything about project scope, coverage or progress. Read them straight from the files; this mirrors how Testomat.io parses them. `find .` also looks inside `.testeiya/test-cases/`, so a re-run after a pull finds the cached cases instead of reporting "no manual tests":
 
 ```bash
 # one line per suite or test: SUITE <title>, or <type> <title>
@@ -127,7 +127,7 @@ find . -name "*.test.md" -exec awk '
 
 Pipe the output into `grep -c '\[manual\]'` or `grep -c '\[automated\]'` to count one kind.
 
-- If the only `.test.md` files are under `.testeiya/manual-tests/`, say so in the inventory: they came from Testomat.io, not from this repo.
+- If the only `.test.md` files are under `.testeiya/test-cases/`, say so in the inventory: they came from Testomat.io, not from this repo.
 - A source checkout with no `*.test.md` files has nothing to count. Say so; do not estimate.
 
 ### Automated tests
@@ -186,7 +186,7 @@ Return one structured markdown result directly. **Do NOT save to a file.**
 ## Test Inventory
 
 - **Automated Tests:** 10 files (Playwright)
-- **Manual Tests:** 37 cases (`.testeiya/manual-tests/`, pulled from Testomat.io)
+- **Manual Tests:** 37 cases (`.testeiya/test-cases/`, pulled from Testomat.io)
 - **Automated References:** 12 (implementation lives in another repository)
 
 ### Manual Tests (20 of 37 shown)

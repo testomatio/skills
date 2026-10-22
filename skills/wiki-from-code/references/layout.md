@@ -1,94 +1,93 @@
 # Wiki layout
 
-Product-agnostic. Name `{area}` / `{feature}` (and any extra group folders) from **what the product does**, not from the stack. Follow naming rules according to code/language used (kebab-case by default). Same relative path in `capabilities/` and `catalog/`.
+`features/` mirrors `features/.catalog/`: same areas and subareas, one feature page per catalog feature. Every folder has a README. Tree may be updated while the wiki is built.
 
-Default tree is multiple levels under `capabilities/`. Add sub-folders (with required depth) when the project is complex enough that an area needs a named group. Each with a README.
 
 ```
-wiki/
-  README.md                        # front door → roots
-  capabilities/                    # Wiki > Capabilities
-    README.md                      # areas index
-    {area}/                        # Wiki > Capabilities > {Area}
-      README.md                    # features index
-      {feature}.md                 # Wiki > … > {Feature}  — leaf
-      {group}/                     # optional extra nesting
-        README.md
-        {feature}.md
-  catalog/                         # Wiki > Catalog  — list of functionalities
-    README.md                      # areas index
-    {area}/
-      README.md                    # YAML index
-      {feature}.yaml
-      {group}/
-        README.md
-        {feature}.yaml
-  mismatches/                      # optional — create when a disagreement exists
-    README.md
+{output}/                    # output folder
+  README.md                  # sitemap, baseline commit
+  features/
+    README.md                # areas
+    .catalog/                # internal: code catalog (catalog-features)
+    {area}/                  # any depth, as in the catalog
+      README.md              # subareas and features
+      {feature}.md           # feature page
+      {subarea}/             # as in the catalog
+        README.md            # subareas and features
+        {feature}.md         # feature page
+  mismatches/                # code vs claims in the repo
+    README.md                # index
+    {mismatch}.md            # one behavior, every source that disagrees
 ```
 
-Create `mismatches/` when code disagrees with comments, infra, docs, issues etc.
+## Feature page
 
-## Rules
+- Breadcrumb that matches folders.
+- Feature description.
+- `## Behaviors`: [behaviors.md](behaviors.md).
 
-| Rule | Do |
-| --- | --- |
-| Default | `capabilities/{area}/{feature}.md` |
-| Extra depth | New group folder when the area (or group) is too crowded or a cluster needs a name. Any depth. |
-| Split | New sibling `{feature}.md`, a new group folder, or a new `{area}/`. |
-| Share | One page owns a shared rule; others link. Same behavior, two entries → one page. |
-| Growth | New behavior → new leaf + catalog entry + one new index line. Do not thicken an existing leaf into a mega-page. |
-| Overview first | Indexes exist before any leaf is written. |
+## Catalog feature YAML
 
-## Formatting
-
-Every page: `# Title`, then a breadcrumb that matches folders, then the body. Omit empty sections. Relative links only.
-
-**Index** (any `README.md`): title + breadcrumb + a bullet list. No Requirement or Acceptance.
-
-| File | Body |
-| --- | --- |
-| `wiki/README.md` | Roots (`capabilities/`, `catalog/`, `changes/` / `mismatches/` (if present)) |
-| `capabilities/README.md` | Every area: link + purpose (markdown indexes only — not catalog YAML) |
-| `capabilities/{area}/README.md` | Every child feature (or group): link + purpose |
-| Extra group `README.md` | Every child feature (or deeper group): link + purpose |
-| `catalog/README.md` | Every area: link to that area’s catalog README |
-| `catalog/{area}/README.md` | Every child YAML: link + purpose (YAML indexes only — not feature pages) |
-
-**Leaf** (`{feature}.md`): headings in this order only — Requirement, Acceptance. After the breadcrumb, a relative link to the paired catalog YAML. Intended-but-unwired behavior is not a feature heading — it goes in `mismatches/` only. Code and tracker references live in catalog YAML (`sources`, `tests`, `issues`), never on the feature page.
-
-## Catalog YAML
+- No key (cause does not exist in code).
+- `links` become `code` paths.
 
 ```yaml
-wiki_path: capabilities/{area}/{feature}.md
-entry:
-  - POST /api/v1/orders
-  - UI /checkout
-  - Job SettlePayments
-sources:
-  - path/to/code
-tests:
-  - TestOrSpecFile
-issues:                    # optional; omit the key when none
-  - key: PROJ-123
-    url: https://example.com/browse/PROJ-123
-behaviors:
-  - One as-implemented fact (observable outcome).
+# features/.catalog/checkout/pay-with-saved-card.yaml
+title: Pay with saved card      # catalog-feature
+code:                           # implementation files
+  - src/api/cards.ts
+tests:                          # tests that cover the feature
+  - test/checkout/cards.spec.ts
 ```
 
-`entry` is whatever a human would use to *find* the behavior. Catalog is **implicit** current state. One YAML per feature. If the feature sits in extra folders, the YAML uses the same folders.
+## Mismatches
 
-`wiki_path` is the pointer from catalog to the feature page. `sources` is the implementation (and product docs that describe it). `issues` is optional tracker links (tasks, issues, stories). `url` is required on each item; `key` when the tracker has a display key. Ask before adding. Omit `issues` when the user declined or nothing matched.
+`mismatches/README.md` missing → create it: `# Mismatches`, breadcrumb. Write the list of mismatches, grouped by kind (not implemented, differs, unwired/not used, etc.), highest impact first: page link + impact level.
 
-Repo paths (implementation, tests, docs) and tracker links are written only in catalog YAML.
+### Mismatch page
 
-## Mismatch page
+A reader learns what disagrees from the first lines, without opening the sources.
 
-Create `mismatches/` when code disagrees with comments, infra, docs, issues/tasks. Index: `mismatches/README.md`.
+File name: follow existing file name pattern or kebab-case of the title by default.
 
-Every mismatch must link every source that justifies it (omit none that exist):
+- `# Title`: the behavior in question, as the user meets it.
+- `Feature:` the feature area › title, linked to its feature page.
+- `## Difference`: first a one-sentence summary of how they differ, then one bullet for the code, first, then one per claim; claims that agree grouped on one bullet. Each bullet: the source, then its behavior. Write each side so it is clear alone: the condition, then what the user gets.
+- `## Impact`: level first: **High** (users blocked, data or money wrong), **Medium** (a workaround exists), **Low** (wording, cosmetic). Then who meets it, when, and what they see or cannot do.
+- `## Solution`: suggested fix: change the code, or correct the claim.
+- `## Sources`: evidence, one row per source; Code row always, first. Code, Comment, Docstring, README, Developer docs, API spec, Config, Infra, Test, etc.
+- Other info required to explain the mismatch.
 
-| Link | What to point at |
-| --- | --- |
-| Implemented | Always — current behavior based on code |
-| Intended | Always — the non-wiki source that disagrees with those files (comment, doc, infra, issue, unused config, or stub) |
+#### Example
+
+```markdown
+# Upload retries after a network error
+
+Feature: [Reports › Upload results](../features/reports/upload-results.md)
+
+## Difference
+
+The code retries a failed upload 3 times; the docstring and developer docs say 5.
+
+- **Code:** A failed upload is retried 3 times, then the run shows "Upload failed".
+- **Docstring, developer docs:** A failed upload is retried 5 times.
+
+## Impact
+
+Low. On a flaky network, "Upload failed" shows after 3 attempts, sooner than a developer reading the docs expects.
+
+## Solution
+
+Correct the docstring and developer docs: 3 retries.
+
+## Sources
+
+| Source         | Says                         | Link                        | Updated    |
+| -------------- | ---------------------------- | --------------------------- | ---------- |
+| Code (actual)  | Retries 3 times, then fails  | `src/upload/client.ts:40-52` | 2026-09-02 |
+| Docstring      | "Retries up to 5 times"      | `src/upload/client.ts:31`    | 2026-03-11 |
+| Developer docs | "5 retries before giving up" | `docs/upload.md:18`          | 2026-03-11 |
+```
+
+- `Link`: repo file: `path:lines`; outside the repo: URL, with the heading when the page is long.
+- `Updated`: repo file: date the cited line last changed (`git blame --date=short -L {line},+1 -- {path}`), doc section without a line: the section's last change; URL: the page's "last updated" date, else empty.

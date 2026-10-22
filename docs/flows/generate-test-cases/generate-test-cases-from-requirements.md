@@ -129,14 +129,14 @@ The agent guides you through **multiple interactive checkpoints** — it won't m
 
 Depending on your needs, you can let the agent make decisions automatically or steer it with your own feedback at every step.
 
-| Checkpoint               | What happens                                                                                                                                      |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Context review**       | Agent shows the sources it found; you confirm or add more                                                                                         |
-| **Coverage scope**       | 🚀 Smoke / ⚖️ Balanced / 🧨 Exhaustive / ✏️ Other; agent computes estimated test counts for your feature                                          |
-| **Tester role**          | Pick an agent proposed role if you want to focus on specific aspect of testing e.g. optimist, nerd, psycho (or just proceed with the default one) |
-| **Checklist approval**   | Review the structured checklist; provide your feedback                                                                                            |
-| **Test case generation** | Detailed test cases written to `.test.md` files                                                                                                   |
-| **Upload suggestion**    | Agent prompts you to push cases to Testomat.io via `sync-cases`                                                                                   |
+| Checkpoint               | What happens                                                                                                                                                                                |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Context review**       | Agent shows the sources it found; you confirm or add more                                                                                                                                   |
+| **Coverage scope**       | 🚀 Smoke / ⚖️ Balanced / 🧨 Exhaustive / ✏️ Other; agent computes estimated test counts for your feature                                                                                      |
+| **Tester role**          | Only when test cases for the feature already exist: pick an agent proposed role to focus on a specific aspect of testing e.g. optimist, nerd, psycho (or just proceed with the default one) |
+| **Checklist approval**   | Review the structured checklist; provide your feedback                                                                                                                                      |
+| **Test case generation** | Detailed test cases written to `.test.md` files                                                                                                                                             |
+| **Upload suggestion**    | Agent prompts you to push cases to Testomat.io via `sync-cases`                                                                                                                             |
 
 ### 4. Test case generation
 

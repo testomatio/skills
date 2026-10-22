@@ -3,7 +3,7 @@ name: detect-useless-tests
 description: Find useless tests within one testing level (unit, e2e, manual) and list them by area, file, and line for review. Use when asked "which tests can we delete?", "find useless tests", or "what in our suite is not worth keeping?".
 ---
 
-# Detect Useless Manual Tests
+# Detect Useless Tests
 
 Go through tests of the same level (unit, e2e, manual) and detect useless ones.
 User must provide exact locations of tests to check to identify the level of tests in pyramid.
