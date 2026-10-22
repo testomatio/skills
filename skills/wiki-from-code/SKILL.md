@@ -1,124 +1,111 @@
 ---
 name: wiki-from-code
 description: >-
-  Builds and refreshes a product wiki from the application source code (implicit requirements).
-  Optionally attaches issue-tracker task/issue/story links.
-  Use when the user asks to build or refresh the wiki/requirements/specification/docs from code, or to catalog existing functionality.
+  Builds a product wiki from the application source code or updates it after large code changes (release, refactor, many merged PRs).
+  Records mismatches between code and claims about it (comments, docstrings, developer docs, API specs, configs).
+  Use when the user asks to build or update the wiki/requirements/specification/docs from code.
 metadata:
   author: Testomat.io
-  version: 1.0.0
+  version: 2.0.0
 ---
 
 # Wiki from code
 
-Wiki of **how the product works now**. Bootstrap from code. Refresh when the code changes.
+Wiki of **how the product works now**: one page per feature, listing its behaviors, and mismatches between the code and other repo claims.
 
-We call this "wiki" as the closest term to what we are building. But user may ask for "requirements" or "specification" or "docs" or something similar.
+Output folder:
+  - default: `wiki/` (in the repo root)
+  - or given by calling skill or the user
+  - all paths are relative inside the output folder
+  - if there is `features-catalog/` dir → move it to `features/.catalog/`
 
-**Implicit** requirements means inferred from code. **Explicit** requirements means from issues/tasks/docs etc.
-
-Decide audience once:
-
-| Audience | Human wiki |
-| --- | --- |
-| End users (default, preferred) | Behavior and acceptance only. No file paths, types, stack, or protocol internals. |
-| Callers who are not end users (API, job, contract etc.) | Technical entry could be treated as requirements. |
+**Mismatch** is a disagreement between code and a claim about it (comment, docstring, developer docs, API spec, config, infra, test). They could differ, be not implemented, not used, etc.
 
 ## Modes
 
-Pick one. If unclear, **bootstrap** when `wiki/` is missing, else **refresh**.
-
-| Mode | When |
-| --- | --- |
-| `bootstrap` | First wiki from this repo |
-| `refresh` | Code moved; update implicit pages + catalog |
-
-Default root: `wiki/` (or the user’s path).
-
-Move from **overview** to **details**. Do not write feature pages before the tree exists.
+| Mode     | When                                                                                    |
+| -------- | --------------------------------------------------------------------------------------- |
+| `build`  | No `features/` or baseline in the root `README.md`, no git, or the user asks to rebuild |
+| `update` | `features/` and baseline exist: change only what the code changed since the baseline    |
 
 ## Steps
 
 ```
-- [ ] 1. Catalog (shallow)
-- [ ] 2. Tracker links? (ask; optional)
-- [ ] 3. Overview tree (indexes)
-- [ ] 4. Dive each area (one subagent each)
+- [ ] 1. Catalog
+- [ ] 2. Indexes
+- [ ] 3. Feature pages (one subagent per area)
+- [ ] 4. Merge
 - [ ] 5. Validate
 - [ ] 6. Report
 ```
 
-Read [references/layout.md](references/layout.md) before writing files.
+Read [references/behaviors.md](references/behaviors.md) and [references/layout.md](references/layout.md) before writing files.
 
 ## Rules
 
-- Current-state code wins any other source (e.g. docs, tests, config, infra, comments, issues etc). Intended, but not implemented (or implemented differently) behavior goes in `mismatches/` only — never a SHOULD heading on a feature page.
-- Name areas and features from the **product** and user perspective, not the stack or code.
-- Capabilities describe *what the product does*. Catalog records *where that lives in the repo*.
-- Pair capabilities and catalog items (use relative path) (`capabilities/{area}/{feature}.md` ↔ `catalog/{area}/{feature}.yaml`). Feature page: after breadcrumb, relative link to the YAML.
-- Tracker links (tasks, issues, stories, etc.) are optional. **Ask** before adding any. Put them in catalog YAML (`issues`), not on feature pages. Do not invent keys or URLs.
+- Source is the repository only.
+- **Current-state code wins** over claims (comments, docstrings, developer docs, API specs, configs, tests, etc.). What they claim that the code lacks or does differently goes in `mismatches/` only, never as a "should" on a feature page.
+- Write only paths that exist in the repo. Never guess or build them.
+- Name areas and features from the product and user's perspective, NOT from the code/stack/files/classes/etc.
+- Domain terms (prefer the docs' terms), one term per concept across the wiki.
+- Update catalog file names and content as you get more info about the features.
+- Treat and describe features as end-to-end flows or use cases, not just "actions" from code.
 
-## 1. Catalog (shallow)
+## 1. Catalog
 
-The **catalog** is what exists in the product: first a shallow area → feature list, then YAML facts in `catalog/`. Code, test, doc, and issue tracker links live here (`sources`, `tests`, `wiki_path`, `issues`).
+Run `catalog-features` skill on the repo, same mode, output folder `features/.catalog/`.
 
-From **code** map the product into **areas**, each with a **feature list**. That list *is* the catalog of what exists in the product at this step. Do not draft Requirement/Acceptance or YAML yet.
+`update`: get the baseline commit > `git diff --name-status -M {baseline}..HEAD` > process updated/removed files accordingly.
 
-If an area is large, group features into sub-folders at this step. Catalog YAML uses the same relative path as the feature page.
+## 2. Indexes
 
-## 2. Tracker links (optional)
+Write the `features/` indexes before any feature page.
 
-**Ask the user** whether to attach issue-tracker links (tasks, issues, stories, etc.) to catalog YAML.
+[layout.md](references/layout.md)
 
-If none of MCP / user-supplied links work: skip with reason. Do not write placeholder tickets.
+## 3. Feature pages
 
-Write only into catalog YAML (`issues`). Omit the `issues` key when a feature has no match.
+One subagent per area, in parallel (`update`: affected areas only). Each subagent gets: the area, its subareas and catalog features (feature YAMLs), allowed code paths, the Domain from `features/.catalog/README.md`, the rules above, [references/behaviors.md](references/behaviors.md), [references/layout.md](references/layout.md). `update` also: the area's existing pages and mismatches, and its changed features.
 
-## 3. Overview tree
+Subagent, per feature, starting from its catalog links:
 
-Write only the indexes first ([references/layout.md](references/layout.md)). Give the tree hierarchy when the product is complex enough. If names are ambiguous, **stop and show the list** before diving.
+1. In its catalog feature YAML: adds implementation files to `code`, and adds `tests`.
+2. Writes the feature page ([layout.md](references/layout.md) › Feature page): Description, then Behaviors ([behaviors.md](references/behaviors.md)).
+3. Returns one mismatch per disagreement: its kind and every section of a mismatch page ([layout.md](references/layout.md) › Mismatches).
 
-Shared rules live on one page; others link.
+Subagent writes only inside its area, in `features/` and `features/.catalog/`. Catalog features found missing, misnamed, or misplaced → fix them in the area's catalog files. Anything outside the area (mismatch pages, catalog README, other areas) → return it.
 
-## 4. Dive each area
+Subagent returns: files added, changed, and removed; mismatches (`update`: also resolved ones); changes outside its area; open questions; catalog errors; terms the Domain lacks.
 
-For each feature: catalog YAML first (`catalog/{area}/{feature}.yaml`), then the feature page (Requirement / Acceptance). Stubs, unused wiring, and doc-vs-code gaps go in `mismatches/` with all required source links (layout).
+## 4. Merge
 
-Use `subagent` per area/feature to keep the main agent focused on the helicopter view, subagents focused on the details of one area/feature.
-
-Each subagent gets: area/feature name, allowed paths, audience, [references/layout.md](references/layout.md), "code wins", and whether tracker `issues` are in scope (matched links to write, or omit). Feature pages are Requirement / Acceptance only. Do not rewrite sibling areas except to add the one index line the parent asked for.
-
-Subagent returns: files written, mismatches, open questions. Parent merges links and sitemap; then validates.
-
-Exception: a one-line fix on an existing page already in context — no subagent spawn.
+1. Apply the changes subagents returned outside their areas, including links to renamed or moved pages. Terms the Domain lacks → add to the Domain in `features/.catalog/README.md`.
+2. Update every `README.md` in `features/` to list the feature pages that now exist. Write the root `README.md`: a link and purpose for each folder (not `.catalog/`), plus the baseline commit.
+3. Write the mismatch pages subagents returned. Same disagreement from several areas → one mismatch page.
+4. Two terms for one concept → keep one, fix the pages that use the other.
+5. `update`: remove resolved mismatches.
+6. In `mismatches/README.md`, write the mismatches list ([layout.md](references/layout.md) › Mismatches).
 
 ## 5. Validate
 
 ```markdown
 Structure
-- [ ] wiki/README.md is a sitemap; every listed link exists
-- [ ] catalog YAML exists for every feature; every wiki_path exists
-- [ ] catalog/README.md indexes every area; each area catalog README lists its YAML
-- [ ] Area (and group) folders named from the product, not from stack/code
-- [ ] Feature pages use the layout heading order (Requirement, Acceptance); breadcrumbs match folder depth; links are relative
-- [ ] Feature pages link to the paired catalog YAML (relative path)
-- [ ] Feature pages are not mega-dumps (one cluster per page)
-- [ ] Feature pages not overloaded with meta info (it is located in catalog YAML)
-- [ ] Tracker links are in catalog YAML (`issues`); omitted when declined or none matched; no invented keys/URLs
+- [ ] README.md is a sitemap with the baseline commit
+- [ ] Every catalog feature has a feature page, and its feature YAML lists the rest of its implementation files in `code` and its tests in `tests`; `features/` mirrors the catalog's areas and subareas
+- [ ] Every `links`, `code`, and `tests` path exists in the repo
 
 Content
-- [ ] Features described from the user perspective, not the stack/code
-- [ ] Catalog is YAML facts, not a second spec
-- [ ] Current-state Requirement matches code
-- [ ] mismatches/ covers disagreements (between code and other sources)
+- [ ] Every feature page has a Description and at least one behavior under Behaviors; every behavior passes the check in [references/behaviors.md](references/behaviors.md)
+- [ ] Every disagreement between code and claims has a mismatch page
+- [ ] update: resolved mismatches removed; nothing left for deleted code
 ```
 
 ## 6. Report
 
-Where to start from. Results. Mismatches. Huge projects: those three only.
+Where to start. Results (`update`: features added, changed, removed). Mismatches by kind, highest user impact first. Catalog errors. Open questions.
 
 ## Next actions
 
-- Explain a capability in QA language → `qa-explain-behavior`
-- Risk scenarios for a capability → `qa-thinking`
-- Test cases for capability/feature → `qa-write-test-cases`
+- Compare with issues, requirements, user docs → `detect-product-mismatches`
+- Explain a feature in QA language → `qa-explain-behavior`
+- Test cases for a feature → `qa-write-test-cases`
