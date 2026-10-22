@@ -3,7 +3,7 @@
 The tree mirrors how the source groups its content: code areas, epics, page tree, docs nav.
 
 ```
-{features-catalog}/                    # output folder
+features/.catalog/           # output folder
   README.md                  # source facts, counts, areas, ungrouped features
   {area}/                    # code area, epic, parent page, nav section; any depth
     README.md                # the area's own link/path, subarea if any, its features

@@ -12,7 +12,7 @@ metadata:
 
 Catalog of **the source's features**: a tree that mirrors the source, each feature with its key, title, and link. Its behaviors (description, requirements, acceptance criteria, etc.) stay at the source.
 
-Output folder: given by the calling skill or the user. Default: `features-catalog/`. Write only inside it.
+Output folder: given by the calling skill or the user. Default: `features/.catalog/`. Write only inside it.
 
 ## Modes
 
