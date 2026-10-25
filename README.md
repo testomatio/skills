@@ -34,7 +34,7 @@ For other ways of installation (Claude Code plugin, Codex, Cursor etc.) see [ins
 | `wiki-from-code` | Build a whole-product wiki from code (actual behavior), or update it after large changes; flags mismatches with comments, dev docs, configs |
 | `catalog-features` | Catalog the features of one source — codebase, issue tracker (JQL), requirements space, or user docs — as key, title, and link, mirroring the source structure |
 | `detect-product-mismatches` | Compare code, issues, requirements, and user docs with each other — what is not implemented, differs, unspecified, or undocumented |
-| `qa-requirement-reviewer` | Review requirements for ambiguity, gaps, contradictions, and testability before development |
+| `epic-requirement-reviewer` | Review epics and features with their subissues: feature breakdown, ambiguities, risks, and acceptance criteria |
 | `qa-explain-behavior`  | Answer QA questions about product behavior — features, flows, rules, edge cases, and what is not implemented |
 | `qa-thinking`          | Analyze a feature from a QA perspective — edge cases, negative flows, abuses, unobvious scenarios |
 | `qa-pr-requirements-analyzer` | Extract original intent and acceptance criteria from a PR's title, description, comments, and linked tickets |
@@ -129,7 +129,7 @@ Skills are also bundled as [Claude Code plugins](https://docs.testomat.io) via t
 
 | Plugin            | Bundled skills                                                       | Use it to                                                                       |
 | ----------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `requirements`    | `write-user-story`, `wiki-from-code`, `catalog-features`, `detect-product-mismatches`, `qa-requirement-reviewer`, `qa-thinking`, `qa-explain-behavior`, `qa-pr-requirements-analyzer`, `pull-request-diff-analyzer` | Write, review, and analyze requirements and features before and during development |
+| `requirements`    | `write-user-story`, `wiki-from-code`, `catalog-features`, `detect-product-mismatches`, `epic-requirement-reviewer`, `qa-thinking`, `qa-explain-behavior`, `qa-pr-requirements-analyzer`, `pull-request-diff-analyzer` | Write, review, and analyze requirements and features before and during development |
 | `qa-process`      | `qa-lead-strategy-advisor`, `qa-explain-behavior`, `qa-thinking`, `testing-workflow` | Assess QA maturity, prioritize a quality roadmap, explain product behavior, and orchestrate the test lifecycle |
 | `test-management` | `qa-write-test-cases`, `improve-test-cases`, `sync-test-cases-with-tms`, coverage & more | Manage the test case lifecycle: generate, improve, sync to Testomat.io          |
 | `test-automation` | `automate-manual-test-cases`, `debug-fix-failed-flaky-autotests`, `qa-data-seeder` | Create automated tests, heal failing/flaky autotests, and seed test data        |

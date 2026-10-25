@@ -128,5 +128,5 @@ To a calling skill: features added, changed, and removed.
 
 - `detect-product-mismatches`
 - Feature pages from the code → `wiki-from-code`
-- `qa-requirement-reviewer`
+- `epic-requirement-reviewer`
 - Test cases from requirements → `qa-write-test-cases`
