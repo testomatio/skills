@@ -1,54 +1,69 @@
-# PR Requirements Summary — Example
+<!-- testeiya -->
+# Requirements Extraction — Examples
 
-A filled-in example of the artifact produced by the `qa-pr-requirements-analyzer` skill.
+These examples use fictional issues and URLs to illustrate extraction, not implementation review.
 
----
+## Linked issue with a requirement review
 
-## PR Requirements Summary
+### Source material
 
-**PR:** Add user export to CSV
-**Branch:** feature/PRJ-789-user-export → main
-**Type:** feature
-**Linked Tickets:** PRJ-789
+- PR links issue #42 and states that it adds CSV export of filtered users.
+- Issue #42 requests CSV export of the current filtered result set for administrators.
+- A requirement-review comment proposes an export notification for large result sets and asks which columns to include.
+- A later product decision specifies the columns `Name` and `Email`, but does not approve notifications.
 
-**Source of Truth:**
-- PR description: present (detailed, includes AC checklist and screenshot of the export modal)
-- Jira/GitHub ticket: resolved (PRJ-789)
-- Most reliable source: PR description + ticket (consistent, no conflicts)
+### Output
 
-**Changes Overview:** Adds a CSV export action on the user list page that streams all currently filtered users to a downloadable file, with an email notification when exports exceed 10k rows.
+```markdown
+## Linked requirements
 
-**Impacted Areas:**
-- User list page UI (new "Export" action).
-- User data export pipeline (CSV generation, streaming, email delivery).
-- Permission checks for export (admin-only).
+- [Export filtered users #42](https://github.com/example/product/issues/42) — administrator CSV export.
+- [Requirement review](https://github.com/example/product/issues/42#issuecomment-100) — column question resolved by later discussion; notification remains a proposal.
 
-**High Level Key files (up to 5):**
-- `src/pages/UserList.tsx` — source
-- `src/services/ExportService.ts` — source
-- `src/api/export.ts` — source
-- `src/components/ExportModal.tsx` — source
-- `i18n/en.json` — config
+## Expected behavior
 
-**Scope Verification:**
-- ✅ In scope: PRJ-789 AC1 (export button on the user list) — addressed in `src/pages/UserList.tsx` and `src/components/ExportModal.tsx`
-- ✅ In scope: PRJ-789 AC2 (admin-only) — addressed in `ExportService.ts` permission check
-- ⚠️ Out of scope: PRJ-789 AC3 (email notification for >10k exports) — no implementation found
-- ➕ Extra (not in ticket): i18n strings for German locale (`i18n/de.json`) — ticket only mentioned English
+- Administrators can export the current filtered user result set as CSV — [requirement](https://github.com/example/product/issues/42).
+- The CSV contains Name and Email columns — [product decision](https://github.com/example/product/issues/42#issuecomment-101).
+```
 
-**Ambiguities, Edge Cases & Open Questions:**
-- CSV column order not specified — needs product confirmation.
-- Concurrent exports by the same admin — no rate limiting or deduplication specified.
-- 50k+ user export (memory/timeout) — no performance budget in the ticket.
-- CSV date/time localization (UTC vs. user locale) — not specified.
-- Backward compatibility with existing scheduled exports (if any) — not addressed.
+The unapproved notification proposal is not included as expected behavior or raised as a blocker to the requested CSV export.
 
-**Acceptance Criteria:**
-- Admin opens user list with filters and clicks "Export" → modal appears with row count estimate
-- Admin starts export with <10k matching users → CSV downloads with columns `id, name, email, created_at` in that order
-- Non-admin opens user list → "Export" action is hidden (or returns 403 via API)
-- Admin triggers >10k user export → export is queued, email sent when ready *(NOT IMPLEMENTED — see Scope Verification)*
-- User without email is included → email field is empty string in CSV
-- Empty filtered list → button disabled OR empty CSV with header only
-- 50k+ user export completes without server timeout or OOM
-- German admin sees the export modal translated
+## Linked issue without a requirement review
+
+### Source material
+
+- PR links bug #57.
+- The issue says an explicitly selected priority is overwritten by defect severity.
+- Its expected behavior says that the selected priority must be preserved.
+
+### Output
+
+```markdown
+## Linked requirements
+
+- [Preserve selected issue priority #57](https://github.com/example/product/issues/57) — prevent defect severity from replacing an explicit priority.
+
+## Expected behavior
+
+- When a user supplies both defect severity and issue priority, the created issue keeps the selected priority — [expected behavior](https://github.com/example/product/issues/57).
+```
+
+No full requirement review or new acceptance criteria are needed.
+
+## Unresolved decision
+
+If the linked requirement instead says only “apply the appropriate priority” and no discussion defines that rule, include:
+
+```markdown
+## Unresolved decisions
+
+- What determines the issue priority when both a priority and defect severity are supplied? The requirement does not define precedence — [requirement](https://github.com/example/product/issues/57).
+```
+
+Do not infer precedence from the implementation.
+
+## No linked issue
+
+Even if the PR describes a feature and the code is accessible, output only:
+
+> No linked requirement found. Requirements extraction skipped.
