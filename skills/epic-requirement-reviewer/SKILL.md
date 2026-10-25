@@ -1,17 +1,10 @@
 ---
-name: qa-requirement-reviewer
-description: Review requirements before development. Identify ambiguity, missing information, contradictions, unclear acceptance criteria, logical gaps, edge cases, and testability issues. Determine whether the requirements are sufficiently clear for development and QA. Use this skill when a user provides requirements (BRD, user story, use case, feature ticket, specification, or prose) and asks for feedback, validation, review, or readiness assessment before implementation.
+name: epic-requirement-reviewer
+description: Review an epic or feature requirement together with its subissues and discussion. Produce a concise feature breakdown, material ambiguities, concrete risks, and high-level acceptance criteria. Use when a user supplies an epic, feature ticket, specification, or requirement and asks for a review, analysis, or feature breakdown. Accept issue links, documents, directories, and pasted text.
 license: MIT
 metadata:
   author: Testomat.io
   version: 1.0.0
----
-
-# QA Requirement Reviewer
-
----
-name: epic-requirement-reviewer
-description: "Review an epic or feature requirement together with its subissues and discussion. Produce a concise feature breakdown, material ambiguities, concrete risks, and high-level acceptance criteria."
 ---
 
 # Epic Requirement Reviewer
@@ -19,10 +12,6 @@ description: "Review an epic or feature requirement together with its subissues 
 Review an epic or feature proposal to explain what it delivers, identify consequential unresolved behavior, and describe how its outcomes can be accepted.
 
 The deliverable is a brief, useful feature analysis—not a sentence-by-sentence requirements audit, release assessment, or critique of ticket organization.
-
-## When to use
-
-Use when a user supplies an epic, feature ticket, specification, or requirement and asks for a review, analysis, or feature breakdown. Accept issue links, documents, directories, and pasted text.
 
 ## Workflow
 

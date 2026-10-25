@@ -142,5 +142,5 @@ Where to start. Mismatches by highest user impact first. Missing features per so
 
 - Update a catalog → `catalog-features`; feature pages from code → `wiki-from-code`
 - User stories for not-implemented behavior → `write-user-story`
-- Review contradicting requirements → `qa-requirement-reviewer`
+- Review contradicting requirements → `epic-requirement-reviewer`
 - Test cases for differing behavior → `qa-write-test-cases`
