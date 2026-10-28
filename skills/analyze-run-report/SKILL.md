@@ -69,6 +69,7 @@ Read stderr warnings; detail and artifact downloads can fail without failing the
 - Split by two categories:
   - Defect: incorrect product behavior against a valid expectation.
   - Automation: faulty test, helper, expectation, locator, synchronization, environment, or fixture logic.
+  - Unsure: could be product defect but you can't say for sure (but try to look deeper into test intent, and where)
 - A timeout or HTTP error alone does not establish the category.
 - A passing retry alone does not prove flakiness or an automation issue.
 - **Cluster by shared origin, not similar error wording.**
@@ -83,17 +84,24 @@ Read stderr warnings; detail and artifact downloads can fail without failing the
 
 ## Output
 
+- Start report with full run URL 
+- If specific run widget available add it to report
 - Provide pie chart when available with discovered segments by number of affected tests
 - Provide extended report by clusters as table. Order desc by count.
 
-| Cluster | Count | Cause | File | Evidence |
-| --- | --- | --- | --- | --- | --- |
+| Category | Cluster | Count | Cause | File | Evidence |
+| --- | --- | --- | --- | --- | --- |--- |
 
+- Category must be one of following: Defect, Automation, Unknown. 
+- Unknown is your last resort. Try not to use it, if you suspect Defect or Automation. However, avoid words like 'likely' or 'suspected', be confident
+- Use emojis: 🤖 - automation, 🐞 - defect, 👻 - unknown
 - Use a titled rendered table when available; otherwise use bullet points in Markdown.
 - Include every member in the table or a linked appendix.
 - Link inspected report sections, artifacts and available test/run records.
+- Cluster. Avoid combining multiple clusters in one with AND or / ,
 - If available use URL links to mentioned test cases 
 - If possible use relative paths to files
 - Do not paste raw stacks.
+- Severity must be set from:  ‼️ Critical, ⬆️ High, ℹ️ Medium, ⬇️ Low 
 
 - Write short summary as bullet points, make a best guess what should be fixed first. On automation - propose fixing cause that affects most tests. On defects - suggest fixing defect the most severe defects. List found defects with severity. If defects are severe ask to raise it.
