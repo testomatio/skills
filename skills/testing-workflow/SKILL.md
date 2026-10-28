@@ -28,6 +28,7 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 | `qa-e2e-tests-reporting`             | Add Testomat.io reporter to your automation project                               |
 | `automate-manual-test-cases`         | Convert manual test cases into automated test scripts (write new autotests)       |
 | `debug-fix-failed-flaky-autotests`   | Diagnose and fix failing or flaky autotests (heal autotests)                      |
+| `analyze-run-report`                 | Cluster a run's failures by origin; defects vs automation/environment issues      |
 | `qa-test-code-coverage`              | Map manual & automated tests to source files (`coverage.tests.yml`)               |
 | `setup-ci-automation`                | Investigate a project's CI and deploy automated QA workflows into it              |
 | `setup-change-aware-pr-testing`      | Set up CI so PRs create scoped runs and launch affected automated tests           |
