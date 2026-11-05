@@ -37,6 +37,6 @@ Each requirement has at least one AC. Mark AC with a short unique id (e.g. `AC-1
 
 ## Next actions
 
-- Review for gaps and testability → `qa-requirement-reviewer`
+- Review for gaps and testability → `epic-requirement-reviewer`
 - Risk scenarios → `qa-thinking`
 - Test cases from these user stories → `qa-write-test-cases`
