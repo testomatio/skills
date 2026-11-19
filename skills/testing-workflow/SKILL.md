@@ -17,7 +17,8 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 | `qa-thinking`                        | Analyze a feature as QA — edge cases, negative flows, abuses, risk scenarios      |
 | `qa-split-testing-levels-pyramid`    | Apply the test pyramid — assign scenarios to testing levels, coverage split       |
 | `write-user-story`                    | Write user stories and acceptance criteria (the requirements)                     |
-| `wiki-from-code`                     | Build a whole-product wiki from code, or update it after large changes            |
+| `requirements-from-code`             | Build a whole-product wiki from code, or update it after large changes            |
+| `requirements-from-expected`         | Build requirements from issues, requirements, user docs, or update them           |
 | `catalog-features`                   | Catalog features of one source: code, issue tracker, requirements, user docs      |
 | `detect-product-mismatches`          | Compare code, issues, requirements, user docs with each other — mismatches        |
 | `epic-requirement-reviewer`            | Review requirements for ambiguity, gaps, and testability                          |
@@ -40,7 +41,8 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 - Flows are examples, not exhaustive. Combine or extend them when a request spans several tasks.
 - When suggesting next steps, take into account the flows, context, user request, and results of previous steps.
 - **Write / draft user stories** (requirements, spec, acceptance criteria) → route to the `write-user-story` skill. Review of existing requirements → `epic-requirement-reviewer`.
-- **Wiki / spec from code** (build or update the whole-product wiki, actual behavior, implicit requirements) → route to the `wiki-from-code` skill.
+- **Wiki / spec from code** (build or update the whole-product wiki, actual behavior, implicit requirements) → route to the `requirements-from-code` skill.
+- **Requirements from issues, requirements, user docs** (build or update feature pages from what was intended) → route to the `requirements-from-expected` skill.
 - **Catalog features of a source** (codebase, Jira, Confluence, Notion, user docs, etc.; import or sync into the wiki) → route to the `catalog-features` skill.
 - **Compare sources** (code, issues, requirements, user docs: not implemented, differs, unspecified, undocumented) → route to the `detect-product-mismatches` skill.
 - **Behavior questions** ("what happens when…", "can a user…", "is X supported") ask what the product does rather than for an artifact → route to the `qa-explain-behavior` skill first, then continue with the flow the answer points to.
@@ -53,7 +55,7 @@ Orchestrates the test case lifecycle by routing requests to specialized skills a
 ```
 User: asks to build/update a wiki, requirements, or spec from the codebase
 =>
-Use `wiki-from-code` skill to build or update `wiki/` from implemented code
+Use `requirements-from-code` skill to build or update `wiki/` from implemented code
 =>
 After the wiki is written, suggest next actions:
 1. 🔍 Cross-check with issues, requirements, user docs (with `detect-product-mismatches` skill)
