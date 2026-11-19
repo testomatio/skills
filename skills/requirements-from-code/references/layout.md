@@ -1,24 +1,31 @@
-# Wiki layout
+# Requirements layout
 
-`features/` mirrors `features/.catalog/`: same areas and subareas, one feature page per catalog feature. Every folder has a README. Tree may be updated while the wiki is built.
+`features/` mirrors `features/.catalog/`: same areas and subareas, one feature page per catalog feature. Every folder has a README. Tree may be updated while the requirements are built.
 
 
 ```
-{output}/                    # output folder
-  README.md                  # sitemap, baseline commit
-  features/
-    README.md                # areas
-    .catalog/                # internal: code catalog (catalog-features)
-    {area}/                  # any depth, as in the catalog
-      README.md              # subareas and features
-      {feature}.md           # feature page
-      {subarea}/             # as in the catalog
-        README.md            # subareas and features
-        {feature}.md         # feature page
-  mismatches/                # code vs claims in the repo
-    README.md                # index
-    {mismatch}.md            # one behavior, every source that disagrees
+requirements/
+  README.md                  # index: every source folder, mismatches
+  actual/                    # strict name: how it works now
+    {source-name}/           # output folder: this repo's source folder
+      README.md              # summary, sitemap, baseline commit
+      features/
+        README.md            # areas
+        .catalog/            # internal: code catalog (catalog-features)
+        {area}/              # any depth, as in the catalog
+          README.md          # subareas and features
+          {feature}.md       # feature page
+          {subarea}/         # as in the catalog
+            README.md        # subareas and features
+            {feature}.md     # feature page
+      mismatches/            # code vs claims in this repo
+        README.md            # index
+        {mismatch}.md        # one behavior, every source that disagrees
+  expected/                  # strict name: other sources (requirements-from-expected); not written here
+  mismatches/                # mismatches between sources (detect-product-mismatches); not written here
 ```
+
+`actual` and `expected` are strict names: every source folder is inside one of them. The index `requirements/README.md` links every source folder and `mismatches/`.
 
 ## Feature page
 
