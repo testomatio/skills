@@ -1,23 +1,29 @@
 # Mismatches layout
 
-Reads catalogs (layout owned by `catalog-features`) and feature pages (owned by `wiki-from-code`); changes them only through those skills (SKILL.md › 2. Catalogs). Writes mismatch pages into `mismatches/`
+Reads source folders: catalogs and `.source/` (layout owned by `catalog-features`), feature pages (code: owned by `requirements-from-code`); changes them only through those skills (SKILL.md › 2. Catalogs). Writes mismatch pages into the output folder only.
 
 ```
-mismatches/                  # output folder
-  README.md                  # sitemap; one line each
-  sources/
-    README.md                # every catalog here: name, type, role, link, Date
-    {name}/                  # source name
-      features/              # feature pages (wiki-from-code), when present
+requirements/
+  README.md                  # index: every source folder, mismatches
+  actual/                    # strict name
+    {source-name}/           # source folder: code
+      features/              # feature pages (requirements-from-code), when present
         .catalog/            # internal: `catalog-features` skill output
-  mismatches/
-    README.md                # index
+      mismatches/            # code vs claims in the repo (requirements-from-code); not used here
+  expected/                  # strict name
+    {source-name}/           # source folder: issue tracker, requirements, user docs, other
+      features/              # feature pages, when present
+        .catalog/            # internal: `catalog-features` skill output
+      .source/               # raw source items; README: every item, its status and its feature
+      mismatches/            # contradictions inside this source; not used here
+  mismatches/                # output folder: mismatches between sources
+    README.md                # compared sources, index
     {mismatch}.md            # one mismatch per disagreement, every compared source
 ```
 
 ## Formatting
 
-Every page: `# Title`, then a breadcrumb that matches folders (links to the parent pages only), then the body. Mismatch pages: no breadcrumb. Relative links to pages in the output folder and to repo paths; source features as key + URL.
+README: `# Mismatches`, then a breadcrumb to the index, then the body. Mismatch pages: `# Title`, no breadcrumb. Relative links to pages in `requirements/` and to repo paths; source items as key + URL.
 
 ## Kinds
 
@@ -29,9 +35,9 @@ Every page: `# Title`, then a breadcrumb that matches folders (links to the pare
 
 ## README
 
-`mismatches/README.md` missing → create it: `# Mismatches`, breadcrumb. Write the mismatches list.
+Output `README.md` missing → create it: `# Mismatches`, breadcrumb. Write the mismatches list.
 
-1. Compared: one row per source: name, role, scope, history, catalog link, Date (code: baseline commit). Product version. Check date.
+1. Compared: one row per source: name, role, scope, history, source folder link, Date (code: baseline commit). Product version. Check date.
 2. Differs, Not implemented: one list per kind, highest impact first: page link + impact level + sources + likely cause.
 3. Missing features: one list per silent source (Not implemented, Unspecified, Undocumented, Missing in {source}): feature + where found (catalog feature links) + where searched.
 4. Open questions: vague behaviors, unread content, or unclear Scope that blocks a comparison.
@@ -43,7 +49,7 @@ A reader learns what disagrees from the first lines, without opening the sources
 File name: follow existing file name pattern or kebab-case of the title by default.
 
 - `# Title`: the behavior in question, as the user meets it.
-- `Feature:` the feature area › title; link to its feature page in `features/`, when present.
+- `Feature:` the feature area › title; link to its feature page in a source folder's `features/` (code first), when present.
 - `## Difference`: first a one-sentence summary of how they differ, then one bullet per side, code first when compared; sources that agree grouped on one bullet. Each bullet: the sources (key or name), then their behavior. Write each side so it is clear alone: the condition, then what the user gets. Not implemented: the code bullet says what is missing and where it was searched.
 - `## Impact`: level first: **High** (users blocked, data or money wrong), **Medium** (a workaround exists), **Low** (wording, cosmetic). Then who meets it, when, and what they see or cannot do.
 - `## Likely cause`: SKILL.md › Likely cause, with the dates that decide it.
@@ -56,7 +62,7 @@ File name: follow existing file name pattern or kebab-case of the title by defau
 ```markdown
 # Expired cards at checkout
 
-Feature: [Checkout › Pay with saved card](../sources/code/features/checkout/pay-with-saved-card.md)
+Feature: [Checkout › Pay with saved card](../actual/shop-web/features/checkout/pay-with-saved-card.md)
 
 ## Difference
 
@@ -79,12 +85,12 @@ Update the Confluence page "Saved cards": expired saved cards are listed at chec
 
 ## Sources
 
-| Source                 | Says                                                  | Link                                             | Updated    |
-| ---------------------- | ----------------------------------------------------- | ------------------------------------------------ | ---------- |
-| Code (actual)          | Expired saved cards are listed, greyed out            | `src/checkout/cards.ts:48-61`                    | 2026-08-30 |
-| Jira (intended)        | PAY-112: Expired saved cards are listed, not selectable | [PAY-112](https://example.atlassian.net/...)   | 2026-08-28 |
-| Confluence (intended)  | Expired saved cards are not listed                    | [Saved cards](https://example.atlassian.net/...) | 2026-01-10 |
-| User docs (documented) | silent                                                | Searched: docs/payments/, site search "expired"  |            |
+| Source                | Says                                                    | Link                                             | Updated    |
+| --------------------- | ------------------------------------------------------- | ------------------------------------------------ | ---------- |
+| Code (actual)         | Expired saved cards are listed, greyed out              | `src/checkout/cards.ts:48-61`                    | 2026-08-30 |
+| Jira (expected)       | PAY-112: Expired saved cards are listed, not selectable | [PAY-112](https://example.atlassian.net/...)     | 2026-08-28 |
+| Confluence (expected) | Expired saved cards are not listed                      | [Saved cards](https://example.atlassian.net/...) | 2026-01-10 |
+| User docs (expected)  | silent                                                  | Searched: docs/payments/, site search "expired"  |            |
 ```
 
 - `Says`: the source's behavior, as [features.md](features.md) › Behaviors describes; `silent` when it has none.

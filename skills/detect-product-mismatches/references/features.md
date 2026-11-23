@@ -1,16 +1,16 @@
 # Features
 
-A feature is something the product does for its users that they would name: "Pay with saved card", "Export report to CSV". In a catalog, one feature YAML is one feature of its source, in the area where the source puts it. Another source may name it differently or split it differently: e.g. one epic covers three code features, one docs page covers two.
+A feature is something the product does for its users that they would name: "Pay with saved card", "Export report to CSV". In a catalog, one feature YAML is one feature of its source, with links to the source items (issues, pages, code paths) that describe it. Another source may name it differently or split it differently: e.g. one epic covers three code features, one docs page covers two.
 
 A feature is made of behaviors: what someone who uses it (end user, admin, API client, integrated system) can do, see, or get, and when. Sources are compared behavior by behavior, so every source's behaviors are written the same way.
 
-Behavior is similar to requirement or acceptance criteria, but those terms describe intended behavior; code gives actual behavior, user docs documented behavior (`catalog-features` › Source roles). "Behavior" fits every role: implemented, planned, or documented.
+Behavior is similar to requirement or acceptance criteria, but those terms describe expected behavior; code gives actual behavior (`catalog-features` › Source roles). "Behavior" fits both roles: what the product does, and what it is expected to do.
 
 ## Find
 
 Per source:
 
-1. Catalog: key, title, the area it sits in. Links in the feature YAML to other sources help.
+1. Catalog: key, title, the area it sits in. Links in the feature YAML to other sources help. Expected sources: `.source/README.md` maps every source item to its feature.
 2. Not in the catalog → search the source, within the catalog's Scope:
 
 | Source        | Search                                                                                 |
@@ -22,12 +22,12 @@ Per source:
 | Other         | The source's own search                                                                |
 
 - Found at the source, missing from the catalog → use it and report a catalog error.
-- Found, but outside the catalog's Scope (open issue, draft, deprecated page or copy, other version) → not a behavior. Mention it on the mismatch page when it explains one.
+- Found, but not done (open issue, draft, deprecated page: `catalog-features` › Status) or outside the catalog's Scope (copy, other version) → not a behavior. Mention it on the mismatch page when it explains one.
 - Not found → the source is silent on the feature. Record where you searched.
 
 ## Read
 
-Read every matching feature at its links (documents: under its headings). Behaviors come from:
+Read every matching feature at its links (documents: under its headings); Expected sources: its source items in `.source/`, when present. Behaviors come from:
 
 | Source        | Behaviors from                                                                                                                                              | Not behaviors                                                                                                                                     |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -37,7 +37,7 @@ Read every matching feature at its links (documents: under its headings). Behavi
 | User docs     | Guides, how-tos, limits, notes and warnings; badges (plan, edition, role, platform) as conditions; navigation steps                                         | Screenshots and videos                                                                                                                            |
 | Test cases    | Expected results                                                                                                                                            | Steps, test data                                                                                                                                  |
 
-- Code behind a flag or setting that can be turned on → a behavior with that condition (as `wiki-from-code`).
+- Code behind a flag or setting that can be turned on → a behavior with that condition (as `requirements-from-code`).
 - Comments and later edits may change the body ("dropped", "moved to PROJ-456", "decided: 3 retries, not 5"): state the final behavior, never the comment.
 - Acceptance criteria may sit in a custom field, a description heading, a checklist, or sub-tasks: find the convention in the first issues.
 
@@ -46,7 +46,7 @@ Read every matching feature at its links (documents: under its headings). Behavi
 ### Shape
 
 - One behavior per line, one sentence, present tense.
-- No `should`, `shall`, `must`, `will`: state it as a fact. The source's role says whether it is actual, intended, or documented.
+- No `should`, `shall`, `must`, `will`: state it as a fact. The source's role says whether it is actual or expected.
 - Name who acts or what changes, in domain terms. Never "the system", "it", or "we".
 - Outcome is what the actor can observe (screen, response, file, email, notification), not how the product gets there.
 - Conditions stay in the behavior: role, platform, setting, state.
@@ -57,7 +57,7 @@ Read every matching feature at its links (documents: under its headings). Behavi
 ### Values and words
 
 - Values as the source states them, with units. No value in the source → none in the behavior. Never round, convert, or fill one in; a vague behavior stays vague (open question).
-- Code: exact values from the code that runs; a value read from config or environment: its default, marked `(configurable)` (as `wiki-from-code`).
+- Code: exact values from the code that runs; a value read from config or environment: its default, marked `(configurable)` (as `requirements-from-code`).
 - UI labels and messages verbatim, in quotes; navigation paths with `›`.
 - Domain terms (prefer the user docs' terms), one per concept across sources and `features/`.
 - No class, function, table, file, flag, or library names. Protocol details (endpoints, status codes, fields) only when the API is what users use.

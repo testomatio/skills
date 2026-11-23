@@ -43,4 +43,4 @@ Offer after the analysis:
 - Draft missing or unclear user stories → `write-user-story` skill.
 - Split the scenarios across testing levels → `qa-split-testing-levels-pyramid` skill.
 - Turn scenarios into test cases or a checklist → `qa-write-test-cases` skill.
-- Ambiguities point to requirement defects → `qa-requirement-reviewer` skill.
+- Ambiguities point to requirement defects → `epic-requirement-reviewer` skill.
