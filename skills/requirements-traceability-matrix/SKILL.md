@@ -15,15 +15,15 @@ Maps each requirement to the test cases that verify it, and each test case back 
 Input: the requirements and test cases the user points to.
 Output: one markdown file (path given by the user, defined by context or `traceability-matrix.md` by default).
 
-Build `forward` traceability matrix by default (requirements to test cases). But if user asks for a `backward` or `bidirectional` matrix, do it.
+By default build the `forward` matrix (requirements to test cases) and the orphan tests list. (The same for `bidirectional`: it shows gaps in both directions.) Build a `backward` matrix (test cases to requirements) only when the user asks for it.
 
 ## What is a requirement
 
 `Requirement` is anything describing a capability, feature, change, etc. It may be a requirement, acceptance criteria, user story, epic, spec or other artifact.
 
 The most atomic entity with identifier is used (until user asks for a different level of granularity).
-E.g. if user story contains ACs without identifiers, use the story as the requirement. If ACs have identifiers, use the ACs as the requirement.
-If amount of low level entities is too high, decide based on context or ask user.
+E.g. if user story contains ACs without identifiers, use the story as the requirement. If ACs have unique identifiers, use the ACs as the requirements.
+If number of low level entities is too high, decide based on context or ask user.
 
 ## Flow
 
@@ -35,17 +35,48 @@ If amount of low level entities is too high, decide based on context or ask user
 
   If requirements do not satisfy the "good enough" criteria (atomic, clear, complete, consistent, testable), suggest user to work on them first. E.g. user `write-user-story` skill.
 
-3. Identifiers should be unique and consistent
+1. Identifiers should be unique
 
-  Each requirement and test case should have a unique identifier. Make sure they: exist, are unique. If not – suggest/ask user to create/update them first.
+  Each requirement and each test case should have a unique identifier. Make sure they: exist, are unique. If not – suggest/ask user to create/update them first.
 
 4. Build the matrix
 
-## Rows
+## Matrix
 
-- **One row per requirement** (What is a requirement). Its ACs without identifiers stay inside that row.
-- Keep values, limits, roles, and messages as the source states them.
-- Requirements not to be built (Won't Do, Duplicate, future phase, out of scope) → no rows; list them under Excluded.
+- Requirement: the unit from "What is a requirement" section
+- **One row per requirement–test case pair.** Merge cells which cover the same requirement/test case pair.
+- Coverage: the requirement's verdict (Verdicts).
+- No pair: `—` in the missing ID cell.
+
+### Forward
+
+Requirements → test cases. Every requirement.
+
+| Req ID | Req Description                    | Coverage    | TC ID | TC Title                         |
+| ------ | ---------------------------------- | ----------- | ----- | -------------------------------- |
+| REQ-1  | Login to the app                   | Covered     | TC-1  | Login with valid credentials     |
+|        |                                    |             | TC-2  | Login with wrong password        |
+| REQ-2  | Reset password                     | Not covered | —     |                                  |
+| REQ-3  | Lock account after 5 failed logins | Partial     | TC-4  | Lock account after failed logins |
+
+### Orphan tests
+
+Test cases that cover no requirement. (It may verify a requirement outside the scope, so don't call it useless.)
+
+| TC ID | TC Title      |
+| ----- | ------------- |
+| TC-9  | Change avatar |
+
+### Backward
+
+On request only, instead of the forward matrix. Test cases → requirements. Every test case; orphan tests with `—`, no separate list.
+
+| TC ID | TC Title                     | Req ID | Req Description  |
+| ----- | ---------------------------- | ------ | ---------------- |
+| TC-1  | Login with valid credentials | REQ-1  | Login to the app |
+| TC-3  | Login, then log out          | REQ-1  | Login to the app |
+|       |                              | REQ-4  | Log out          |
+| TC-9  | Change avatar                | —      |                  |
 
 ## Evidence rule
 
@@ -69,19 +100,12 @@ Several tests may cover one requirement together: Covered when together they che
 
 ## Verdicts
 
-| Verdict     | Requirement                                                                                         |
-| ----------- | --------------------------------------------------------------------------------------------------- |
-| Covered     | Tests check every AC, condition, and value                                                          |
-| Partial     | Some ACs, conditions, or values are not checked; the note names them                                |
-| Not covered | No test checks it                                                                                   |
-| Unclear     | Not good enough to check (Flow › 2) and the user chose to go on; the note says what is missing      |
-
-## Backward
-
-`backward` and `bidirectional` only.
-
-- One row per test case: the requirements it covers, fully or partially, by the evidence rule.
-- Orphan test: covers no requirement in scope. List it; it may verify a requirement outside the scope, so never call it useless.
+| Verdict     | Requirement                                                                                    |
+| ----------- | ---------------------------------------------------------------------------------------------- |
+| Covered     | Tests check every AC, condition, and value                                                     |
+| Partial     | Some ACs, conditions, or values are not checked; the note names them                           |
+| Not covered | No test checks it                                                                              |
+| Unclear     | Not good enough to check (Flow › 2) and the user chose to go on; the note says what is missing |
 
 ## IDs
 
@@ -89,15 +113,12 @@ Requirement and test case IDs as the sources give them: issue key, AC key, `@T` 
 
 ## Output
 
-- Forward: Requirements → test cases.
-- Backward: Test cases → requirements, Orphan tests.
-- Bidirectional: both.
-- Omit empty Gaps subsections.
+Omit empty Gaps subsections.
 
 ```markdown
 # Traceability matrix: {scope}
 
-Direction: {forward | backward | bidirectional}. Requirements: {source, scope}. Test cases: {source, scope}. Date: {date}.
+Requirements: {source, scope}. Test cases: {source, scope}. Date: {date}.
 
 ## Summary
 
@@ -121,18 +142,13 @@ Test cases: {n} in scope, {n} orphan.
 ### Unclear
 - {requirement ID}: {title}. Missing: {what}
 
-### Orphan tests
-- {test ID}: {title}
+## Matrix
 
-## Requirements → test cases
+{forward or backward table}
 
-| Requirement | Verdict | Test cases | Note |
-| ----------- | ------- | ---------- | ---- |
+## Orphan tests
 
-## Test cases → requirements
-
-| Test case | Requirements | Note |
-| --------- | ------------ | ---- |
+{orphan tests table (only for forward matrix)}
 
 ## Excluded
 - {requirement ID}: {reason}
@@ -140,8 +156,9 @@ Test cases: {n} in scope, {n} orphan.
 
 ## Check
 
-- [ ] Every requirement in scope has a row or is under Excluded
-- [ ] Backward, bidirectional: every test case in scope has a row
+- [ ] Forward: every requirement has a row or is under Excluded
+- [ ] Forward: every test case is in the matrix or under Orphan tests
+- [ ] Backward: every test case has a row
 - [ ] Summary counts match the matrix
 
 ## Next actions
